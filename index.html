@@ -115,7 +115,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-count">2</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -149,6 +149,86 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://pr0b1em.github.io/2021/06/17/get_started_3dsctf_2016/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Pr0b1em">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="无稽之谈">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/17/get_started_3dsctf_2016/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-06-17 21:11:48 / 修改时间：21:15:22" itemprop="dateCreated datePublished" datetime="2021-06-17T21:11:48+08:00">2021-06-17</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="get-started-3dsctf-2016"><a href="#get-started-3dsctf-2016" class="headerlink" title="get_started_3dsctf_2016"></a>get_started_3dsctf_2016</h1><p>先查壳，32位，开了NX</p>
+<p><img src="D:\blog\Pr0b1emBlog\source\img\image-20210425011728468.png" alt="image-20210425011728468"></p>
+<p>IDA打开，main函数上的get_flag函数里发现一个flag.txt</p>
+<p><img src="D:\blog\Pr0b1emBlog\source\img\image-20210425011933854.png" alt="image-20210425011933854"></p>
+<p>继续跟进发现当满足一个条件时，可以打开flag.txt，即为a1 == 814536271 &amp;&amp; a2 == 425138641时</p>
+<p><img src="D:\blog\Pr0b1emBlog\source\img\image-20210425012146370.png" alt="image-20210425012146370"></p>
+<p>点击a1查看到了在栈中的位置</p>
+<p><img src="D:\blog\Pr0b1emBlog\source\img\image-20210425012353464.png" alt="image-20210425012353464"></p>
+<p>但是这两个位置在返回地址之后，无法利用溢出覆盖来实现控制</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/06/17/get_started_3dsctf_2016/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
