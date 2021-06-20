@@ -6,7 +6,7 @@
   <link href="https://pr0b1em.github.io/atom.xml" rel="self"/>
   
   <link href="https://pr0b1em.github.io/"/>
-  <updated>2021-06-18T03:16:37.048Z</updated>
+  <updated>2021-06-20T09:17:37.659Z</updated>
   <id>https://pr0b1em.github.io/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>ret2libc</title>
+    <link href="https://pr0b1em.github.io/2021/06/20/ret2libc/"/>
+    <id>https://pr0b1em.github.io/2021/06/20/ret2libc/</id>
+    <published>2021-06-20T07:26:12.000Z</published>
+    <updated>2021-06-20T09:17:37.659Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="ret2libc"><a href="#ret2libc" class="headerlink" title="ret2libc"></a>ret2libc</h1><p>libc是Linux下的ANSI C的函数库。</p><p>ret2libc即控制函数执行libc中的函数。通常选择执行system(“/bin/sh”)</p><h3 id="非执行堆栈"><a href="#非执行堆栈" class="headerlink" title="非执行堆栈"></a>非执行堆栈</h3><p>非执行堆栈是为避免堆或者堆栈的内存区域被植入恶意代码执行，当然也可以直接防止一部分内存被写入恶意代码。换句话说，这是个防止缓冲区溢出的功能。</p><p>当checksec发现NX(No-eXecute)开启后，其实就已经是非执行堆栈了，这时候就需要用到libc库。</p><h5 id="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"><a href="#libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖" class="headerlink" title="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"></a>libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖</h5><p>思路：</p><p>1.泄露 一个调用函数的 地址</p><p>2.获取 libc 版本</p><p>3.获取 system 地址与 /bin/sh 的地址</p><p>4.再次执行源程序</p><p>5.触发栈溢出执行 system(‘/bin/sh’)</p><p>shellcode结构：</p><p><img src="/img/shellcode.png"></p><p>正常堆栈布局：</p><p><img src="/img/1.png"></p><p>ret2libc执行system的堆栈布局：</p><p><img src="/img/2.png"></p><p>平常的shellcode在源程序里就能找到system函数和/bin/sh，而ret2libc类型的题差别就在这里，我们需要通过libc库查找到system函数和/bin/sh在源程序中的位置，然后才能构造shellcode进行夺权，最后拿下flag。</p>]]></content>
+    
+    
+    <summary type="html">&lt;h1 id=&quot;ret2libc&quot;&gt;&lt;a href=&quot;#ret2libc&quot; class=&quot;headerlink&quot; title=&quot;ret2libc&quot;&gt;&lt;/a&gt;ret2libc&lt;/h1&gt;&lt;p&gt;libc是Linux下的ANSI C的函数库。&lt;/p&gt;
+&lt;p&gt;ret2libc即控制函数执行libc中的函数。通常选择执行system(“/bin/sh”)&lt;/p&gt;
+&lt;h3 id=&quot;非执行堆栈&quot;&gt;&lt;a href=&quot;#非执行堆栈&quot; class=&quot;headerlink&quot; title=&quot;非执行堆栈&quot;&gt;&lt;/a&gt;非执行堆栈&lt;/h3&gt;&lt;p&gt;非执行堆栈是为避免堆或者堆栈的内存区域被植入恶意代码执行，当然也可以直接防止一部分内存被写入恶意代码。换句话说，这是个防止缓冲区溢出的功能。&lt;/p&gt;
+&lt;p&gt;当checksec发现NX(No-eXecute)开启后，其实就已经是非执行堆栈了，这时候就需要用到libc库。&lt;/p&gt;
+&lt;h5 id=&quot;libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖&quot;&gt;&lt;a href=&quot;#libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖&quot; class=&quot;headerlink&quot; title=&quot;libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖&quot;&gt;&lt;/a&gt;libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖&lt;/h5&gt;&lt;p&gt;思路：&lt;/p&gt;
+&lt;p&gt;1.泄露 一个调用函数的 地址&lt;/p&gt;
+&lt;p&gt;2.获取 libc 版本&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="笔记" scheme="https://pr0b1em.github.io/categories/%E7%AC%94%E8%AE%B0/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>blog诞生日2021.6.17</title>
