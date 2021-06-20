@@ -177,7 +177,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-06-20 15:26:12 / 修改时间：17:17:37" itemprop="dateCreated datePublished" datetime="2021-06-20T15:26:12+08:00">2021-06-20</time>
+              <time title="创建时间：2021-06-20 15:26:12 / 修改时间：17:19:32" itemprop="dateCreated datePublished" datetime="2021-06-20T15:26:12+08:00">2021-06-20</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -214,16 +214,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="ret2libc"><a href="#ret2libc" class="headerlink" title="ret2libc"></a>ret2libc</h1><p>libc是Linux下的ANSI C的函数库。</p>
-<p>ret2libc即控制函数执行libc中的函数。通常选择执行system(“/bin/sh”)</p>
-<h3 id="非执行堆栈"><a href="#非执行堆栈" class="headerlink" title="非执行堆栈"></a>非执行堆栈</h3><p>非执行堆栈是为避免堆或者堆栈的内存区域被植入恶意代码执行，当然也可以直接防止一部分内存被写入恶意代码。换句话说，这是个防止缓冲区溢出的功能。</p>
-<p>当checksec发现NX(No-eXecute)开启后，其实就已经是非执行堆栈了，这时候就需要用到libc库。</p>
-<h5 id="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"><a href="#libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖" class="headerlink" title="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"></a>libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖</h5><p>思路：</p>
-<p>1.泄露 一个调用函数的 地址</p>
-<p>2.获取 libc 版本</p>
+          <p>ret2libc类型题目解法</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/06/20/ret2libc/#more" rel="contents">
+              <a class="btn" href="/2021/06/20/ret2libc/">
                 阅读全文 &raquo;
               </a>
             </div>
