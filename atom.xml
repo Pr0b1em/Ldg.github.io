@@ -131,25 +131,6 @@
   </entry>
   
   <entry>
-    <title>CURL</title>
-    <link href="https://pr0b1em.github.io/2021/06/17/curl%E5%91%BD%E4%BB%A4%EF%BC%88http%E8%AF%B7%E6%B1%82%EF%BC%89/"/>
-    <id>https://pr0b1em.github.io/2021/06/17/curl%E5%91%BD%E4%BB%A4%EF%BC%88http%E8%AF%B7%E6%B1%82%EF%BC%89/</id>
-    <published>2021-06-17T10:17:26.000Z</published>
-    <updated>2021-06-18T03:16:53.895Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="curl-命令"><a href="#curl-命令" class="headerlink" title="curl 命令"></a>curl 命令</h1><span id="more"></span><p>curl 命令在 Linux 操作系统中经常来测试网络和 url 的联通性，模拟正常的网络访问。除此之外，curl<br>还支持包括 HTTP、HTTPS、ftp 等众多协议，还支持 POST、cookies、认证、从指定偏移处下载部分文<br>件等功能<br>1.curl url(获取网址的文本信息)<br>2.curl -i url(获取文本的头部及文本信息)<br>3.curl -x proxy url(使用代理请求网页内容)<br>4.curl -v(获取整个通信过程)<br>5.curl -X url(使用特定方法请求网页文本)<br>6.curl -I url(仅返回头部信息)</p>]]></content>
-    
-    
-    <summary type="html">curl常用方法</summary>
-    
-    
-    
-    <category term="笔记" scheme="https://pr0b1em.github.io/categories/%E7%AC%94%E8%AE%B0/"/>
-    
-    
-  </entry>
-  
-  <entry>
     <title>get_started_3dsctf_2016</title>
     <link href="https://pr0b1em.github.io/2021/06/17/get_started_3dsctf_2016/"/>
     <id>https://pr0b1em.github.io/2021/06/17/get_started_3dsctf_2016/</id>
@@ -164,6 +145,25 @@
     
     
     <category term="writeup" scheme="https://pr0b1em.github.io/categories/writeup/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>CURL</title>
+    <link href="https://pr0b1em.github.io/2021/06/17/curl%E5%91%BD%E4%BB%A4%EF%BC%88http%E8%AF%B7%E6%B1%82%EF%BC%89/"/>
+    <id>https://pr0b1em.github.io/2021/06/17/curl%E5%91%BD%E4%BB%A4%EF%BC%88http%E8%AF%B7%E6%B1%82%EF%BC%89/</id>
+    <published>2021-06-17T10:17:26.000Z</published>
+    <updated>2021-06-18T03:16:53.895Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="curl-命令"><a href="#curl-命令" class="headerlink" title="curl 命令"></a>curl 命令</h1><span id="more"></span><p>curl 命令在 Linux 操作系统中经常来测试网络和 url 的联通性，模拟正常的网络访问。除此之外，curl<br>还支持包括 HTTP、HTTPS、ftp 等众多协议，还支持 POST、cookies、认证、从指定偏移处下载部分文<br>件等功能<br>1.curl url(获取网址的文本信息)<br>2.curl -i url(获取文本的头部及文本信息)<br>3.curl -x proxy url(使用代理请求网页内容)<br>4.curl -v(获取整个通信过程)<br>5.curl -X url(使用特定方法请求网页文本)<br>6.curl -I url(仅返回头部信息)</p>]]></content>
+    
+    
+    <summary type="html">curl常用方法</summary>
+    
+    
+    
+    <category term="笔记" scheme="https://pr0b1em.github.io/categories/%E7%AC%94%E8%AE%B0/"/>
     
     
   </entry>
