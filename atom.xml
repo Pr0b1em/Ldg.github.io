@@ -6,7 +6,7 @@
   <link href="https://pr0b1em.github.io/atom.xml" rel="self"/>
   
   <link href="https://pr0b1em.github.io/"/>
-  <updated>2021-06-28T10:21:09.329Z</updated>
+  <updated>2021-06-28T10:26:13.145Z</updated>
   <id>https://pr0b1em.github.io/</id>
   
   <author>
@@ -15,6 +15,25 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>SROP</title>
+    <link href="https://pr0b1em.github.io/2021/06/28/SROP/"/>
+    <id>https://pr0b1em.github.io/2021/06/28/SROP/</id>
+    <published>2021-06-28T10:22:28.000Z</published>
+    <updated>2021-06-28T10:26:13.145Z</updated>
+    
+    <content type="html"><![CDATA[<p>Srop</p><p>Srop 的全称是Sigreturn Oriented Programming</p><p>Srop 可以理解成一种高级的ROP，利用了linux下15号系统调用的-&gt;rt_sigreturn<br>Signal</p><p>Signal是Unix系统中的一种通信机制，通常用于在进程之间传递信息，也可以说是软中断信息</p><p>常见于在一个进程中，内核向其发送发送软中断信号，该进程将暂时被挂起，系统进入内核态</p><p>因为是暂时被挂起，所以系统会保留该进程的上下文  (部分内容摘自ctf-wiki)</p><pre><code>将所有的寄存器压入栈中，以及signal信息和指向sigreturn的系统调用地址在栈顶上放置rt_sigreturn</code></pre><p>此时栈上的内存分布：<br><img src="/img/14487175105930.png!small.jpg"></p><p>Signal Frame</p><p>这一段内存也被称为Signal Frame<br>漏洞利用点</p><pre><code>Signal Frame 被放置在用户进程的内存空间中，也就说Signal Frame是可以读写的在恢复Signal信号的时候没有检测，也就是说我们可以通过改变Signal Frame中的信息来劫持控制流</code></pre><p>例如：<br>  1  | rax = 59//对应59号系统调用-&gt; exceve<br>  2  | rdi = ‘/bin/sh’<br>  3  | rsi = 0<br>  4  | rdx = 0</p><p>这样就能进行一个最简单的Srop<br>Srop链</p><p>有时候我们希望执行一系列的操作,此时可以通过syscall ret;这个gadget去串联起我们我们的Srop链</p><p>执行完一个SignalFrame接着执行下一个SignalFrame。</p>]]></content>
+    
+    
+    <summary type="html">SROP原理</summary>
+    
+    
+    
+    <category term="笔记" scheme="https://pr0b1em.github.io/categories/%E7%AC%94%E8%AE%B0/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>ciscn_s_3</title>
