@@ -6,7 +6,7 @@
   <link href="https://pr0b1em.github.io/atom.xml" rel="self"/>
   
   <link href="https://pr0b1em.github.io/"/>
-  <updated>2021-07-18T03:22:13.542Z</updated>
+  <updated>2021-07-23T02:31:28.719Z</updated>
   <id>https://pr0b1em.github.io/</id>
   
   <author>
@@ -15,6 +15,25 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>整数安全漏洞</title>
+    <link href="https://pr0b1em.github.io/2021/07/23/%E6%95%B4%E6%95%B0%E5%AE%89%E5%85%A8%E6%BC%8F%E6%B4%9E/"/>
+    <id>https://pr0b1em.github.io/2021/07/23/%E6%95%B4%E6%95%B0%E5%AE%89%E5%85%A8%E6%BC%8F%E6%B4%9E/</id>
+    <published>2021-07-23T02:09:34.000Z</published>
+    <updated>2021-07-23T02:31:28.719Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="整数溢出"><a href="#整数溢出" class="headerlink" title="整数溢出"></a>整数溢出</h3><p>如果一个整数用来计算一些敏感数值，如缓冲区大小或数值索引，就会产生潜在的危险。通常情况下，整数溢出并没有改写额外的内存，不会直接导致任意代码执行，但是它会导致栈溢出和堆溢出，而后两者都会导致任意代码执行。由于整数溢出发生之后，很难立即被察觉，比较难用一个有效的方法去判断是否出现或者可能出现整数溢出。</p><p>关于整数的异常情况主要有三种：<br>(1) 溢出，只有有符号数才会发生溢出。有符号数的最高位表示符号，在两正或两负相加时，有可能改变符号位的值，产生溢出。溢出标指OF可检测有符号数的溢出；<br>(2) 回绕，无符号数0-1时会变成最大的数，如1字节的无符号数会变成255，而255+1会变成最小数0.进位标志CF可检测无符号数的回绕；<br>(3) 截断，将一个较大宽度的数存入一个宽度小的操作数中，高位发生截断</p><h3 id="漏洞多发函数"><a href="#漏洞多发函数" class="headerlink" title="漏洞多发函数"></a>漏洞多发函数</h3><p>整数溢出要配合其他类型的缺陷才能有用，下面的两个函数都有一个size_t类型的参数（size_t是无符号整数类型的sizeof()的结果），常常被误用而产生整数溢出，接着就可能导致缓冲区溢出漏洞。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#include&lt;string.h&gt;</span></span><br><span class="line">void *memcpy(void *dest,const void *src,size_t n);</span><br></pre></td></tr></table></figure><p>memcpy()函数将src所指向的字符串中以src地址开始的前n个字节复制到dest所指的数组中，并返回dest。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#include&lt;string.h&gt;</span></span><br><span class="line">char *strncpy(char *dest, const char *src,size_t n);</span><br></pre></td></tr></table></figure><p>strncpy()函数从源src所指的内存地址的起始位置开始复制n个字节到目标dest所指的内存地址的起始位置中。</p><p>两个函数中都有一个类型为size_t的参数，它是无符号整型的sizeof运算符的结果。</p><pre><code>typedef unsigned int size_t;    </code></pre>]]></content>
+    
+    
+    <summary type="html">整数安全</summary>
+    
+    
+    
+    <category term="笔记" scheme="https://pr0b1em.github.io/categories/%E7%AC%94%E8%AE%B0/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>格式化字符串漏洞</title>
@@ -369,25 +388,6 @@
     
     
     <summary type="html">ret2text类型题目解法</summary>
-    
-    
-    
-    <category term="笔记" scheme="https://pr0b1em.github.io/categories/%E7%AC%94%E8%AE%B0/"/>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>ret2libc</title>
-    <link href="https://pr0b1em.github.io/2021/06/20/ret2libc/"/>
-    <id>https://pr0b1em.github.io/2021/06/20/ret2libc/</id>
-    <published>2021-06-20T07:26:12.000Z</published>
-    <updated>2021-06-20T13:47:34.431Z</updated>
-    
-    <content type="html"><![CDATA[<span id="more"></span><h1 id="ret2libc"><a href="#ret2libc" class="headerlink" title="ret2libc"></a>ret2libc</h1><p>libc是Linux下的ANSIC的函数库。</p><p>ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个函数的 plt 处或者函数的具体位置 (即函数对应的 got 表项的内容)。一般情况下，我们会选择执行 system(“/bin/sh”)，故而此时我们需要知道 system 函数的地址。</p><h3 id="非执行堆栈"><a href="#非执行堆栈" class="headerlink" title="非执行堆栈"></a>非执行堆栈</h3><p>非执行堆栈是为避免堆或者堆栈的内存区域被植入恶意代码执行，当然也可以直接防止一部分内存被写入恶意代码。换句话说，这是个防止缓冲区溢出的功能。</p><p>当checksec发现NX(No-eXecute)开启后，其实就已经是非执行堆栈了，这时候就需要用到libc库。</p><h5 id="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"><a href="#libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖" class="headerlink" title="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"></a>libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖</h5><p>思路：</p><p>1.泄露 一个调用函数的 地址</p><p>2.获取 libc 版本</p><p>3.获取 system 地址与 /bin/sh 的地址</p><p>4.再次执行源程序</p><p>5.触发栈溢出执行 system(‘/bin/sh’)</p><p>shellcode结构：</p><p><img src="/img/shellcode.png"></p><p>正常堆栈布局：</p><p><img src="/img/1.png"></p><p>ret2libc执行system的堆栈布局：</p><p><img src="/img/2.png"></p><p>具体例题可以查看[OGeek2019]babyrop的writeup。</p><p>平常的shellcode在源程序里就能找到system函数和/bin/sh，而ret2libc类型的题差别就在这里，我们需要通过libc库查找到system函数和/bin/sh在源程序中的位置，然后才能构造shellcode进行夺权，最后拿下flag。</p>]]></content>
-    
-    
-    <summary type="html">ret2libc类型题目解法</summary>
     
     
     
