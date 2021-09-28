@@ -135,6 +135,9 @@
       <categories>
         <category>日常闲话</category>
       </categories>
+      <tags>
+        <tag>生活</tag>
+      </tags>
   </entry>
   <entry>
     <title>bjdctf_2020_babyrop2</title>
@@ -382,6 +385,9 @@
       <categories>
         <category>笔记</category>
       </categories>
+      <tags>
+        <tag>web、笔记</tag>
+      </tags>
   </entry>
   <entry>
     <title>pwn1</title>
@@ -595,6 +601,9 @@
       <categories>
         <category>笔记</category>
       </categories>
+      <tags>
+        <tag>pwn、笔记</tag>
+      </tags>
   </entry>
   <entry>
     <title>xjusec考核赛</title>
@@ -677,6 +686,9 @@
       <categories>
         <category>writeup</category>
       </categories>
+      <tags>
+        <tag>复现</tag>
+      </tags>
   </entry>
   <entry>
     <title>一些危险函数和64位寄存器与32位不同之处</title>
@@ -721,6 +733,9 @@ callq 在栈里存放一个8位的返回地址
       <categories>
         <category>笔记</category>
       </categories>
+      <tags>
+        <tag>pwn、笔记</tag>
+      </tags>
   </entry>
   <entry>
     <title>铁人三项(第五赛区)_2018_rop</title>
@@ -757,6 +772,9 @@ callq 在栈里存放一个8位的返回地址
       <categories>
         <category>日常闲话</category>
       </categories>
+      <tags>
+        <tag>生活</tag>
+      </tags>
   </entry>
   <entry>
     <title>格式化字符串漏洞</title>
@@ -803,6 +821,9 @@ callq 在栈里存放一个8位的返回地址
       <categories>
         <category>笔记</category>
       </categories>
+      <tags>
+        <tag>pwn、笔记</tag>
+      </tags>
   </entry>
   <entry>
     <title>整数安全漏洞</title>
@@ -823,5 +844,8 @@ callq 在栈里存放一个8位的返回地址
       <categories>
         <category>笔记</category>
       </categories>
+      <tags>
+        <tag>pwn、笔记</tag>
+      </tags>
   </entry>
 </search>
