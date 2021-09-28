@@ -1,469 +1,62 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-    <!DOCTYPE html>
-<html>
+{% extends '_layout.swig' %}
+{% import '_macro/post-collapse.swig' as post_template %}
+{% import '_macro/sidebar.swig' as sidebar_template %}
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-  
-  <title>Archive - 8023</title>
-  
-    <link rel="shortcut icon" href="/favicon.png">
-  
-  
-    <link rel='manifest' href='/manifest.json'>
-  
+{% block title %}{{ __('title.archive') }} | {{ config.title }}{% endblock %}
 
-  
-<link rel="stylesheet" href="/css/var.css">
+{% block page_class %}page-archive{% endblock %}
 
-  
-<link rel="stylesheet" href="/css/main.css">
+{% block content %}
 
-  
-<link rel="stylesheet" href="/css/typography.css">
+  {#####################}
+  {### ARCHIVE BLOCK ###}
+  {#####################}
+  <div class="post-block archive">
+    <div id="posts" class="posts-collapse">
+      <span class="archive-move-on"></span>
 
-  
-<link rel="stylesheet" href="/css/code-highlighting.css">
+      <span class="archive-page-counter">
+        {% set cheers %}
+        {% set posts_length = site.posts.length %}
+        {% if posts_length > 210 %} {% set cheers = 'excellent' %}
+          {% elif posts_length > 130 %} {% set cheers = 'great' %}
+          {% elif posts_length > 80 %} {% set cheers = 'good' %}
+          {% elif posts_length > 50 %} {% set cheers = 'nice' %}
+          {% elif posts_length > 30 %} {% set cheers = 'ok' %}
+        {% else %}
+          {% set cheers = 'um' %}
+        {% endif %}
+        {{ __('cheers.' + cheers) }}! {{ _p("counter.archive_posts", site.posts.length) }} {{ __('keep_on') }}
+      </span>
 
-  
-<link rel="stylesheet" href="/css/components.css">
+      {% for post in page.posts %}
 
-  
-<link rel="stylesheet" href="/css/nav.css">
+        {# Show year #}
+        {% set year %}
+        {% set post.year = date(post.date, 'YYYY') %}
 
-  
-<link rel="stylesheet" href="/css/paginator.css">
+        {% if post.year !== year %}
+          {% set year = post.year %}
+          <div class="collection-title">
+            <{% if theme.seo %}h2{% else %}h1{% endif %} class="archive-year" id="archive-year-{{ year }}">{{ year }}</{% if theme.seo %}h2{% else %}h1{% endif %}>
+          </div>
+        {% endif %}
+        {# endshow #}
 
-  
-<link rel="stylesheet" href="/css/footer.css">
+        {{ post_template.render(post) }}
 
-  
-<link rel="stylesheet" href="/css/post-list.css">
+      {% endfor %}
 
-  
-<link rel="stylesheet" href="/css/waline.css">
-
-  
-  
-  
-<link rel="stylesheet" href="/css/post.css">
-
-  
-
-  
-<meta name="generator" content="Hexo 5.4.0"></head>
-    <body>
-        <nav id="theme-nav">
-    <div class="inner">
-        <a class="title" href="/">Blog</a>
-        <div class="nav-arrow"></div>
-        <div class="nav-items">
-            <a class="nav-item nav-item-home" href="/">Home</a>
-            
-            
-            <a class="nav-item" href="/archives">Archives</a>
-            
-            
-            
-            <a class="nav-item" href="/friends">Friends</a>
-            
-            
-            
-            <a class="nav-item" href="/projects">Projects</a>
-            
-            
-            
-            <a class="nav-item" href="/about">About</a>
-            
-            
-            
-            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/MrWillCom" target="_blank">&nbsp;</a>
-            
-            
-            
-            <a class="nav-item nav-item-codepen nav-item-icon" href="https://codepen.io/mrwillcom" target="_blank">&nbsp;</a>
-            
-            
-            
-            <a class="nav-item nav-item-patreon nav-item-icon" href="https://www.patreon.com/MrWillCom" target="_blank">&nbsp;</a>
-            
-            
-        </div>
     </div>
-</nav>
-        <div class="container">
-    
+  </div>
+  {#########################}
+  {### END ARCHIVE BLOCK ###}
+  {#########################}
 
-    <div class="post-list">
-        
-        <article class="post-list-item">
-            <a href="/2021/06/28/ciscn-2019-es-2/">
-                
-                <div class="content">
-                    <div class="title">
-                        ciscn_2019_es_2
-                    </div>
-                    
-                    <div class="time">
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>June</span>
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>&nbsp;28,&nbsp;</span>
-                        <span>2021</span>
-                    </div>
-                </div>
-            </a>
-        </article>
-        
-        <article class="post-list-item">
-            <a href="/2021/06/28/HarekazeCTF2019-baby-rop2/">
-                
-                <div class="content">
-                    <div class="title">
-                        (HarekazeCTF2019)baby_rop2
-                    </div>
-                    
-                    <div class="time">
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>June</span>
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>&nbsp;28,&nbsp;</span>
-                        <span>2021</span>
-                    </div>
-                </div>
-            </a>
-        </article>
-        
-        <article class="post-list-item">
-            <a href="/2021/06/28/SROP/">
-                
-                <div class="content">
-                    <div class="title">
-                        SROP
-                    </div>
-                    
-                    <div class="time">
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>June</span>
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>&nbsp;28,&nbsp;</span>
-                        <span>2021</span>
-                    </div>
-                </div>
-            </a>
-        </article>
-        
-        <article class="post-list-item">
-            <a href="/2021/06/28/ciscn-s-3/">
-                
-                <div class="content">
-                    <div class="title">
-                        ciscn_s_3
-                    </div>
-                    
-                    <div class="time">
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>June</span>
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>&nbsp;28,&nbsp;</span>
-                        <span>2021</span>
-                    </div>
-                </div>
-            </a>
-        </article>
-        
-        <article class="post-list-item">
-            <a href="/2021/06/28/ciscn-2019-c-1/">
-                
-                <div class="content">
-                    <div class="title">
-                        ciscn_2019_c_1
-                    </div>
-                    
-                    <div class="time">
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>June</span>
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>&nbsp;28,&nbsp;</span>
-                        <span>2021</span>
-                    </div>
-                </div>
-            </a>
-        </article>
-        
-        <article class="post-list-item">
-            <a href="/2021/06/26/%E4%B8%80%E4%BA%9B%E5%8D%B1%E9%99%A9%E5%87%BD%E6%95%B0%E5%92%8C64%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8%E4%B8%8E32%E4%BD%8D%E4%B8%8D%E5%90%8C%E4%B9%8B%E5%A4%84/">
-                
-                <div class="content">
-                    <div class="title">
-                        一些危险函数和64位寄存器与32位不同之处
-                    </div>
-                    
-                    <div class="time">
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>June</span>
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>&nbsp;26,&nbsp;</span>
-                        <span>2021</span>
-                    </div>
-                </div>
-            </a>
-        </article>
-        
-        <article class="post-list-item">
-            <a href="/2021/06/26/bjdctf-2020-babyrop/">
-                
-                <div class="content">
-                    <div class="title">
-                        bjdctf_2020_babyrop
-                    </div>
-                    
-                    <div class="time">
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>June</span>
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>&nbsp;26,&nbsp;</span>
-                        <span>2021</span>
-                    </div>
-                </div>
-            </a>
-        </article>
-        
-        <article class="post-list-item">
-            <a href="/2021/06/25/%E9%93%81%E4%BA%BA%E4%B8%89%E9%A1%B9-%E7%AC%AC%E4%BA%94%E8%B5%9B%E5%8C%BA-2018-rop/">
-                
-                <div class="content">
-                    <div class="title">
-                        铁人三项(第五赛区)_2018_rop
-                    </div>
-                    
-                    <div class="time">
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>June</span>
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>&nbsp;25,&nbsp;</span>
-                        <span>2021</span>
-                    </div>
-                </div>
-            </a>
-        </article>
-        
-        <article class="post-list-item">
-            <a href="/2021/06/20/%E5%9F%BA%E6%9C%ACROP/">
-                
-                <div class="content">
-                    <div class="title">
-                        基本ROP
-                    </div>
-                    
-                    <div class="time">
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>June</span>
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>&nbsp;20,&nbsp;</span>
-                        <span>2021</span>
-                    </div>
-                </div>
-            </a>
-        </article>
-        
-        <article class="post-list-item">
-            <a href="/2021/06/20/%5BHarekazeCTF2019%5Dbaby_rop/">
-                
-                <div class="content">
-                    <div class="title">
-                        (HarekazeCTF2019)baby_rop(ret2text)
-                    </div>
-                    
-                    <div class="time">
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>June</span>
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        <span>&nbsp;20,&nbsp;</span>
-                        <span>2021</span>
-                    </div>
-                </div>
-            </a>
-        </article>
-        
-    </div>
+  {% include '_partials/pagination.swig' %}
 
-    
-<div class="paginator">
-    <a class="extend prev" rel="prev" href="/archives/">Prev</a><a class="page-number" href="/archives/">1</a><span class="page-number current">2</span><a class="page-number" href="/archives/page/3/">3</a><a class="extend next" rel="next" href="/archives/page/3/">Next</a>
-</div>
+{% endblock %}
 
-</div>
-        <footer>
-    <div class="inner">
-        <div class="links">
-            
-            <div class="group">
-                <h4 class="title">Blog</h4>
-                
-                <a href="/" class="item" target="_blank">Blog</a>
-                
-                <a href="/archives" class="item" target="_blank">Archives</a>
-                
-                <a href="/friends" class="item" target="_blank">Friends</a>
-                
-                <a href="/projects" class="item" target="_blank">Projects</a>
-                
-                <a href="/resume" class="item" target="_blank">Resume</a>
-                
-                <a href="/about" class="item" target="_blank">About</a>
-                
-                <a href="/atom.xml" class="item" target="_blank">RSS</a>
-                
-            </div>
-            
-            <div class="group">
-                <h4 class="title">Projects</h4>
-                
-                <a href="https://github.com/transmister" class="item" target="_blank">Transmister</a>
-                
-                <a href="https://github.com/MrWillCom/css-and-js-windows-uwp-xaml-controls" class="item" target="_blank">CSS&amp;JS Windows UWP XAML Controls</a>
-                
-                <a href="https://github.com/MrWillCom/hexo-theme-cupertino" class="item" target="_blank">Theme Cupertino</a>
-                
-                <a href="https://github.com/MrWillCom/github-dark-mode" class="item" target="_blank">GitHub Dark Mode</a>
-                
-            </div>
-            
-            <div class="group">
-                <h4 class="title">Me</h4>
-                
-                <a href="https://github.com/MrWillCom" class="item" target="_blank">GitHub</a>
-                
-                <a href="https://codepen.io/mrwillcom" class="item" target="_blank">CodePen</a>
-                
-                <a href="https://www.patreon.com/MrWillCom" class="item" target="_blank">Patreon</a>
-                
-                <a href="mailto:mr.will.com@outlook.com" class="item" target="_blank">Email</a>
-                
-            </div>
-            
-        </div>
-        &copy; 2021 Pr0b1em<br />
-        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
-    </div>
-</footer>
-
-        
-<script src="/js/main.js"></script>
-
-        
-    </body>
-</html>
+{% block sidebar %}
+  {{ sidebar_template.render(false) }}
+{% endblock %}

