@@ -139,7 +139,7 @@
   </entry>
   <entry>
     <title>unctf-fo</title>
-    <url>/2022/01/26/UNCTF%E2%80%94%E2%80%94fo/</url>
+    <url>/2022/01/21/UNCTF%E2%80%94%E2%80%94fo/</url>
     <content><![CDATA[<span id="more"></span>
 <h2 id="UNCTF——fo"><a href="#UNCTF——fo" class="headerlink" title="UNCTF——fo"></a>UNCTF——fo</h2><p>我真是个傻逼！这题目就是拿来自己打醒自己的，比赛卡了一晚上，一度怀疑是自己字符串漏洞没学好，研究一晚格式化字符串，结果wp出来一看，计算偏移量搞错，我真是个大傻逼！！！</p>
 <p>检查保护机制，64位，开NX和canary</p>
@@ -579,7 +579,7 @@
   </entry>
   <entry>
     <title>pwnable_simple_login</title>
-    <url>/2022/01/26/pwnable_simple_login/</url>
+    <url>/2022/01/21/pwnable_simple_login/</url>
     <content><![CDATA[<span id="more"></span>
 <h2 id="pwnable-simple-login"><a href="#pwnable-simple-login" class="headerlink" title="pwnable_simple_login"></a>pwnable_simple_login</h2><p>小萌新斗胆做了一下buu上第六页的一道pwn题，<del>纯粹是为了冲分，就是卷（bushi</del></p>
 <p>首先检查保护机制，32位文件，开NX，没有开PIE，那这个题目应该不会太难。</p>
@@ -681,7 +681,7 @@
   </entry>
   <entry>
     <title>bjdctf_2020_router</title>
-    <url>/2022/01/26/%E5%88%B7%E6%96%B0%E4%B8%89%E8%A7%82%E7%AC%AC%E4%B8%80%E9%A2%98(bjdctf_2020_router)/</url>
+    <url>/2022/01/21/%E5%88%B7%E6%96%B0%E4%B8%89%E8%A7%82%E7%AC%AC%E4%B8%80%E9%A2%98(bjdctf_2020_router)/</url>
     <content><![CDATA[<span id="more"></span>
 <h2 id="刷新三观第一题-bjdctf-2020-router"><a href="#刷新三观第一题-bjdctf-2020-router" class="headerlink" title="刷新三观第一题(bjdctf_2020_router)"></a>刷新三观第一题(bjdctf_2020_router)</h2><p><del>昨天本来已经没想到，但今天更没想到</del></p>
 <p>这是一个考察linux中命令方式的题，直接就不需要IDA查看文件</p>
@@ -1163,7 +1163,7 @@ callq 在栈里存放一个8位的返回地址
   </entry>
   <entry>
     <title>pwnable_orw</title>
-    <url>/2022/01/26/%E6%B2%99%E7%AE%B1%E5%88%9D%E4%BD%93%E9%AA%8C%EF%BC%88pwnable_orw)/</url>
+    <url>/2022/01/21/%E6%B2%99%E7%AE%B1%E5%88%9D%E4%BD%93%E9%AA%8C%EF%BC%88pwnable_orw)/</url>
     <content><![CDATA[<span id="more"></span>
 <h1 id="沙箱初体验（pwnable-orw"><a href="#沙箱初体验（pwnable-orw" class="headerlink" title="沙箱初体验（pwnable_orw)"></a>沙箱初体验（pwnable_orw)</h1><p>确实很新奇嗷，照着buu上题目顺序来做，没想到这么快就接触到了沙箱的题目，<del>而我堆都还没玩明白</del></p>
 <p>那废话不多说，先来看看文件吧。这时候问题就出现了，不知道为啥就被拦下了，附件不让下载。</p>
