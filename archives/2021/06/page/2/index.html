@@ -458,29 +458,26 @@
             <article class="cd-timeline-content" data-aos="fade-up">
                 <div class="article col s12 m6">
                     <div class="card">
-                        <a href="/2021/06/20/%5BHarekazeCTF2019%5Dbaby_rop/">
+                        <a href="/2021/06/20/%5BOGeek2019%5Dbabyrop/">
                             <div class="card-image">
                                 
                                 
-                                <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="(HarekazeCTF2019)baby_rop(ret2text)">
+                                <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="(OGeek2019)babyrop(ret2libc)">
                                 
-                                <span class="card-title">(HarekazeCTF2019)baby_rop(ret2text)</span>
+                                <span class="card-title">(OGeek2019)babyrop(ret2libc)</span>
                             </div>
                         </a>
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
                                     
-[HarekazeCTF2019]baby_rop(ret2text)查看保护机制，开了NX，64位
+[OGeek2019]babyrop(ret2libc)查看保护机制，32位，开了NX
 
-IDA打开，F5查看main函数
+IDA打开查看发现有随机数问题
 
+通过strncmp函数比较随机数与输入数是否相等
 
-看见system函数
-然后F12+shift搜索字符串，还找到了’/bin/sh/‘
-
-
-因为6
+这里想到可以通过\x00来绕过strncmp函数，因为strl
                                 
                             </div>
                             <div class="publish-info">
@@ -527,26 +524,29 @@ IDA打开，F5查看main函数
             <article class="cd-timeline-content" data-aos="fade-up">
                 <div class="article col s12 m6">
                     <div class="card">
-                        <a href="/2021/06/20/%5BOGeek2019%5Dbabyrop/">
+                        <a href="/2021/06/20/%5BHarekazeCTF2019%5Dbaby_rop/">
                             <div class="card-image">
                                 
                                 
-                                <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="(OGeek2019)babyrop(ret2libc)">
+                                <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="(HarekazeCTF2019)baby_rop(ret2text)">
                                 
-                                <span class="card-title">(OGeek2019)babyrop(ret2libc)</span>
+                                <span class="card-title">(HarekazeCTF2019)baby_rop(ret2text)</span>
                             </div>
                         </a>
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
                                     
-[OGeek2019]babyrop(ret2libc)查看保护机制，32位，开了NX
+[HarekazeCTF2019]baby_rop(ret2text)查看保护机制，开了NX，64位
 
-IDA打开查看发现有随机数问题
+IDA打开，F5查看main函数
 
-通过strncmp函数比较随机数与输入数是否相等
 
-这里想到可以通过\x00来绕过strncmp函数，因为strl
+看见system函数
+然后F12+shift搜索字符串，还找到了’/bin/sh/‘
+
+
+因为6
                                 
                             </div>
                             <div class="publish-info">
