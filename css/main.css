@@ -1923,7 +1923,7 @@ img:hover {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #963357;
+  background: #d6d508;
 }
 .links-of-blogroll {
   font-size: 13px;
@@ -3354,37 +3354,26 @@ ul.breadcrumb li+li:last-child {
 }
 .footer {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  text-align: center;
-  margin-top: 20px;
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
   font-size: 14px;
   color: #666;
+  margin-top: 20px;
 }
-.footer-left,
-.footer-center,
-.footer-right {
-  flex: 1;
-}
-.footer-left {
-  text-align: left;
-}
-.footer-center {
-  text-align: center;
-}
-.footer-right {
-  text-align: right;
-}
-.footer a {
+.footer-item {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 5px; /* 控制元素之间的间距 */
   color: #666;
   text-decoration: none;
 }
-.footer a:hover {
+.footer-item:hover {
   color: #333;
 }
 .footer img {
   height: 16px;
   vertical-align: middle;
+  margin: 0 2px; /* 图标两侧的间距 */
 }
 body {
   background: url("/images/4.jpg");
