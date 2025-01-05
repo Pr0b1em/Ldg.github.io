@@ -4,10 +4,10 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="ret2libc, 8023">
-    <meta name="description" content="
-ret2libclibc是Linux下的ANSIC的函数库。
-ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个函数的 plt 处或者函数的具体位置 (即函数对应的 got 表项的内容)。一般情况下，我们会选择执行 ">
+    <meta name="keywords" content="2024年末总结, 8023">
+    <meta name="description" content="2024年末总结(2025-1-6-0:59起笔)按照中国的农历来算，离春节还有23天，想了想，是时候做一个2024年的年终总结了。
+当然不是写给大家看，只是写给自己。
+不用管我文笔，本来理工男也不会有什么好文笔(yzy除外)，就记个流水账">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -19,7 +19,7 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>ret2libc | 8023</title>
+    <title>2024年末总结 | 8023</title>
     <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
     
 
@@ -292,7 +292,7 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
 <script src="/libs/cryptojs/crypto-js.min.js"></script>
 <script>
     (function() {
-        let pwd = '';
+        let pwd = '91cfe93f11f7a9d13dacbe6bc6489090315d1e3780d0c6ba801a348b1dffbec2';
         if (pwd && pwd.length > 0) {
             if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
                 alert('密码错误，将返回主页！');
@@ -305,12 +305,12 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/23.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/11.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">ret2libc</h1>
+                    <h1 class="description center-align post-title">2024年末总结</h1>
                 </div>
             </div>
         </div>
@@ -334,8 +334,8 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/pwn/">
-                                <span class="chip bg-color">pwn</span>
+                            <a href="/tags/%E7%94%9F%E6%B4%BB/">
+                                <span class="chip bg-color">生活</span>
                             </a>
                         
                     </div>
@@ -346,8 +346,8 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category">
-                                笔记
+                            <a href="/categories/%E6%97%A5%E5%B8%B8%E9%97%B2%E8%AF%9D/" class="post-category">
+                                日常闲话
                             </a>
                         
                     </div>
@@ -366,21 +366,21 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-09-17
+                    2025-01-06
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    368
+                    1.3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    4 分
                 </div>
                 
 
@@ -423,25 +423,16 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <span id="more"></span>
-<h1 id="ret2libc"><a href="#ret2libc" class="headerlink" title="ret2libc"></a>ret2libc</h1><p>libc是Linux下的ANSIC的函数库。</p>
-<p>ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个函数的 plt 处或者函数的具体位置 (即函数对应的 got 表项的内容)。一般情况下，我们会选择执行 system(“/bin/sh”)，故而此时我们需要知道 system 函数的地址。</p>
-<h3 id="非执行堆栈"><a href="#非执行堆栈" class="headerlink" title="非执行堆栈"></a>非执行堆栈</h3><p>非执行堆栈是为避免堆或者堆栈的内存区域被植入恶意代码执行，当然也可以直接防止一部分内存被写入恶意代码。换句话说，这是个防止缓冲区溢出的功能。</p>
-<p>当checksec发现NX(No-eXecute)开启后，其实就已经是非执行堆栈了，这时候就需要用到libc库。</p>
-<h5 id="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"><a href="#libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖" class="headerlink" title="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"></a>libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖</h5><p>思路：</p>
-<p>1.泄露 一个调用函数的 地址</p>
-<p>2.获取 libc 版本</p>
-<p>3.获取 system 地址与 /bin/sh 的地址</p>
-<p>4.再次执行源程序</p>
-<p>5.触发栈溢出执行 system(‘/bin/sh’)</p>
-<p>shellcode结构：</p>
-<p><img src="/img/shellcode.png"></p>
-<p>正常堆栈布局：</p>
-<p><img src="/img/1.png"></p>
-<p>ret2libc执行system的堆栈布局：</p>
-<p><img src="/img/2.png"></p>
-<p>具体例题可以查看[OGeek2019]babyrop的writeup。</p>
-<p>平常的shellcode在源程序里就能找到system函数和/bin/sh，而ret2libc类型的题差别就在这里，我们需要通过libc库查找到system函数和/bin/sh在源程序中的位置，然后才能构造shellcode进行夺权，最后拿下flag。</p>
+                <h1 id="2024年末总结-2025-1-6-0-59起笔"><a href="#2024年末总结-2025-1-6-0-59起笔" class="headerlink" title="2024年末总结(2025-1-6-0:59起笔)"></a>2024年末总结<del>(2025-1-6-0:59起笔)</del></h1><p>按照中国的农历来算，离春节还有23天，想了想，是时候做一个2024年的年终总结了。</p>
+<p>当然不是写给大家看，只是写给自己。</p>
+<p>不用管我文笔，本来理工男也不会有什么好文笔(yzy除外)，就记个流水账，嗯。</p>
+<p>今年，不对，应该说去年了，毕竟元旦已经过了好几天，是相当难忘的一整年，主要是在痛苦中度过，但也不乏有美好的回忆。美好有二，一是和宿舍兄弟们一起毕业旅行新疆阿勒泰和赛里木湖，记得很清楚出发的那天是2024年5月25日，现在想起来也觉得激动，太多第一次在那一趟旅途中实现，这辈子都会怀念，毕竟青春只有一次，永远没法复刻。二呢就是和父母自驾318小环线，穷游打卡，在子梅垭口拍到不完整的贡嘎雪山，人生一样，不完美才是完美，我没有拍到我日思夜想的日照金山，那天雾很大，它好像故意躲着我，就像我曾经喜欢的女孩老是忽远忽近，搞得我高兴又难过。But，这个话题不宜多说。</p>
+<p>这一年，我大学毕业了，面临了所有毕业生都会面临的问题，就业。</p>
+<p>就业对我来说，很难评。当然我是不想当牛马的，但是如果是做我自己想做的事，那其实算不上牛马，在我的理解里面是这样的的。我没有急着投简历、面试，我在想，我应该先沉淀自己，没错。这很重要，和修高楼一个道理，不用我多说，地基必须打好，楼才能修得高，所以我选择先打地基。因为我的目标是从事我喜欢的这个专业的工作，但我深知大学里屁都没学到，实话，没有说学校不好，只是大学普遍性教学的弊端，仅此而已。所以我只能现在花时间自己学，自己琢磨。我爹总说，先上班，接触更多的业内大佬，你才有机会更快进步，但你不知道，我得先达到那个水平才有机会接触业内大佬，就像扫地工人难道不努力往上爬这辈子就能和千万富翁谈上话吗？得有敲门砖。所以没办法，不理解就不理解吧，我得犟一次，只是想做我真正想做的事。我觉得我的计划没太大问题，先沉淀，然后到一定水平足够让一些好公司看上我时就去投简历，然后开始工作，接着学习进步。我真的觉得不能急，现在这个社会是很病态的，“内卷”严重，什么都卷，什么都急，快餐时代，有多少人还能慢下脚步来欣赏美好，说真的，我的观念就是人活一世，至少活成自己想要的样子。不要随波逐流，考公热就考公，考研卷就考研，做自己想做的事情难道违法？！真的搞不懂，我觉得我这一年之所以觉得痛苦，就是太多push，太多被迫选择，浪费了时间，还没有正向收获，不过还好后面反应过来，开始坚定自己的道路走。</p>
+<p>说到快餐时代，很想痛骂当代爱情观，简直就是一坨屎，什么都图新鲜，谈个恋爱新鲜感一过，说散就散，完全就是神经病！我讲真的，别说什么真心付出过就够了，那每个人性格不同，我就是长情(说难听点sb恋爱脑)，我能怎么办，只能说遇人不淑。恋爱不是这么谈的，婚姻也不是！说实话我觉得中国传统的包办婚姻是存在一定问题，但是好在那时候的感情很真，很纯。这就不得不搬出那句超级老的话：从前，车马很慢，书信很远，一生只够爱一个人。你可以骂我古板，但是我就是觉得这是对的。那三天两头换对象，像个啥？玩玩具呢，玩腻了买新的，我***！还有嗷，现在的人，换得快就算了，还喜欢多线程，我真™无语！感情不值钱了，无论是在爱情方面还是交朋友方面，这我没办法，只能逼自己改变: (</p>
+<p>哦对，年终总结呢，光发牢骚了，其实，这一年就是挫折中成长，逆境中重生，最后总是在往前走的。而且我看了下，走得应该还不少，顺利毕业了，减重了，也挖到洞了，不错不错，来年再接再厉！</p>
+<p>行吧，被你看出来了，其实没想总结，只是想发发牢骚，哈哈哈哈！就这样吧，闭了。</p>
+<p>​                                                                                                                                                    ——  2025-1-6-1:38</p>
 
                 
             </div>
@@ -468,7 +459,7 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://Pr0b1em.github.io/2021/06/20/ret2libc/">https://Pr0b1em.github.io/2021/06/20/ret2libc/</a>
+                    <a href="https://Pr0b1em.github.io/2021/06/20/2024%E5%B9%B4%E6%9C%AB%E6%80%BB%E7%BB%93(2025.1.6%E5%87%8C%E6%99%A8059)/">https://Pr0b1em.github.io/2021/06/20/2024%E5%B9%B4%E6%9C%AB%E6%80%BB%E7%BB%93(2025.1.6%E5%87%8C%E6%99%A8059)/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -506,8 +497,8 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/pwn/">
-                                    <span class="chip bg-color">pwn</span>
+                                <a href="/tags/%E7%94%9F%E6%B4%BB/">
+                                    <span class="chip bg-color">生活</span>
                                 </a>
                             
                         </div>
@@ -590,13 +581,13 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/06/20/ret2text/">
+                <a href="/2021/06/20/%E5%9F%BA%E6%9C%ACROP/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="ret2text">
+                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="基本ROP">
                         
-                        <span class="card-title">ret2text</span>
+                        <span class="card-title">基本ROP</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -624,8 +615,8 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/pwn/">
-                        <span class="chip bg-color">pwn</span>
+                    <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                        <span class="chip bg-color">笔记</span>
                     </a>
                     
                 </div>
@@ -639,13 +630,13 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2021/06/17/blog%E8%AF%9E%E7%94%9F%E6%97%A52021-6-17/">
+                <a href="/2021/06/20/%5BHarekazeCTF2019%5Dbaby_rop/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="blog诞生日2021.6.17">
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="(HarekazeCTF2019)baby_rop(ret2text)">
                         
-                        <span class="card-title">blog诞生日2021.6.17</span>
+                        <span class="card-title">(HarekazeCTF2019)baby_rop(ret2text)</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -656,14 +647,14 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-06-17
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-06-20
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E6%97%A5%E5%B8%B8%E9%97%B2%E8%AF%9D/" class="post-category">
-                                    日常闲话
+                            <a href="/categories/writeup/" class="post-category">
+                                    writeup
                                 </a>
                             
                             
@@ -673,8 +664,8 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E7%94%9F%E6%B4%BB/">
-                        <span class="chip bg-color">生活</span>
+                    <a href="/tags/pwn/">
+                        <span class="chip bg-color">pwn</span>
                     </a>
                     
                 </div>
