@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="baidu-site-verification" content="codeva-qxRduVBX99" />
+    <meta name="baidu-site-verification" content="codeva-1wZQQJBzcr" />
     <meta name="keywords" content="归档: 2021, 8023">
     <meta name="description" content="在二进制道路上不断探索的勇敢者">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -647,26 +647,29 @@ IDA打开，shift+F12查找字符串，没有发现/bin/sh
             <article class="cd-timeline-content" data-aos="fade-up">
                 <div class="article col s12 m6">
                     <div class="card">
-                        <a href="/2021/062072ce.html">
+                        <a href="/2021/0620c1a3.html">
                             <div class="card-image">
                                 
                                 
-                                <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="(OGeek2019)babyrop(ret2libc)">
+                                <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="(HarekazeCTF2019)baby_rop(ret2text)">
                                 
-                                <span class="card-title">(OGeek2019)babyrop(ret2libc)</span>
+                                <span class="card-title">(HarekazeCTF2019)baby_rop(ret2text)</span>
                             </div>
                         </a>
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
                                     
-[OGeek2019]babyrop(ret2libc)查看保护机制，32位，开了NX
+[HarekazeCTF2019]baby_rop(ret2text)查看保护机制，开了NX，64位
 
-IDA打开查看发现有随机数问题
+IDA打开，F5查看main函数
 
-通过strncmp函数比较随机数与输入数是否相等
 
-这里想到可以通过\x00来绕过strncmp函数，因为strl
+看见system函数
+然后F12+shift搜索字符串，还找到了’/bin/sh/‘
+
+
+因为6
                                 
                             </div>
                             <div class="publish-info">
@@ -713,29 +716,26 @@ IDA打开查看发现有随机数问题
             <article class="cd-timeline-content" data-aos="fade-up">
                 <div class="article col s12 m6">
                     <div class="card">
-                        <a href="/2021/0620c1a3.html">
+                        <a href="/2021/062072ce.html">
                             <div class="card-image">
                                 
                                 
-                                <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="(HarekazeCTF2019)baby_rop(ret2text)">
+                                <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="(OGeek2019)babyrop(ret2libc)">
                                 
-                                <span class="card-title">(HarekazeCTF2019)baby_rop(ret2text)</span>
+                                <span class="card-title">(OGeek2019)babyrop(ret2libc)</span>
                             </div>
                         </a>
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
                                     
-[HarekazeCTF2019]baby_rop(ret2text)查看保护机制，开了NX，64位
+[OGeek2019]babyrop(ret2libc)查看保护机制，32位，开了NX
 
-IDA打开，F5查看main函数
+IDA打开查看发现有随机数问题
 
+通过strncmp函数比较随机数与输入数是否相等
 
-看见system函数
-然后F12+shift搜索字符串，还找到了’/bin/sh/‘
-
-
-因为6
+这里想到可以通过\x00来绕过strncmp函数，因为strl
                                 
                             </div>
                             <div class="publish-info">
@@ -964,6 +964,67 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
             <article class="cd-timeline-content" data-aos="fade-up">
                 <div class="article col s12 m6">
                     <div class="card">
+                        <a href="/2021/0617139.html">
+                            <div class="card-image">
+                                
+                                
+                                <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="CURL">
+                                
+                                <span class="card-title">CURL</span>
+                            </div>
+                        </a>
+                        <div class="card-content article-content">
+                            <div class="summary block-with-text">
+                                
+                                    curl 命令
+
+curl 命令在 Linux 操作系统中经常来测试网络和 url 的联通性，模拟正常的网络访问。除此之外，curl还支持包括 HTTP、HTTPS、ftp 等众多协议，还支持 POST、cookies、认证、从指定偏移处下
+                                
+                            </div>
+                            <div class="publish-info">
+                                <span class="publish-date">
+                                    <i class="far fa-clock fa-fw icon-date"></i>2021-06-17
+                                </span>
+                                <span class="publish-author">
+                                    
+                                    <i class="fas fa-bookmark fa-fw icon-category"></i>
+                                    
+                                    <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category">
+                                    笔记
+                                    </a>
+                                    
+                                    
+                                </span>
+                            </div>
+                        </div>
+
+                        
+                        <div class="card-action article-tags">
+                            
+                            <a href="/tags/%E7%AC%94%E8%AE%B0/"><span class="chip bg-color">笔记</span></a>
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+            </article>
+        </div>
+        
+        <div class="cd-timeline-block">
+
+            
+            
+
+            
+            
+
+            
+            <div class="cd-timeline-img day" data-aos="zoom-in-up">
+                <span>17</span>
+            </div>
+            <article class="cd-timeline-content" data-aos="fade-up">
+                <div class="article col s12 m6">
+                    <div class="card">
                         <a href="/2021/06173df8.html">
                             <div class="card-image">
                                 
@@ -1006,67 +1067,6 @@ IDA打开，main函数上的get_flag函数里发现一个flag.txt
                         <div class="card-action article-tags">
                             
                             <a href="/tags/pwn/"><span class="chip bg-color">pwn</span></a>
-                            
-                        </div>
-                        
-                    </div>
-                </div>
-            </article>
-        </div>
-        
-        <div class="cd-timeline-block">
-
-            
-            
-
-            
-            
-
-            
-            <div class="cd-timeline-img day" data-aos="zoom-in-up">
-                <span>17</span>
-            </div>
-            <article class="cd-timeline-content" data-aos="fade-up">
-                <div class="article col s12 m6">
-                    <div class="card">
-                        <a href="/2021/0617139.html">
-                            <div class="card-image">
-                                
-                                
-                                <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="CURL">
-                                
-                                <span class="card-title">CURL</span>
-                            </div>
-                        </a>
-                        <div class="card-content article-content">
-                            <div class="summary block-with-text">
-                                
-                                    curl 命令
-
-curl 命令在 Linux 操作系统中经常来测试网络和 url 的联通性，模拟正常的网络访问。除此之外，curl还支持包括 HTTP、HTTPS、ftp 等众多协议，还支持 POST、cookies、认证、从指定偏移处下
-                                
-                            </div>
-                            <div class="publish-info">
-                                <span class="publish-date">
-                                    <i class="far fa-clock fa-fw icon-date"></i>2021-06-17
-                                </span>
-                                <span class="publish-author">
-                                    
-                                    <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                    
-                                    <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category">
-                                    笔记
-                                    </a>
-                                    
-                                    
-                                </span>
-                            </div>
-                        </div>
-
-                        
-                        <div class="card-action article-tags">
-                            
-                            <a href="/tags/%E7%AC%94%E8%AE%B0/"><span class="chip bg-color">笔记</span></a>
                             
                         </div>
                         
