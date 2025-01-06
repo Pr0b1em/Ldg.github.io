@@ -366,15 +366,7 @@
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-列举一下常见的危险函数：
-输入    gets，直接读取一行，忽略&#39;\x00&#39;
-    scanf
-    vscanf
-
-输出    sprintf
-
-字符串    strcpy，字符串复制，遇到&#39;\x00&#3
+                                做题心得
                             
                         </div>
                         <div class="publish-info">
@@ -423,13 +415,7 @@
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-bjdctf_2020_babyrop检查保护机制，开启NX，64位
-
-运行程序，看见有libc的字眼，想到应该和libc泄露有关
-
-shift+F12查找字符串，没有找到system(‘/bin/sh’)，看样子应该就是这个类型的题了
-
+                                libc泄露
                             
                         </div>
                         <div class="publish-info">
@@ -478,12 +464,7 @@ shift+F12查找字符串，没有找到system(‘/bin/sh’)，看样子应该�
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-铁人三项(第五赛区)_2018_rop查看保护机制，开了NX，32位
-
-IDA打开，shift+F12查找字符串，没有发现/bin/sh
-
-再查看main函数中，东西不多，挨个查看里面的函数，发现vulnerable_function()
+                                2018_rop
                             
                         </div>
                         <div class="publish-info">
@@ -532,7 +513,7 @@ IDA打开，shift+F12查找字符串，没有发现/bin/sh
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                基本ROP随着 NX 保护的开启，以往直接向栈或者堆上直接注入代码的方式难以继续发挥效果。攻击者们也提出来相应的方法来绕过保护，目前主要的是 ROP(Return Oriented Programming)，其主要思想是在栈缓冲区溢出的基础
+                                ROP小分类
                             
                         </div>
                         <div class="publish-info">
@@ -554,6 +535,10 @@ IDA打开，shift+F12查找字符串，没有发现/bin/sh
 
                     
                     <div class="card-action article-tags">
+                        
+                        <a href="/tags/pwn/">
+                            <span class="chip bg-color">pwn</span>
+                        </a>
                         
                         <a href="/tags/%E7%AC%94%E8%AE%B0/">
                             <span class="chip bg-color">笔记</span>
@@ -581,17 +566,7 @@ IDA打开，shift+F12查找字符串，没有发现/bin/sh
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-[HarekazeCTF2019]baby_rop(ret2text)查看保护机制，开了NX，64位
-
-IDA打开，F5查看main函数
-
-
-看见system函数
-然后F12+shift搜索字符串，还找到了’/bin/sh/‘
-
-
-因为6
+                                简单的ret2text
                             
                         </div>
                         <div class="publish-info">
@@ -616,6 +591,10 @@ IDA打开，F5查看main函数
                         
                         <a href="/tags/pwn/">
                             <span class="chip bg-color">pwn</span>
+                        </a>
+                        
+                        <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                            <span class="chip bg-color">笔记</span>
                         </a>
                         
                     </div>
@@ -640,14 +619,7 @@ IDA打开，F5查看main函数
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-[OGeek2019]babyrop(ret2libc)查看保护机制，32位，开了NX
-
-IDA打开查看发现有随机数问题
-
-通过strncmp函数比较随机数与输入数是否相等
-
-这里想到可以通过\x00来绕过strncmp函数，因为strl
+                                简单的ret2libc
                             
                         </div>
                         <div class="publish-info">
@@ -674,6 +646,10 @@ IDA打开查看发现有随机数问题
                             <span class="chip bg-color">pwn</span>
                         </a>
                         
+                        <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                            <span class="chip bg-color">笔记</span>
+                        </a>
+                        
                     </div>
                     
                 </div>
@@ -696,8 +672,7 @@ IDA打开查看发现有随机数问题
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-ret2textret2text 即控制程序执行程序本身已有的的代码 (.text),使EIP指向具有system(“/bin/sh”)的代码段。其实，这种攻击方法是一种笼统的描述。我们控制执行程序已有的代码的时候也可以控制程序执行好几段
+                                ret2text类型题目解法
                             
                         </div>
                         <div class="publish-info">
@@ -722,6 +697,10 @@ ret2textret2text 即控制程序执行程序本身已有的的代码 (.text),使
                         
                         <a href="/tags/pwn/">
                             <span class="chip bg-color">pwn</span>
+                        </a>
+                        
+                        <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                            <span class="chip bg-color">笔记</span>
                         </a>
                         
                     </div>
@@ -746,9 +725,7 @@ ret2textret2text 即控制程序执行程序本身已有的的代码 (.text),使
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-ret2libclibc是Linux下的ANSIC的函数库。
-ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个函数的 plt 处或者函数的具体位置 (即函数对应的 got 表项的内容)。一般情况下，我们会选择执行 
+                                ret2libc类型题目解法
                             
                         </div>
                         <div class="publish-info">
@@ -775,6 +752,10 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                             <span class="chip bg-color">pwn</span>
                         </a>
                         
+                        <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                            <span class="chip bg-color">笔记</span>
+                        </a>
+                        
                     </div>
                     
                 </div>
@@ -797,9 +778,7 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-经过一下午不懈的努力，我终于在2021年6月17日下午17：30成功搭建了我的博客，在这发文纪念一下！
-
+                                博客诞生日！
                             
                         </div>
                         <div class="publish-info">
@@ -824,6 +803,10 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                         
                         <a href="/tags/%E7%94%9F%E6%B4%BB/">
                             <span class="chip bg-color">生活</span>
+                        </a>
+                        
+                        <a href="/tags/2021/">
+                            <span class="chip bg-color">2021</span>
                         </a>
                         
                     </div>

@@ -6,13 +6,7 @@
     <meta charset="utf-8">
     <meta name="baidu-site-verification" content="codeva-1wZQQJBzcr" />
     <meta name="keywords" content="ciscn_2019_c_1, 8023">
-    <meta name="description" content="ciscn_2019_c_1检查保护机制，64位，开NX
-
-IDA打开后F5查看main函数
-
-发现没有之前做的gets()栈溢出，但是发现了一个encrypt函数，点开之后查看，找到了gets函数
-
-读得内容为gets读取输入内容进入wh">
+    <meta name="description" content="libc泄露">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -636,7 +630,7 @@ main<span class="token punctuation">(</span><span class="token punctuation">)</s
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            
+                            SROP
                         
                     </div>
                     <div class="publish-info">
@@ -685,7 +679,7 @@ main<span class="token punctuation">(</span><span class="token punctuation">)</s
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            
+                            做题心得
                         
                     </div>
                     <div class="publish-info">

@@ -366,12 +366,7 @@
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                [Black Watch 入群题]PWN检查保护机制，32位，开NX
-
-IDA打开，查看main函数，看到vul_function()函数
-
-
-虽然buf在栈上但输入的长度仅仅能够覆盖ebp和返回地址，但s在bss段，而且输入的长度也够长，
+                                栈劫持
                             
                         </div>
                         <div class="publish-info">
@@ -420,16 +415,7 @@ IDA打开，查看main函数，看到vul_function()函数
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                jarvisoj_level3_x64检查保护机制，64位，开NX
-
-IDA打开，
-main函数
-
-发现function函数，找到栈溢出漏洞
-
-写入长度为7，读的长度为0x200
-解题思路1.泄露read地址得到libc版本
-2.获取sys
+                                libc泄露
                             
                         </div>
                         <div class="publish-info">
@@ -478,15 +464,7 @@ main函数
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                pwn2_sctf_2016检查保护机制，开了NX,32位
-
-尝试运行了一下
-
-IDA打开，main函数很简单，就调用了一个vuln()函数，那就看看vuln()函数
-
-
-
-读出内容限制a2输入最大字节长度为32，接受a2个长度的字符串并放
+                                libc泄露|整数溢出
                             
                         </div>
                         <div class="publish-info">
@@ -535,11 +513,7 @@ IDA打开，main函数很简单，就调用了一个vuln()函数，那就看看v
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                jarvisoj_level3检查保护机制，32位，开NX
-
-IDA打开，shift+F12没有找到system和’/bin/sh’，所以应该也是libc泄露
-查看main函数，又看到了熟悉的vulnerable_function()函数
-
+                                libc泄露
                             
                         </div>
                         <div class="publish-info">
@@ -588,13 +562,7 @@ IDA打开，shift+F12没有找到system和’/bin/sh’，所以应该也是libc
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                ciscn_2019_es_2检查保护机制，32位，开启NX
-
-IDA打开，shift+F12查找字符串，发现sysytem函数，但没有/bin/sh，还是无法直接利用
-
-找到system函数真实地址0x8048400
-
-main函数，还是
+                                libc泄露|栈劫持
                             
                         </div>
                         <div class="publish-info">
@@ -643,11 +611,7 @@ main函数，还是
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                [HarekazeCTF2019]baby_rop2检查保护机制，64位，开NX
-
-IDA打开，查看main函数，发现buf大小为0x20,而读入的大小为0x100，存在溢出漏洞
-
-再用shift+F12查找字符串，没有发现system(‘
+                                libc泄露
                             
                         </div>
                         <div class="publish-info">
@@ -696,9 +660,7 @@ IDA打开，查看main函数，发现buf大小为0x20,而读入的大小为0x100
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                SropSrop 的全称是Sigreturn Oriented Programming
-Srop 可以理解成一种高级的ROP，利用了linux下15号系统调用的-&gt;rt_sigreturn
-SignalSignal是Unix系统中的一
+                                SROP原理
                             
                         </div>
                         <div class="publish-info">
@@ -718,6 +680,18 @@ SignalSignal是Unix系统中的一
                         </div>
                     </div>
 
+                    
+                    <div class="card-action article-tags">
+                        
+                        <a href="/tags/pwn/">
+                            <span class="chip bg-color">pwn</span>
+                        </a>
+                        
+                        <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                            <span class="chip bg-color">笔记</span>
+                        </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -739,12 +713,7 @@ SignalSignal是Unix系统中的一
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                ciscn_2019_s_3检查保护机制，64位，开NX
-IDA打开，查看main函数，里面只有一个vuln函数
-
-再查看vuln函数，一个sys_read,一个sys_write,写入0x400，读0x30，这里就发现栈溢出的漏洞
-
-然后
+                                SROP
                             
                         </div>
                         <div class="publish-info">
@@ -793,13 +762,7 @@ IDA打开，查看main函数，里面只有一个vuln函数
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                ciscn_2019_c_1检查保护机制，64位，开NX
-
-IDA打开后F5查看main函数
-
-发现没有之前做的gets()栈溢出，但是发现了一个encrypt函数，点开之后查看，找到了gets函数
-
-读得内容为gets读取输入内容进入wh
+                                libc泄露
                             
                         </div>
                         <div class="publish-info">

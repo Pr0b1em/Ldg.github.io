@@ -426,9 +426,7 @@
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-原理由于canary保护就是在距离EBP一定距离的栈帧中，用于验证是否程序有构造缓冲区的危险。而canary所在的位置一般也都在EBP-8的位置上存储着，因此 只要有机会泄露canary的位置，我们便有机会溢出程序
-泄露方式覆盖00字节读
+                                三种绕过canary的方法
                             
                         </div>
                         <div class="publish-info">
@@ -474,8 +472,7 @@
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-Linux系统调用 int 80h（int 0x80）系统调用在计算机中，系统调用（英语：system call），又称为系统呼叫，指运行在使用者空间的程序向操作系统内核请求需要更高权限运行的服务。 系统调用提供了用户程序与操作系统之间的
+                                系统调用
                             
                         </div>
                         <div class="publish-info">
@@ -502,6 +499,10 @@ Linux系统调用 int 80h（int 0x80）系统调用在计算机中，系统调�
                             <span class="chip bg-color">pwn</span>
                         </a>
                         
+                        <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                            <span class="chip bg-color">笔记</span>
+                        </a>
+                        
                     </div>
                     
                 </div>
@@ -521,9 +522,7 @@ Linux系统调用 int 80h（int 0x80）系统调用在计算机中，系统调�
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-shellcode主要是普及一下shellcode在pwntools中的用法
-shellcraft模块shellcraft模块是shellcode的模块，包含一些生成shellcode的函数。其中的子模块声明架构，比如shellcraft
+                                pwntools下的shellcode
                             
                         </div>
                         <div class="publish-info">
@@ -550,6 +549,10 @@ shellcraft模块shellcraft模块是shellcode的模块，包含一些生成shellc
                             <span class="chip bg-color">pwn</span>
                         </a>
                         
+                        <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                            <span class="chip bg-color">笔记</span>
+                        </a>
+                        
                     </div>
                     
                 </div>
@@ -569,13 +572,7 @@ shellcraft模块shellcraft模块是shellcode的模块，包含一些生成shellc
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-PWN——从入门到入土咚!咚!咚!
-从入门到入土之路开始了
-
-”Pwn”是一个黑客语法的俚语词 ，是指攻破设备或者系统 。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了 。
-
-在CT
+                                指难
                             
                         </div>
                         <div class="publish-info">
@@ -621,7 +618,7 @@ PWN——从入门到入土咚!咚!咚!
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                整数溢出如果一个整数用来计算一些敏感数值，如缓冲区大小或数值索引，就会产生潜在的危险。通常情况下，整数溢出并没有改写额外的内存，不会直接导致任意代码执行，但是它会导致栈溢出和堆溢出，而后两者都会导致任意代码执行。由于整数溢出发生之后，很难立
+                                整数安全
                             
                         </div>
                         <div class="publish-info">
@@ -667,7 +664,7 @@ PWN——从入门到入土咚!咚!咚!
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                格式化字符串漏洞格式化字符串漏洞是PWN题常见的考察点，仅次于栈溢出漏洞。漏洞原因：程序使用了格式化字符串作为参数，并且格式化字符串为用户可控。其中触发格式化字符串漏洞函数主要是printf、sprintf、fprintf、prin等C库中
+                                小结一下
                             
                         </div>
                         <div class="publish-info">
@@ -689,6 +686,10 @@ PWN——从入门到入土咚!咚!咚!
 
                     
                     <div class="card-action article-tags">
+                        
+                        <a href="/tags/pwn/">
+                            <span class="chip bg-color">pwn</span>
+                        </a>
                         
                         <a href="/tags/%E7%AC%94%E8%AE%B0/">
                             <span class="chip bg-color">笔记</span>
@@ -713,9 +714,7 @@ PWN——从入门到入土咚!咚!咚!
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                SropSrop 的全称是Sigreturn Oriented Programming
-Srop 可以理解成一种高级的ROP，利用了linux下15号系统调用的-&gt;rt_sigreturn
-SignalSignal是Unix系统中的一
+                                SROP原理
                             
                         </div>
                         <div class="publish-info">
@@ -736,6 +735,18 @@ SignalSignal是Unix系统中的一
                     </div>
 
                     
+                    <div class="card-action article-tags">
+                        
+                        <a href="/tags/pwn/">
+                            <span class="chip bg-color">pwn</span>
+                        </a>
+                        
+                        <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                            <span class="chip bg-color">笔记</span>
+                        </a>
+                        
+                    </div>
+                    
                 </div>
             </div>
             
@@ -753,15 +764,7 @@ SignalSignal是Unix系统中的一
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-列举一下常见的危险函数：
-输入    gets，直接读取一行，忽略&#39;\x00&#39;
-    scanf
-    vscanf
-
-输出    sprintf
-
-字符串    strcpy，字符串复制，遇到&#39;\x00&#3
+                                做题心得
                             
                         </div>
                         <div class="publish-info">
@@ -807,54 +810,7 @@ SignalSignal是Unix系统中的一
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                基本ROP随着 NX 保护的开启，以往直接向栈或者堆上直接注入代码的方式难以继续发挥效果。攻击者们也提出来相应的方法来绕过保护，目前主要的是 ROP(Return Oriented Programming)，其主要思想是在栈缓冲区溢出的基础
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-06-20
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                
-                                <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category">
-                                    笔记
-                                </a>
-                                
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                    <div class="card-action article-tags">
-                        
-                        <a href="/tags/%E7%AC%94%E8%AE%B0/">
-                            <span class="chip bg-color">笔记</span>
-                        </a>
-                        
-                    </div>
-                    
-                </div>
-            </div>
-            
-            <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/2021/062043a9.html">
-                        <div class="card-image tag-image">
-                            
-                            
-                            <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="ret2text">
-                            
-                            <span class="card-title">ret2text</span>
-                        </div>
-                    </a>
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                
-ret2textret2text 即控制程序执行程序本身已有的的代码 (.text),使EIP指向具有system(“/bin/sh”)的代码段。其实，这种攻击方法是一种笼统的描述。我们控制执行程序已有的代码的时候也可以控制程序执行好几段
+                                ROP小分类
                             
                         </div>
                         <div class="publish-info">
@@ -879,6 +835,60 @@ ret2textret2text 即控制程序执行程序本身已有的的代码 (.text),使
                         
                         <a href="/tags/pwn/">
                             <span class="chip bg-color">pwn</span>
+                        </a>
+                        
+                        <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                            <span class="chip bg-color">笔记</span>
+                        </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
+                <div class="card">
+                    <a href="/2021/062043a9.html">
+                        <div class="card-image tag-image">
+                            
+                            
+                            <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="ret2text">
+                            
+                            <span class="card-title">ret2text</span>
+                        </div>
+                    </a>
+                    <div class="card-content article-content">
+                        <div class="summary block-with-text">
+                            
+                                ret2text类型题目解法
+                            
+                        </div>
+                        <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-06-20
+                            </span>
+                            <span class="publish-author">
+                                
+                                <i class="fas fa-bookmark fa-fw icon-category"></i>
+                                
+                                <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category">
+                                    笔记
+                                </a>
+                                
+                                
+                            </span>
+                        </div>
+                    </div>
+
+                    
+                    <div class="card-action article-tags">
+                        
+                        <a href="/tags/pwn/">
+                            <span class="chip bg-color">pwn</span>
+                        </a>
+                        
+                        <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                            <span class="chip bg-color">笔记</span>
                         </a>
                         
                     </div>

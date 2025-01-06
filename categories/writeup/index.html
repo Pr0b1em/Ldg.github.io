@@ -426,11 +426,7 @@
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-
-UUCTF writeupwriter:Pr0b1em(小菜鸡二进制选手，目标全栈选手，不配)PWNbabystack下载附件，先检查保护机制，只开了NX，64位文件
-
-拖入IDA查看，分别查看main函数和字符串，找到关键字符串sys
+                                记一次心血来潮的比赛
                             
                         </div>
                         <div class="publish-info">
@@ -457,6 +453,10 @@ UUCTF writeupwriter:Pr0b1em(小菜鸡二进制选手，目标全栈选手，不�
                             <span class="chip bg-color">pwn</span>
                         </a>
                         
+                        <a href="/tags/%E5%A4%8D%E7%8E%B0/">
+                            <span class="chip bg-color">复现</span>
+                        </a>
+                        
                     </div>
                     
                 </div>
@@ -476,11 +476,7 @@ UUCTF writeupwriter:Pr0b1em(小菜鸡二进制选手，目标全栈选手，不�
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-沙箱初体验（pwnable_orw)确实很新奇嗷，照着buu上题目顺序来做，没想到这么快就接触到了沙箱的题目，而我堆都还没玩明白
-那废话不多说，先来看看文件吧。这时候问题就出现了，不知道为啥就被拦下了，附件不让下载。
-
-xs，只好去网上找
+                                沙箱
                             
                         </div>
                         <div class="publish-info">
@@ -526,15 +522,7 @@ xs，只好去网上找
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-刷新三观第一题(bjdctf_2020_router)昨天本来已经没想到，但今天更没想到
-这是一个考察linux中命令方式的题，直接就不需要IDA查看文件
-Linux中打开，连接靶机
-
-界面就这样，让你选
-我选了1
-
-然后让我输入ip地址
+                                新鲜！
                             
                         </div>
                         <div class="publish-info">
@@ -580,13 +568,7 @@ Linux中打开，连接靶机
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-pwnable_simple_login小萌新斗胆做了一下buu上第六页的一道pwn题，纯粹是为了冲分，就是卷（bushi
-首先检查保护机制，32位文件，开NX，没有开PIE，那这个题目应该不会太难。
-
-继续看IDA，main函数
-
-这里
+                                冲冲冲
                             
                         </div>
                         <div class="publish-info">
@@ -632,11 +614,7 @@ pwnable_simple_login小萌新斗胆做了一下buu上第六页的一道pwn题，
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-UNCTF——fo我真是个傻逼！这题目就是拿来自己打醒自己的，比赛卡了一晚上，一度怀疑是自己字符串漏洞没学好，研究一晚格式化字符串，结果wp出来一看，计算偏移量搞错，我真是个大傻逼！！！
-检查保护机制，64位，开NX和canary
-
-思路
+                                unctf
                             
                         </div>
                         <div class="publish-info">
@@ -674,17 +652,15 @@ UNCTF——fo我真是个傻逼！这题目就是拿来自己打醒自己的，�
                         <div class="card-image tag-image">
                             
                             
-                            <img src="/medias/featureimages/24.jpg" class="responsive-img" alt="xjusec考核赛">
+                            <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="xjusec考核赛 writeup">
                             
-                            <span class="card-title">xjusec考核赛</span>
+                            <span class="card-title">xjusec考核赛 writeup</span>
                         </div>
                     </a>
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                xjusec考核赛wpREVERSE：justbase64这个题是以前看见过的一个类似的题，ida打开
-
-这边目录看见encode_one,encode_two,encode_three三个编码，右边主函数里就是三次编码后形成的”EmBmP
+                                2021考核赛
                             
                         </div>
                         <div class="publish-info">
@@ -706,6 +682,10 @@ UNCTF——fo我真是个傻逼！这题目就是拿来自己打醒自己的，�
 
                     
                     <div class="card-action article-tags">
+                        
+                        <a href="/tags/pwn/">
+                            <span class="chip bg-color">pwn</span>
+                        </a>
                         
                         <a href="/tags/%E5%A4%8D%E7%8E%B0/">
                             <span class="chip bg-color">复现</span>
@@ -730,15 +710,7 @@ UNCTF——fo我真是个傻逼！这题目就是拿来自己打醒自己的，�
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                bjdctf_2020_babyrop2检查保护机制，开了NX和canary，64位
-
-IDA打开，查看main函数，发现里面利用到了三个函数
-
-init函数，初始化输出提示
-
-gift函数，存在格式化字符串漏洞
-
-vuln函数，存在栈溢出
+                                libc泄露|格式化字符串漏洞
                             
                         </div>
                         <div class="publish-info">
@@ -784,15 +756,7 @@ vuln函数，存在栈溢出
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                picoctf_2018_rop chain检查保护机制，32位，开NX
-
-IDA打开
-main函数，里面发现vuln函数
-
-
-漏洞点：没有限制输入字符串长度然后发现了一个flag函数，仔细查看后发现这是一个后门函数
-
-win_functi
+                                2018_rop
                             
                         </div>
                         <div class="publish-info">
@@ -838,12 +802,7 @@ win_functi
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                [Black Watch 入群题]PWN检查保护机制，32位，开NX
-
-IDA打开，查看main函数，看到vul_function()函数
-
-
-虽然buf在栈上但输入的长度仅仅能够覆盖ebp和返回地址，但s在bss段，而且输入的长度也够长，
+                                栈劫持
                             
                         </div>
                         <div class="publish-info">
@@ -889,16 +848,7 @@ IDA打开，查看main函数，看到vul_function()函数
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                jarvisoj_level3_x64检查保护机制，64位，开NX
-
-IDA打开，
-main函数
-
-发现function函数，找到栈溢出漏洞
-
-写入长度为7，读的长度为0x200
-解题思路1.泄露read地址得到libc版本
-2.获取sys
+                                libc泄露
                             
                         </div>
                         <div class="publish-info">

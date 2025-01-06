@@ -471,9 +471,7 @@
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    
-原理由于canary保护就是在距离EBP一定距离的栈帧中，用于验证是否程序有构造缓冲区的危险。而canary所在的位置一般也都在EBP-8的位置上存储着，因此 只要有机会泄露canary的位置，我们便有机会溢出程序
-泄露方式覆盖00字节读
+                                    三种绕过canary的方法
                                 
                             </div>
                             <div class="publish-info">
@@ -532,8 +530,7 @@
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    
-Linux系统调用 int 80h（int 0x80）系统调用在计算机中，系统调用（英语：system call），又称为系统呼叫，指运行在使用者空间的程序向操作系统内核请求需要更高权限运行的服务。 系统调用提供了用户程序与操作系统之间的
+                                    系统调用
                                 
                             </div>
                             <div class="publish-info">
@@ -557,6 +554,8 @@ Linux系统调用 int 80h（int 0x80）系统调用在计算机中，系统调�
                         <div class="card-action article-tags">
                             
                             <a href="/tags/pwn/"><span class="chip bg-color">pwn</span></a>
+                            
+                            <a href="/tags/%E7%AC%94%E8%AE%B0/"><span class="chip bg-color">笔记</span></a>
                             
                         </div>
                         
@@ -597,9 +596,7 @@ Linux系统调用 int 80h（int 0x80）系统调用在计算机中，系统调�
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    
-shellcode主要是普及一下shellcode在pwntools中的用法
-shellcraft模块shellcraft模块是shellcode的模块，包含一些生成shellcode的函数。其中的子模块声明架构，比如shellcraft
+                                    pwntools下的shellcode
                                 
                             </div>
                             <div class="publish-info">
@@ -623,6 +620,8 @@ shellcraft模块shellcraft模块是shellcode的模块，包含一些生成shellc
                         <div class="card-action article-tags">
                             
                             <a href="/tags/pwn/"><span class="chip bg-color">pwn</span></a>
+                            
+                            <a href="/tags/%E7%AC%94%E8%AE%B0/"><span class="chip bg-color">笔记</span></a>
                             
                         </div>
                         
@@ -663,13 +662,7 @@ shellcraft模块shellcraft模块是shellcode的模块，包含一些生成shellc
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    
-PWN——从入门到入土咚!咚!咚!
-从入门到入土之路开始了
-
-”Pwn”是一个黑客语法的俚语词 ，是指攻破设备或者系统 。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了 。
-
-在CT
+                                    指难
                                 
                             </div>
                             <div class="publish-info">
@@ -733,7 +726,7 @@ PWN——从入门到入土咚!咚!咚!
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    大一总结：   2020年9月21日，是我第一天到新疆大学报道的日子，怀着憧憬和忐忑的心，我正式成为了一名网安的学生。其实刚到大学，脑子里只有一股念想： 怎么在大学四年里过得充实。   要我说，真正让我开始感到大学意义的便是ctf。刚开学，
+                                    回忆与展望
                                 
                             </div>
                             <div class="publish-info">
@@ -757,6 +750,8 @@ PWN——从入门到入土咚!咚!咚!
                         <div class="card-action article-tags">
                             
                             <a href="/tags/%E7%94%9F%E6%B4%BB/"><span class="chip bg-color">生活</span></a>
+                            
+                            <a href="/tags/2021/"><span class="chip bg-color">2021</span></a>
                             
                         </div>
                         
@@ -789,17 +784,15 @@ PWN——从入门到入土咚!咚!咚!
                             <div class="card-image">
                                 
                                 
-                                <img src="/medias/featureimages/24.jpg" class="responsive-img" alt="xjusec考核赛">
+                                <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="xjusec考核赛 writeup">
                                 
-                                <span class="card-title">xjusec考核赛</span>
+                                <span class="card-title">xjusec考核赛 writeup</span>
                             </div>
                         </a>
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    xjusec考核赛wpREVERSE：justbase64这个题是以前看见过的一个类似的题，ida打开
-
-这边目录看见encode_one,encode_two,encode_three三个编码，右边主函数里就是三次编码后形成的”EmBmP
+                                    2021考核赛
                                 
                             </div>
                             <div class="publish-info">
@@ -821,6 +814,8 @@ PWN——从入门到入土咚!咚!咚!
 
                         
                         <div class="card-action article-tags">
+                            
+                            <a href="/tags/pwn/"><span class="chip bg-color">pwn</span></a>
                             
                             <a href="/tags/%E5%A4%8D%E7%8E%B0/"><span class="chip bg-color">复现</span></a>
                             
@@ -863,7 +858,7 @@ PWN——从入门到入土咚!咚!咚!
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    整数溢出如果一个整数用来计算一些敏感数值，如缓冲区大小或数值索引，就会产生潜在的危险。通常情况下，整数溢出并没有改写额外的内存，不会直接导致任意代码执行，但是它会导致栈溢出和堆溢出，而后两者都会导致任意代码执行。由于整数溢出发生之后，很难立
+                                    整数安全
                                 
                             </div>
                             <div class="publish-info">
@@ -922,7 +917,7 @@ PWN——从入门到入土咚!咚!咚!
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    格式化字符串漏洞格式化字符串漏洞是PWN题常见的考察点，仅次于栈溢出漏洞。漏洞原因：程序使用了格式化字符串作为参数，并且格式化字符串为用户可控。其中触发格式化字符串漏洞函数主要是printf、sprintf、fprintf、prin等C库中
+                                    小结一下
                                 
                             </div>
                             <div class="publish-info">
@@ -944,6 +939,8 @@ PWN——从入门到入土咚!咚!咚!
 
                         
                         <div class="card-action article-tags">
+                            
+                            <a href="/tags/pwn/"><span class="chip bg-color">pwn</span></a>
                             
                             <a href="/tags/%E7%AC%94%E8%AE%B0/"><span class="chip bg-color">笔记</span></a>
                             
@@ -981,15 +978,7 @@ PWN——从入门到入土咚!咚!咚!
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    bjdctf_2020_babyrop2检查保护机制，开了NX和canary，64位
-
-IDA打开，查看main函数，发现里面利用到了三个函数
-
-init函数，初始化输出提示
-
-gift函数，存在格式化字符串漏洞
-
-vuln函数，存在栈溢出
+                                    libc泄露|格式化字符串漏洞
                                 
                             </div>
                             <div class="publish-info">
@@ -1048,15 +1037,7 @@ vuln函数，存在栈溢出
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    picoctf_2018_rop chain检查保护机制，32位，开NX
-
-IDA打开
-main函数，里面发现vuln函数
-
-
-漏洞点：没有限制输入字符串长度然后发现了一个flag函数，仔细查看后发现这是一个后门函数
-
-win_functi
+                                    2018_rop
                                 
                             </div>
                             <div class="publish-info">

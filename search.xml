@@ -332,6 +332,7 @@ end              &#x2F;&#x2F;结束<span aria-hidden="true" class="line-numbers-
         <category>学习</category>
       </categories>
       <tags>
+        <tag>pwn</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -534,6 +535,7 @@ strcpy(buffer, variable);
         <category>学习</category>
       </categories>
       <tags>
+        <tag>pwn</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -740,6 +742,7 @@ payload <span class="token operator">=</span> <span class="token builtin">buffer
         <category>学习</category>
       </categories>
       <tags>
+        <tag>pwn</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -895,6 +898,7 @@ pop ebp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
         <category>学习</category>
       </categories>
       <tags>
+        <tag>pwn</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -995,6 +999,7 @@ pop ebp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
         <category>学习</category>
       </categories>
       <tags>
+        <tag>pwn</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -1099,6 +1104,7 @@ pop ebp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
         <category>学习</category>
       </categories>
       <tags>
+        <tag>pwn</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -1234,6 +1240,7 @@ pop ebp<span aria-hidden="true" class="line-numbers-rows"><span></span><span></s
         <category>学习</category>
       </categories>
       <tags>
+        <tag>pwn</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -1787,6 +1794,7 @@ Breakpoint 9, main (argc&#x3D;4, argv&#x3D;0xbffff824) at heap3&#x2F;heap3.c:28
         <category>学习</category>
       </categories>
       <tags>
+        <tag>pwn</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -1927,6 +1935,7 @@ string <span class="token operator">=</span> long_to_bytes<span class="token pun
       </categories>
       <tags>
         <tag>pwn</tag>
+        <tag>复现</tag>
       </tags>
   </entry>
   <entry>
@@ -2000,6 +2009,10 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
       <categories>
         <category>笔记</category>
       </categories>
+      <tags>
+        <tag>pwn</tag>
+        <tag>笔记</tag>
+      </tags>
   </entry>
   <entry>
     <title>(HarekazeCTF2019)baby_rop(ret2text)</title>
@@ -2040,6 +2053,7 @@ io.interactive()<span aria-hidden="true" class="line-numbers-rows"><span></span>
       </categories>
       <tags>
         <tag>pwn</tag>
+        <tag>笔记</tag>
       </tags>
   </entry>
   <entry>
@@ -2095,6 +2109,7 @@ io<span class="token punctuation">.</span>interactive<span class="token punctuat
       </categories>
       <tags>
         <tag>pwn</tag>
+        <tag>笔记</tag>
       </tags>
   </entry>
   <entry>
@@ -2278,6 +2293,7 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
       </categories>
       <tags>
         <tag>生活</tag>
+        <tag>2021</tag>
       </tags>
   </entry>
   <entry>
@@ -2954,6 +2970,7 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
       </categories>
       <tags>
         <tag>pwn</tag>
+        <tag>笔记</tag>
       </tags>
   </entry>
   <entry>
@@ -2998,6 +3015,7 @@ io.interactive()<span aria-hidden="true" class="line-numbers-rows"><span></span>
       </categories>
       <tags>
         <tag>pwn</tag>
+        <tag>笔记</tag>
       </tags>
   </entry>
   <entry>
@@ -3016,10 +3034,11 @@ io.interactive()<span aria-hidden="true" class="line-numbers-rows"><span></span>
       </categories>
       <tags>
         <tag>pwn</tag>
+        <tag>笔记</tag>
       </tags>
   </entry>
   <entry>
-    <title>xjusec考核赛</title>
+    <title>xjusec考核赛 writeup</title>
     <url>/2021/082666e9.html</url>
     <content><![CDATA[<h1 id="xjusec考核赛wp"><a href="#xjusec考核赛wp" class="headerlink" title="xjusec考核赛wp"></a>xjusec考核赛wp</h1><h2 id="REVERSE："><a href="#REVERSE：" class="headerlink" title="REVERSE："></a>REVERSE：</h2><h3 id="justbase64"><a href="#justbase64" class="headerlink" title="justbase64"></a>justbase64</h3><p>这个题是以前看见过的一个类似的题，ida打开</p>
 <p><img src="/img/image-20210825211051630.png" alt="image-20210825211051630"></p>
@@ -3432,6 +3451,7 @@ alpha <span class="token operator">=</span> <span class="token number">3.0</span
         <category>writeup</category>
       </categories>
       <tags>
+        <tag>pwn</tag>
         <tag>复现</tag>
       </tags>
   </entry>
@@ -3528,6 +3548,7 @@ callq 在栈里存放一个8位的返回地址
         <category>笔记</category>
       </categories>
       <tags>
+        <tag>pwn</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -3568,6 +3589,7 @@ callq 在栈里存放一个8位的返回地址
       </categories>
       <tags>
         <tag>生活</tag>
+        <tag>2021</tag>
       </tags>
   </entry>
   <entry>
@@ -3971,6 +3993,7 @@ warn_on_root &#x3D; 1
       </categories>
       <tags>
         <tag>生活</tag>
+        <tag>2022</tag>
       </tags>
   </entry>
   <entry>
@@ -4004,6 +4027,7 @@ warn_on_root &#x3D; 1
       </categories>
       <tags>
         <tag>生活</tag>
+        <tag>2022</tag>
       </tags>
   </entry>
   <entry>
@@ -4028,6 +4052,7 @@ warn_on_root &#x3D; 1
       </categories>
       <tags>
         <tag>生活</tag>
+        <tag>2022</tag>
       </tags>
   </entry>
   <entry>
@@ -4115,6 +4140,7 @@ int main(void)
         <category>笔记</category>
       </categories>
       <tags>
+        <tag>pwn</tag>
         <tag>笔记</tag>
       </tags>
   </entry>
@@ -4298,6 +4324,7 @@ q.interactive()<span aria-hidden="true" class="line-numbers-rows"><span></span><
       </categories>
       <tags>
         <tag>pwn</tag>
+        <tag>笔记</tag>
       </tags>
   </entry>
 </search>

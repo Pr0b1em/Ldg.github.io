@@ -471,7 +471,7 @@
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    整数溢出如果一个整数用来计算一些敏感数值，如缓冲区大小或数值索引，就会产生潜在的危险。通常情况下，整数溢出并没有改写额外的内存，不会直接导致任意代码执行，但是它会导致栈溢出和堆溢出，而后两者都会导致任意代码执行。由于整数溢出发生之后，很难立
+                                    整数安全
                                 
                             </div>
                             <div class="publish-info">
@@ -530,7 +530,7 @@
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    格式化字符串漏洞格式化字符串漏洞是PWN题常见的考察点，仅次于栈溢出漏洞。漏洞原因：程序使用了格式化字符串作为参数，并且格式化字符串为用户可控。其中触发格式化字符串漏洞函数主要是printf、sprintf、fprintf、prin等C库中
+                                    小结一下
                                 
                             </div>
                             <div class="publish-info">
@@ -552,6 +552,8 @@
 
                         
                         <div class="card-action article-tags">
+                            
+                            <a href="/tags/pwn/"><span class="chip bg-color">pwn</span></a>
                             
                             <a href="/tags/%E7%AC%94%E8%AE%B0/"><span class="chip bg-color">笔记</span></a>
                             
@@ -589,15 +591,7 @@
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    bjdctf_2020_babyrop2检查保护机制，开了NX和canary，64位
-
-IDA打开，查看main函数，发现里面利用到了三个函数
-
-init函数，初始化输出提示
-
-gift函数，存在格式化字符串漏洞
-
-vuln函数，存在栈溢出
+                                    libc泄露|格式化字符串漏洞
                                 
                             </div>
                             <div class="publish-info">
@@ -656,15 +650,7 @@ vuln函数，存在栈溢出
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    picoctf_2018_rop chain检查保护机制，32位，开NX
-
-IDA打开
-main函数，里面发现vuln函数
-
-
-漏洞点：没有限制输入字符串长度然后发现了一个flag函数，仔细查看后发现这是一个后门函数
-
-win_functi
+                                    2018_rop
                                 
                             </div>
                             <div class="publish-info">
@@ -723,12 +709,7 @@ win_functi
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    [Black Watch 入群题]PWN检查保护机制，32位，开NX
-
-IDA打开，查看main函数，看到vul_function()函数
-
-
-虽然buf在栈上但输入的长度仅仅能够覆盖ebp和返回地址，但s在bss段，而且输入的长度也够长，
+                                    栈劫持
                                 
                             </div>
                             <div class="publish-info">
@@ -787,16 +768,7 @@ IDA打开，查看main函数，看到vul_function()函数
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    jarvisoj_level3_x64检查保护机制，64位，开NX
-
-IDA打开，
-main函数
-
-发现function函数，找到栈溢出漏洞
-
-写入长度为7，读的长度为0x200
-解题思路1.泄露read地址得到libc版本
-2.获取sys
+                                    libc泄露
                                 
                             </div>
                             <div class="publish-info">
@@ -855,15 +827,7 @@ main函数
                         <div class="card-content article-content">
                             <div class="summary block-with-text">
                                 
-                                    pwn2_sctf_2016检查保护机制，开了NX,32位
-
-尝试运行了一下
-
-IDA打开，main函数很简单，就调用了一个vuln()函数，那就看看vuln()函数
-
-
-
-读出内容限制a2输入最大字节长度为32，接受a2个长度的字符串并放
+                                    libc泄露|整数溢出
                                 
                             </div>
                             <div class="publish-info">

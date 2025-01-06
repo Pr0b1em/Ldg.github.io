@@ -6,16 +6,7 @@
     <meta charset="utf-8">
     <meta name="baidu-site-verification" content="codeva-1wZQQJBzcr" />
     <meta name="keywords" content="jarvisoj_level3_x64, 8023">
-    <meta name="description" content="jarvisoj_level3_x64检查保护机制，64位，开NX
-
-IDA打开，
-main函数
-
-发现function函数，找到栈溢出漏洞
-
-写入长度为7，读的长度为0x200
-解题思路1.泄露read地址得到libc版本
-2.获取sys">
+    <meta name="description" content="libc泄露">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -629,7 +620,7 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            
+                            栈劫持
                         
                     </div>
                     <div class="publish-info">
@@ -678,7 +669,7 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            
+                            libc泄露|整数溢出
                         
                     </div>
                     <div class="publish-info">

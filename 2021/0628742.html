@@ -6,12 +6,7 @@
     <meta charset="utf-8">
     <meta name="baidu-site-verification" content="codeva-1wZQQJBzcr" />
     <meta name="keywords" content="ciscn_s_3, 8023">
-    <meta name="description" content="ciscn_2019_s_3检查保护机制，64位，开NX
-IDA打开，查看main函数，里面只有一个vuln函数
-
-再查看vuln函数，一个sys_read,一个sys_write,写入0x400，读0x30，这里就发现栈溢出的漏洞
-
-然后">
+    <meta name="description" content="SROP">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -613,7 +608,7 @@ io<span class="token punctuation">.</span>interactive<span class="token punctuat
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            
+                            SROP原理
                         
                     </div>
                     <div class="publish-info">
@@ -631,6 +626,18 @@ io<span class="token punctuation">.</span>interactive<span class="token punctuat
                             
                         </span>
                     </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/pwn/">
+                        <span class="chip bg-color">pwn</span>
+                    </a>
+                    
+                    <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                        <span class="chip bg-color">笔记</span>
+                    </a>
+                    
                 </div>
                 
             </div>
@@ -654,7 +661,7 @@ io<span class="token punctuation">.</span>interactive<span class="token punctuat
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            
+                            libc泄露
                         
                     </div>
                     <div class="publish-info">
