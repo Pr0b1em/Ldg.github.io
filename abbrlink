@@ -4,10 +4,10 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="ret2libc, 8023">
+    <meta name="keywords" content="飞蓬大将军, 8023">
     <meta name="description" content="
-ret2libclibc是Linux下的ANSIC的函数库。
-ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个函数的 plt 处或者函数的具体位置 (即函数对应的 got 表项的内容)。一般情况下，我们会选择执行 ">
+又是一年夏天，又是一年仙剑九叶重楼二两，冬至蝉蛹一钱，加入隔年雪，可医世人相思疾苦，可重楼七叶枝一枝花，冬至何来蝉蛹，雪又怎能隔年，原是相思无解。
+哪来相思无解？九叶重楼可培育，蚕蛹在温室也不是不能活但冬至，今年雪放到冰箱明年用，其实一切">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -19,7 +19,7 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>ret2libc | 8023</title>
+    <title>飞蓬大将军 | 8023</title>
     <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
     
 
@@ -305,12 +305,12 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/23.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/20.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">ret2libc</h1>
+                    <h1 class="description center-align post-title">飞蓬大将军</h1>
                 </div>
             </div>
         </div>
@@ -334,8 +334,8 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/pwn/">
-                                <span class="chip bg-color">pwn</span>
+                            <a href="/tags/%E7%94%9F%E6%B4%BB/">
+                                <span class="chip bg-color">生活</span>
                             </a>
                         
                     </div>
@@ -346,8 +346,8 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category">
-                                笔记
+                            <a href="/categories/%E6%97%A5%E5%B8%B8%E9%97%B2%E8%AF%9D/" class="post-category">
+                                日常闲话
                             </a>
                         
                     </div>
@@ -359,37 +359,22 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-06-20
+                    2021-06-17
                 </div>
                 
 
-                
-                <div class="post-date info-break-policy">
-                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2021-09-17
-                </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    368
+                    137
                 </div>
                 
 
                 
-                <div class="info-break-policy">
-                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
-                </div>
-                
 
                 
-                    <div id="busuanzi_container_page_pv" class="info-break-policy">
-                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
-                        <span id="busuanzi_value_page_pv"></span>
-                    </div>
-				
             </div>
         </div>
         <hr class="clearfix">
@@ -424,24 +409,8 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <span id="more"></span>
-<h1 id="ret2libc"><a href="#ret2libc" class="headerlink" title="ret2libc"></a>ret2libc</h1><p>libc是Linux下的ANSIC的函数库。</p>
-<p>ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个函数的 plt 处或者函数的具体位置 (即函数对应的 got 表项的内容)。一般情况下，我们会选择执行 system(“/bin/sh”)，故而此时我们需要知道 system 函数的地址。</p>
-<h3 id="非执行堆栈"><a href="#非执行堆栈" class="headerlink" title="非执行堆栈"></a>非执行堆栈</h3><p>非执行堆栈是为避免堆或者堆栈的内存区域被植入恶意代码执行，当然也可以直接防止一部分内存被写入恶意代码。换句话说，这是个防止缓冲区溢出的功能。</p>
-<p>当checksec发现NX(No-eXecute)开启后，其实就已经是非执行堆栈了，这时候就需要用到libc库。</p>
-<h5 id="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"><a href="#libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖" class="headerlink" title="libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖"></a>libc是怎么来的：不再用指令覆盖EIP，直接调用libc库中我们需要的函数覆盖</h5><p>思路：</p>
-<p>1.泄露 一个调用函数的 地址</p>
-<p>2.获取 libc 版本</p>
-<p>3.获取 system 地址与 /bin/sh 的地址</p>
-<p>4.再次执行源程序</p>
-<p>5.触发栈溢出执行 system(‘/bin/sh’)</p>
-<p>shellcode结构：</p>
-<p><img src="/img/shellcode.png"></p>
-<p>正常堆栈布局：</p>
-<p><img src="/img/1.png"></p>
-<p>ret2libc执行system的堆栈布局：</p>
-<p><img src="/img/2.png"></p>
-<p>具体例题可以查看[OGeek2019]babyrop的writeup。</p>
-<p>平常的shellcode在源程序里就能找到system函数和/bin/sh，而ret2libc类型的题差别就在这里，我们需要通过libc库查找到system函数和/bin/sh在源程序中的位置，然后才能构造shellcode进行夺权，最后拿下flag。</p>
+<h3 id="又是一年夏天，又是一年仙剑"><a href="#又是一年夏天，又是一年仙剑" class="headerlink" title="又是一年夏天，又是一年仙剑"></a>又是一年夏天，又是一年仙剑</h3><p>九叶重楼二两，冬至蝉蛹一钱，加入隔年雪，可医世人相思疾苦，可重楼七叶枝一枝花，冬至何来蝉蛹，雪又怎能隔年，原是相思无解。</p>
+<p>哪来相思无解？九叶重楼可培育，蚕蛹在温室也不是不能活但冬至，今年雪放到冰箱明年用，其实一切都能实现，就是代价更大，说是无解，其是不解而已，忘掉她不如思念她，既见随念。</p>
 
                 
             </div>
@@ -468,7 +437,7 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://Pr0b1em.github.io/2021/06/20/ret2libc/">https://Pr0b1em.github.io/2021/06/20/ret2libc/</a>
+                    <a href="https://Pr0b1em.github.io/abbrlink">https://Pr0b1em.github.io/abbrlink</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -506,8 +475,8 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/pwn/">
-                                    <span class="chip bg-color">pwn</span>
+                                <a href="/tags/%E7%94%9F%E6%B4%BB/">
+                                    <span class="chip bg-color">生活</span>
                                 </a>
                             
                         </div>
@@ -590,13 +559,13 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2021/06/20/ret2text/">
+                <a href="/abbrlink">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="ret2text">
+                        <img src="/medias/featureimages/28.jpg" class="responsive-img" alt="get_started_3dsctf_2016">
                         
-                        <span class="card-title">ret2text</span>
+                        <span class="card-title">get_started_3dsctf_2016</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -607,14 +576,14 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-06-20
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-06-17
                         </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category">
-                                    笔记
+                            <a href="/categories/writeup/" class="post-category">
+                                    writeup
                                 </a>
                             
                             
@@ -636,16 +605,16 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
         
         <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+                本篇&nbsp;<i class="far fa-dot-circle"></i>
             </div>
             <div class="card">
-                <a href="/2021/06/17/blog%E8%AF%9E%E7%94%9F%E6%97%A52021-6-17/">
+                <a href="/abbrlink">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="blog诞生日2021.6.17">
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="飞蓬大将军">
                         
-                        <span class="card-title">blog诞生日2021.6.17</span>
+                        <span class="card-title">飞蓬大将军</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -670,6 +639,7 @@ ret2libc 即控制函数的执行 libc 中的函数，通常是返回至某个�
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
