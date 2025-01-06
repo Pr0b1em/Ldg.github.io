@@ -1936,6 +1936,7 @@ string <span class="token operator">=</span> long_to_bytes<span class="token pun
       <tags>
         <tag>pwn</tag>
         <tag>复现</tag>
+        <tag>2023</tag>
       </tags>
   </entry>
   <entry>
@@ -3453,6 +3454,7 @@ alpha <span class="token operator">=</span> <span class="token number">3.0</span
       <tags>
         <tag>pwn</tag>
         <tag>复现</tag>
+        <tag>2021</tag>
       </tags>
   </entry>
   <entry>
