@@ -3074,11 +3074,7 @@ sudo apt install bridge-utils<span aria-hidden="true" class="line-numbers-rows">
 <h3 id="2-创建虚拟网桥"><a href="#2-创建虚拟网桥" class="headerlink" title="2. 创建虚拟网桥"></a>2. 创建虚拟网桥</h3><p>创建虚拟网桥的步骤如下：</p>
 <ol>
 <li><p><strong>创建网桥</strong>：使用 <code>brctl</code> 工具创建一个新的网桥。假设我们要创建一个名为 <code>br0</code> 的网桥：</p>
-<pre class="line-numbers language-none"><code class="language-none">sudo brctl addbr br0
-sudo brctl addif br0 eth0
-sudo ifconfig br0 up
-sudo ifconfig eth0 up
-sudo ifconfig br0 192.168.1.100 netmask 255.255.255.0 up<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<pre class="line-numbers language-none"><code class="language-none">sudo brctl addbr br0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
 <li><p><strong>添加网络接口到网桥</strong>：将现有的网络接口（如 <code>eth0</code> 或 <code>wlan0</code>）添加到网桥中。例如，将 <code>eth0</code> 添加到 <code>br0</code>：</p>
 <pre class="line-numbers language-none"><code class="language-none">sudo brctl addif br0 eth0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
 <li><p><strong>启用网桥和接口</strong>：激活网桥和所有的接口：</p>
@@ -3113,17 +3109,13 @@ iface br0 inet dhcp
 
 <p>这样，你就成功地在 Kali Linux 上创建了一个虚拟网桥。如果你有其他需求，可能需要调整配置或添加更多接口到网桥。</p>
 <p><strong>停止虚拟网卡</strong>： 首先，你需要将虚拟网卡从 <code>up</code> 状态变为 <code>down</code> 状态，这样你才能安全地移除它。</p>
-<pre class="line-numbers language-none"><code class="language-none">sudo ifconfig br0 down
-sudo brctl delif br0 eth0
-sudo brctl delbr br0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">sudo ifconfig br0 down<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p><strong>从桥接中移除物理接口</strong>： 接下来，将之前添加到桥接接口 <code>br0</code> 的物理接口 <code>ens32</code> 移除。</p>
 <pre class="line-numbers language-none"><code class="language-none">sudo brctl delif br0 eth0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p><strong>删除桥接接口</strong>： 最后，使用 <code>brctl</code> 命令删除桥接接口 <code>br0</code>。</p>
 <pre class="line-numbers language-none"><code class="language-none">sudo brctl delbr br0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-
 
 
 
@@ -3134,12 +3126,6 @@ sudo brctl delbr br0<span aria-hidden="true" class="line-numbers-rows"><span></s
 <li><strong><code>memcpy</code><strong>、</strong><code>memmove</code></strong> 等内存操作函数，在复制或移动数据时没有对目标缓冲区的大小进行检查。</li>
 <li>**<code>alloca</code>**，用于栈上动态分配内存时，如果分配的内存过大，可能导致栈溢出。</li>
 </ul>
-<p>临时英文环境</p>
-<pre class="line-numbers language-none"><code class="language-none">sudo dpkg-reconfigure locales
-export LANG&#x3D;en_US.UTF-8
-export LANGUAGE&#x3D;en_US.UTF-8
-export LC_ALL&#x3D;en_US.UTF-8<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
 ]]></content>
       <categories>
         <category>笔记</category>
