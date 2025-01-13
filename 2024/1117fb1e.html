@@ -53,7 +53,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.1"></head>
+<meta name="generator" content="Hexo 5.4.1">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
 
 
 <body>
@@ -435,51 +437,51 @@
             <div id="articleContent">
                 <span id="more"></span>
 
-<h1 id="Pwn-protostar靶场7-heap-two"><a href="#Pwn-protostar靶场7-heap-two" class="headerlink" title="Pwn-protostar靶场7 heap two"></a>Pwn-protostar靶场7 heap two</h1><h2 id="heap2"><a href="#heap2" class="headerlink" title="heap2"></a>heap2</h2><h3 id="程序静态分析"><a href="#程序静态分析" class="headerlink" title="程序静态分析"></a>程序静态分析</h3><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/types.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<h1 id="Pwn-protostar靶场7-heap-two"><a href="#Pwn-protostar靶场7-heap-two" class="headerlink" title="Pwn-protostar靶场7 heap two"></a>Pwn-protostar靶场7 heap two</h1><h2 id="heap2"><a href="#heap2" class="headerlink" title="heap2"></a>heap2</h2><h3 id="程序静态分析"><a href="#程序静态分析" class="headerlink" title="程序静态分析"></a>程序静态分析</h3><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/types.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h&gt;</span></span>
 
-<span class="token keyword">struct</span> <span class="token class-name">auth</span> <span class="token punctuation">&#123;</span>  #定义了一个名为 auth 的结构体
+<span class="token keyword">struct</span> <span class="token class-name">auth</span> <span class="token punctuation">{</span>  #定义了一个名为 auth 的结构体
   <span class="token keyword">char</span> name<span class="token punctuation">[</span><span class="token number">32</span><span class="token punctuation">]</span><span class="token punctuation">;</span>  #定义了一个名叫name的变量，能存储<span class="token number">32</span>字节数据
   <span class="token keyword">int</span> auth<span class="token punctuation">;</span>  #定义了一个整数变量auth
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
 <span class="token keyword">struct</span> <span class="token class-name">auth</span> <span class="token operator">*</span>auth<span class="token punctuation">;</span>  #auth 指针用来指向 <span class="token keyword">struct</span> <span class="token class-name">auth</span> 类型的对象
 <span class="token keyword">char</span> <span class="token operator">*</span>service<span class="token punctuation">;</span>  #定义了一个service指针
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span>  #主函数
-<span class="token punctuation">&#123;</span>
+<span class="token punctuation">{</span>
   <span class="token keyword">char</span> line<span class="token punctuation">[</span><span class="token number">128</span><span class="token punctuation">]</span><span class="token punctuation">;</span>  #定义了一个名叫line的变量，能存储<span class="token number">128</span>字节数据
 
-  <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>  #一个无限循环
+  <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  #一个无限循环
     <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"[ auth = %p, service = %p ]\n"</span><span class="token punctuation">,</span> auth<span class="token punctuation">,</span> service<span class="token punctuation">)</span><span class="token punctuation">;</span>  #输出auth 和 service 指针的当前值
 
     <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">fgets</span><span class="token punctuation">(</span>line<span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>line<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token constant">stdin</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">break</span><span class="token punctuation">;</span>  #获取我们输入，如果读取失败就会退出
     
-    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strncmp</span><span class="token punctuation">(</span>line<span class="token punctuation">,</span> <span class="token string">"auth "</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>  #如果输入auth，进入<span class="token keyword">if</span>语句 
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strncmp</span><span class="token punctuation">(</span>line<span class="token punctuation">,</span> <span class="token string">"auth "</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  #如果输入auth，进入<span class="token keyword">if</span>语句 
       auth <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span>auth<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #给auth 结构体分配内存
       <span class="token function">memset</span><span class="token punctuation">(</span>auth<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>auth<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #将内存初始化为零
-      <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strlen</span><span class="token punctuation">(</span>line <span class="token operator">+</span> <span class="token number">5</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">31</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>  #line <span class="token operator">+</span> <span class="token number">5</span>（即 <span class="token string">"auth "</span> 后面的字符串）的长度小于<span class="token number">31</span>字符
-        <span class="token function">strcpy</span><span class="token punctuation">(</span>auth<span class="token operator">-></span>name<span class="token punctuation">,</span> line <span class="token operator">+</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #它将被复制到 auth 结构体的 name 字段
-      <span class="token punctuation">&#125;</span>
-    <span class="token punctuation">&#125;</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strncmp</span><span class="token punctuation">(</span>line<span class="token punctuation">,</span> <span class="token string">"reset"</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>  #如果输入是 <span class="token string">"reset"</span>
+      <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strlen</span><span class="token punctuation">(</span>line <span class="token operator">+</span> <span class="token number">5</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">31</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  #line <span class="token operator">+</span> <span class="token number">5</span>（即 <span class="token string">"auth "</span> 后面的字符串）的长度小于<span class="token number">31</span>字符
+        <span class="token function">strcpy</span><span class="token punctuation">(</span>auth<span class="token operator">-&gt;</span>name<span class="token punctuation">,</span> line <span class="token operator">+</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #它将被复制到 auth 结构体的 name 字段
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strncmp</span><span class="token punctuation">(</span>line<span class="token punctuation">,</span> <span class="token string">"reset"</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  #如果输入是 <span class="token string">"reset"</span>
       <span class="token function">free</span><span class="token punctuation">(</span>auth<span class="token punctuation">)</span><span class="token punctuation">;</span>  #释放掉auth结构体的内存
-    <span class="token punctuation">&#125;</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strncmp</span><span class="token punctuation">(</span>line<span class="token punctuation">,</span> <span class="token string">"service"</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>  #如果输入以 <span class="token string">"service"</span> 开头
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strncmp</span><span class="token punctuation">(</span>line<span class="token punctuation">,</span> <span class="token string">"service"</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  #如果输入以 <span class="token string">"service"</span> 开头
       service <span class="token operator">=</span> <span class="token function">strdup</span><span class="token punctuation">(</span>line <span class="token operator">+</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #程序将使用 strdup 函数复制 <span class="token string">"service"</span> 后面的字符串，并将 service 指针指向这个新分配的副本
-    <span class="token punctuation">&#125;</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strncmp</span><span class="token punctuation">(</span>line<span class="token punctuation">,</span> <span class="token string">"login"</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>  #如果输入是 <span class="token string">"login"</span>
-      <span class="token keyword">if</span><span class="token punctuation">(</span>auth<span class="token operator">-></span>auth<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>  #程序将检查 auth 结构体的 auth 字段
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">strncmp</span><span class="token punctuation">(</span>line<span class="token punctuation">,</span> <span class="token string">"login"</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  #如果输入是 <span class="token string">"login"</span>
+      <span class="token keyword">if</span><span class="token punctuation">(</span>auth<span class="token operator">-&gt;</span>auth<span class="token punctuation">)</span> <span class="token punctuation">{</span>  #程序将检查 auth 结构体的 auth 字段
         <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"you have logged in already!\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #如果 auth 字段非零，程序会打印一条消息表示用户已经登录
-      <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+      <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
         <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"please enter your password\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #否则，程序提示用户输入密码
-      <span class="token punctuation">&#125;</span>
-    <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <h3 id="什么是use-after-free漏洞？"><a href="#什么是use-after-free漏洞？" class="headerlink" title="什么是use-after-free漏洞？"></a>什么是use-after-free漏洞？</h3><p>Use-After-Free（UAF）漏洞是一种内存安全漏洞，发生在程序释放了一块内存之后再次错误地使用（访问或操作）这块内存的情况。这种漏洞通常出现在动态内存管理的环境中，尤其是在使用手动内存管理（如C和C++语言）的程序中较为常见。UAF漏洞可能导致程序行为异常、数据损坏、信息泄露，甚至允许攻击者执行任意代码。</p>
 <h3 id="UAF漏洞发生的条件"><a href="#UAF漏洞发生的条件" class="headerlink" title="UAF漏洞发生的条件"></a>UAF漏洞发生的条件</h3><p>内存释放：程序通过某种机制（例如C语言的free()函数）释放了一块动态分配的内存。<br>错误重用：在该内存被释放后，程序中的某个部分尝试再次访问或使用这块已释放的内存。<br>内存再分配：操作系统或内存管理器可能将已释放的内存块重新分配给其他请求，导致原先的引用变得不可预测或危险。</p>
@@ -518,7 +520,7 @@
 <p>我们在printf函数处下一个断点，然后用commands参数在每一步操作停下来后，自动的运行我们设置的命令，可以更方便的展示堆空间的操作 </p>
 <p><img src="/img/1731846696741.png"></p>
 <pre class="line-numbers language-none"><code class="language-none">&gt;echo -----------------------------------------------\n
-&gt;x&#x2F;20wx 0x804c000
+&gt;x/20wx 0x804c000
 &gt;echo auth-------------------------------------------\n
 &gt;print *auth
 &gt;echo service----------------------------------------\n
@@ -982,7 +984,7 @@
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">42.3k</span>
+                        class="white-color">41.6k</span>
             
             
             

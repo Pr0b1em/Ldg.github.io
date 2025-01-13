@@ -53,7 +53,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.1"></head>
+<meta name="generator" content="Hexo 5.4.1">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
 
 
 <body>
@@ -435,42 +437,42 @@
             <div id="articleContent">
                 <span id="more"></span>
 
-<h1 id="Pwn-protostar靶场6-heap-one"><a href="#Pwn-protostar靶场6-heap-one" class="headerlink" title="Pwn-protostar靶场6 heap one"></a>Pwn-protostar靶场6 heap one</h1><h2 id="程序静态分析"><a href="#程序静态分析" class="headerlink" title="程序静态分析"></a>程序静态分析</h2><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/types.h></span></span>
+<h1 id="Pwn-protostar靶场6-heap-one"><a href="#Pwn-protostar靶场6-heap-one" class="headerlink" title="Pwn-protostar靶场6 heap one"></a>Pwn-protostar靶场6 heap one</h1><h2 id="程序静态分析"><a href="#程序静态分析" class="headerlink" title="程序静态分析"></a>程序静态分析</h2><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/types.h&gt;</span></span>
 
-<span class="token keyword">struct</span> <span class="token class-name">internet</span> <span class="token punctuation">&#123;</span>  #定义了一个名为 internet 的结构体
+<span class="token keyword">struct</span> <span class="token class-name">internet</span> <span class="token punctuation">{</span>  #定义了一个名为 internet 的结构体
   <span class="token keyword">int</span> priority<span class="token punctuation">;</span>  #定义了一个<span class="token keyword">int</span> 类型的 priority函数
   <span class="token keyword">char</span> <span class="token operator">*</span>name<span class="token punctuation">;</span>  #定义了一个 <span class="token keyword">char</span> 指针 name 函数
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
 
 <span class="token keyword">void</span> <span class="token function">winner</span><span class="token punctuation">(</span><span class="token punctuation">)</span>  #winner函数
-<span class="token punctuation">&#123;</span>
+<span class="token punctuation">{</span>
   <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"and we have a winner @ %d\n"</span><span class="token punctuation">,</span> <span class="token function">time</span><span class="token punctuation">(</span><span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #输出and we have a winner @ <span class="token operator">%</span>d\n"<span class="token punctuation">,</span> <span class="token function">time</span><span class="token punctuation">(</span><span class="token constant">NULL</span><span class="token punctuation">)</span>
-<span class="token punctuation">&#125;</span>
+<span class="token punctuation">}</span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span>  #主函数，参数是从命令行里获取的
-<span class="token punctuation">&#123;</span>
+<span class="token punctuation">{</span>
   <span class="token keyword">struct</span> <span class="token class-name">internet</span> <span class="token operator">*</span>i1<span class="token punctuation">,</span> <span class="token operator">*</span>i2<span class="token punctuation">,</span> <span class="token operator">*</span>i3<span class="token punctuation">;</span>  #声明了三个指针变量，i1、i2和i3，它们都是指向<span class="token keyword">struct</span> <span class="token class-name">internet</span>类型的结构体的指针
 
   i1 <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">internet</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #为 internet 结构体分配内存
-  i1<span class="token operator">-></span>priority <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>  #访问 i1 指向的结构体中的 priority，赋予<span class="token number">1</span>值
-  i1<span class="token operator">-></span>name <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #分配<span class="token number">8</span>个字节的内存
+  i1<span class="token operator">-&gt;</span>priority <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>  #访问 i1 指向的结构体中的 priority，赋予<span class="token number">1</span>值
+  i1<span class="token operator">-&gt;</span>name <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #分配<span class="token number">8</span>个字节的内存
 
   i2 <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">internet</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   #为 internet 结构体分配内存
-  i2<span class="token operator">-></span>priority <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>  #访问 i1 指向的结构体中的 priority，赋予<span class="token number">2</span>值
-  i2<span class="token operator">-></span>name <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #分配<span class="token number">8</span>个字节的内存
+  i2<span class="token operator">-&gt;</span>priority <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>  #访问 i1 指向的结构体中的 priority，赋予<span class="token number">2</span>值
+  i2<span class="token operator">-&gt;</span>name <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #分配<span class="token number">8</span>个字节的内存
 
-  <span class="token function">strcpy</span><span class="token punctuation">(</span>i1<span class="token operator">-></span>name<span class="token punctuation">,</span> argv<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #将第一个命令行参数复制到 i1
-  <span class="token function">strcpy</span><span class="token punctuation">(</span>i2<span class="token operator">-></span>name<span class="token punctuation">,</span> argv<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #将第二个命令行参数复制到 i2
+  <span class="token function">strcpy</span><span class="token punctuation">(</span>i1<span class="token operator">-&gt;</span>name<span class="token punctuation">,</span> argv<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #将第一个命令行参数复制到 i1
+  <span class="token function">strcpy</span><span class="token punctuation">(</span>i2<span class="token operator">-&gt;</span>name<span class="token punctuation">,</span> argv<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  #将第二个命令行参数复制到 i2
 
   <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"and that's a wrap folks!\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  输出and that's a wrap folks<span class="token operator">!</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p> 主函数的分配指针看着有些复杂，我们实际调试一下就能理解了 </p>
-<h2 id="程序动态分析"><a href="#程序动态分析" class="headerlink" title="程序动态分析"></a>程序动态分析</h2><p>使用gdb打开程序，在第一个<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=malloc%E5%87%BD%E6%95%B0&spm=1001.2101.3001.7020">malloc函数</a>处下一个断点</p>
+<h2 id="程序动态分析"><a href="#程序动态分析" class="headerlink" title="程序动态分析"></a>程序动态分析</h2><p>使用gdb打开程序，在第一个<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=malloc%E5%87%BD%E6%95%B0&amp;spm=1001.2101.3001.7020">malloc函数</a>处下一个断点</p>
 <p><img src="/img/1731737324481.png"></p>
 <p><img src="/img/1731737356006.png"></p>
 <p> 我们要输入两个命令行参数才能运行程序 </p>
@@ -520,7 +522,7 @@
 <p><img src="/img/1731738997800.png"></p>
 <p>这里gdb将printf函数解析成了puts函数，第一个参数确定了，我们还需要winner函数的地址 </p>
 <p><img src="/img/1731739076391.png"></p>
-<pre class="line-numbers language-none"><code class="language-none">.&#x2F;heap1 &quot;&#96;&#x2F;bin&#x2F;echo -ne &quot;AAAAAAAAAAAAAAAAAAAA\x74\x97\x04\x08&quot;&#96;&quot; &quot;&#96;&#x2F;bin&#x2F;echo -ne &quot;\x94\x84\x04\x08&quot;&#96;&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">./heap1 "`/bin/echo -ne "AAAAAAAAAAAAAAAAAAAA\x74\x97\x04\x08"`" "`/bin/echo -ne "\x94\x84\x04\x08"`"<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p><img src="/img/1731739193665.png"></p>
 <p> 成功跳转到winner函数，这里我们也可以使用gdb查看堆空间 </p>
@@ -951,7 +953,7 @@
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">42.3k</span>
+                        class="white-color">41.6k</span>
             
             
             

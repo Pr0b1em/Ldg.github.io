@@ -53,7 +53,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.1"></head>
+<meta name="generator" content="Hexo 5.4.1">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
 
 
 <body>
@@ -393,7 +395,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    677
+                    648
                 </div>
                 
 
@@ -434,7 +436,7 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h1 id="格式化字符串漏洞"><a href="#格式化字符串漏洞" class="headerlink" title="格式化字符串漏洞"></a>格式化字符串漏洞</h1><p>格式化字符串漏洞是<code>PWN</code>题常见的考察点，仅次于栈溢出漏洞。漏洞原因：程序使用了格式化字符串作为参数，并且格式化字符串为用户可控。其中触发格式化字符串漏洞函数主要是<code>printf</code>、<code>sprintf</code>、<code>fprintf</code>、<code>prin</code>等C库中<code>print</code>家族的函数</p>
-<h3 id="0x01-格式化字符串介绍"><a href="#0x01-格式化字符串介绍" class="headerlink" title="0x01 格式化字符串介绍"></a>0x01 格式化字符串介绍</h3><pre class="line-numbers language-none"><code class="language-none">printf（&quot;格式化字符串&quot;,参数...)<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h3 id="0x01-格式化字符串介绍"><a href="#0x01-格式化字符串介绍" class="headerlink" title="0x01 格式化字符串介绍"></a>0x01 格式化字符串介绍</h3><pre class="line-numbers language-none"><code class="language-none">printf（"格式化字符串",参数...)<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>该<code>printf</code>函数的第一个参数是由格式化说明符与字符串组成，用来规定参数用什么格式输出内容。</p>
 <p>格式化说明符：</p>
@@ -447,10 +449,10 @@
 
 <p>例如：</p>
 <pre class="line-numbers language-none"><code class="language-none">#include &lt;stdio.h&gt;
-int main(void)&#123;
-    printf(&quot;My name is %s&quot;,&quot;Ezreal&quot;);
+int main(void){
+    printf("My name is %s","Ezreal");
     return 0;
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>调用以后会显示：</p>
 <pre class="line-numbers language-none"><code class="language-none">My name is Ezreal<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
@@ -459,12 +461,12 @@ int main(void)&#123;
 <pre class="line-numbers language-none"><code class="language-none">#include &lt;stdio.h&gt;
 
 int main(void)
-&#123;
-    int c &#x3D; 0; 
-    printf(&quot;the use of %n&quot;, &amp;c);sss
-    printf(&quot;%d\n&quot;, c);
+{
+    int c = 0; 
+    printf("the use of %n", &amp;c);sss
+    printf("%d\n", c);
     return 0;
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>调用以后会显示：</p>
 <pre class="line-numbers language-none"><code class="language-none">the use of 11<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
@@ -473,34 +475,34 @@ int main(void)
 <p>正常的<code>printf</code>用法：</p>
 <pre class="line-numbers language-none"><code class="language-none">#include &lt;stdio.h&gt;
 int main()
-&#123;
+{
   char str[100];
-  scanf(&quot;%s&quot;,str);
-  printf(&quot;%s&quot;,str);
+  scanf("%s",str);
+  printf("%s",str);
   return 0;
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>写程序时要规定字符串的格式化说明符，规定参数的输出类型</p>
 <p>错误的<code>printf</code>写法：</p>
 <pre class="line-numbers language-none"><code class="language-none">#include &lt;stdio.h&gt;
 int main()
-&#123;
+{
   char str[100];
-  scanf(&quot;%s&quot;,str);
+  scanf("%s",str);
   printf(str);
   return 0;
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>漏洞形成原因：程序将格式化字符串的输入权交给用户，printf函数并不知道参数个数，它的内部有个指针，用来索检格式化字符串。对于特定类型%，就去取相应参数的值，直到索检到格式化字符串结束。所以没有参数，代码也会将format string 后面的内存当做参数以16进制输出。这样就会造成内存泄露。示例程序：</p>
 <pre class="line-numbers language-none"><code class="language-none">#include &lt;stdio.h&gt;
 
 int main(void)
-&#123;
+{
     char a[100];
-    scanf(&quot;%s&quot;,a);
+    scanf("%s",a);
     printf(a);
     return 0;
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>假设我们的输入为:</p>
 <pre class="line-numbers language-none"><code class="language-none">AAAA%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
@@ -927,7 +929,7 @@ int main(void)
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">42.3k</span>
+                        class="white-color">41.6k</span>
             
             
             

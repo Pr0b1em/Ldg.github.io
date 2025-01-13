@@ -53,7 +53,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 5.4.1"></head>
+<meta name="generator" content="Hexo 5.4.1">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
 
 
 <body>
@@ -504,7 +506,7 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 <h3 id="Easy-base64"><a href="#Easy-base64" class="headerlink" title="Easy_base64"></a>Easy_base64</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> base64
 <span class="token comment"># 这里有个固定的字符串是flag</span>
 <span class="token comment"># 1.根据flag的base64编码可以确定第一个字符的ASCII码对应的是90</span>
-flag <span class="token operator">=</span> <span class="token string">'flag&#123;&#125;'</span>
+flag <span class="token operator">=</span> <span class="token string">'flag{}'</span>
 tmp <span class="token operator">=</span> base64<span class="token punctuation">.</span>b64encode<span class="token punctuation">(</span><span class="token builtin">bytes</span><span class="token punctuation">(</span>flag<span class="token punctuation">,</span><span class="token string">"utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token builtin">str</span><span class="token punctuation">(</span>tmp<span class="token punctuation">)</span><span class="token punctuation">)</span>
 
@@ -534,7 +536,7 @@ import libnum
 p=getPrime(1024)
 n=p**3
 e=65537
-flag='flag&#123;luoxiheng&#125;'
+flag='flag{luoxiheng}'
 c=pow(libnum.s2n(flag),e,n)
 print(n)
 print(c)
@@ -994,7 +996,7 @@ string <span class="token operator">=</span> long_to_bytes<span class="token pun
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">42.3k</span>
+                        class="white-color">41.6k</span>
             
             
             
