@@ -472,11 +472,11 @@ iface br0 inet dhcp
 
 
 <h3 id="总结：栈溢出漏洞常见函数"><a href="#总结：栈溢出漏洞常见函数" class="headerlink" title="总结：栈溢出漏洞常见函数"></a>总结：栈溢出漏洞常见函数</h3><ul>
-<li><strong><code>strcpy</code><strong>、</strong><code>strcat</code><strong>、</strong><code>sprintf</code></strong> 等字符串处理函数，特别是在没有检查缓冲区大小时。</li>
-<li><strong><code>scanf</code><strong>、</strong><code>sscanf</code><strong>、</strong><code>fgets</code></strong> 等输入输出函数，特别是处理字符串时没有设置最大读取长度。</li>
-<li><strong><code>gets</code></strong> 和 <strong><code>fgets</code><strong>，</strong><code>gets</code></strong> 是已废弃的最典型的栈溢出来源。</li>
-<li><strong><code>memcpy</code><strong>、</strong><code>memmove</code></strong> 等内存操作函数，在复制或移动数据时没有对目标缓冲区的大小进行检查。</li>
-<li>**<code>alloca</code>**用于栈上动态分配内存时，如果分配的内存过大，可能导致栈溢出。</li>
+<li><code>strcpy</code>、<code>strcat</code>、<code>sprintf</code> 等字符串处理函数，特别是在没有检查缓冲区大小时。</li>
+<li><code>scanf</code>、<code>sscanf</code>、<code>fgets</code> 等输入输出函数，特别是处理字符串时没有设置最大读取长度。</li>
+<li><code>gets</code> 和 <code>fgets</code>，<code>gets</code> 是已废弃的最典型的栈溢出来源。</li>
+<li><code>memcpy</code>、<code>memmove</code> 等内存操作函数，在复制或移动数据时没有对目标缓冲区的大小进行检查。</li>
+<li><code>alloca</code>用于栈上动态分配内存时，如果分配的内存过大，可能导致栈溢出。</li>
 </ul>
 
                 
