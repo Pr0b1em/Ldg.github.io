@@ -441,12 +441,12 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h1 id="jarvisoj-level3-x64"><a href="#jarvisoj-level3-x64" class="headerlink" title="jarvisoj_level3_x64"></a>jarvisoj_level3_x64</h1><p>检查保护机制，64位，开NX</p>
-<p><img src="/img/image-20210711122341042.png" alt="image-20210711122341042"></p>
+<p><img src="/img/image-20210711122341042.png"></p>
 <p>IDA打开，</p>
 <p>main函数</p>
-<p><img src="/img/image-20210711123946252.png" alt="image-20210711123946252"></p>
+<p><img src="/img/image-20210711123946252.png"></p>
 <p>发现function函数，找到栈溢出漏洞</p>
-<p><img src="/img/image-20210711124005975.png" alt="image-20210711124005975"></p>
+<p><img src="/img/image-20210711124005975.png"></p>
 <p>写入长度为7，读的长度为0x200</p>
 <h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><p>1.泄露read地址得到libc版本</p>
 <p>2.获取system和‘/bin/sh’的地址</p>
@@ -455,7 +455,7 @@
 <p>需要构造write(1, read_got, 8)，即将rdi=1<code>，</code>rsi=read_got<code>，</code>rdx=8</p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python">ROPgadget <span class="token operator">-</span><span class="token operator">-</span>binary level3_x64 <span class="token operator">-</span><span class="token operator">-</span>only “pop<span class="token operator">|</span>ret”<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="/img/image-20210711132937061.png" alt="image-20210711132937061"></p>
+<p><img src="/img/image-20210711132937061.png"></p>
 <p>利用出栈指令<code>pop</code>给对应的寄存器赋值，但这里没有<code>pop rdx</code>，通过查看反汇编可以发现构造栈溢出前<code>rdx=0x200</code>，足够将<code>read</code>函数的真实地址泄露出来</p>
 <p>第二次栈溢出跳转执行<code>system("/bin/sh")</code></p>
 <h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -492,7 +492,7 @@ p<span class="token punctuation">.</span>sendlineafter<span class="token punctua
 p<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="/img/image-20210711133802398.png" alt="image-20210711133802398"></p>
+<p><img src="/img/image-20210711133802398.png"></p>
 
                 
             </div>

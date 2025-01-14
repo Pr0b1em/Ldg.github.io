@@ -446,16 +446,16 @@
             <div id="articleContent">
                 <span id="more"></span>
 <h2 id="HarekazeCTF2019-baby-rop-ret2text"><a href="#HarekazeCTF2019-baby-rop-ret2text" class="headerlink" title="[HarekazeCTF2019]baby_rop(ret2text)"></a>[HarekazeCTF2019]baby_rop(ret2text)</h2><p>查看保护机制，开了NX，64位</p>
-<p><img src="/img/image-20210620201226614.png" alt="image-20210620201226614"></p>
+<p><img src="/img/image-20210620201226614.png"></p>
 <p>IDA打开，F5查看main函数</p>
-<p><img src="/img/image-20210620201505692.png" alt="image-20210620201505692"></p>
-<p><img src="/img/image-20210620201559551.png" alt="image-20210620201559551"></p>
+<p><img src="/img/image-20210620201505692.png"></p>
+<p><img src="/img/image-20210620201559551.png"></p>
 <p>看见system函数</p>
 <p>然后F12+shift搜索字符串，还找到了’/bin/sh/‘</p>
-<p><img src="/img/image-20210620201708611.png" alt="image-20210620201708611"></p>
-<p><img src="/img/image-20210620202004923.png" alt="image-20210620202004923"></p>
+<p><img src="/img/image-20210620201708611.png"></p>
+<p><img src="/img/image-20210620202004923.png"></p>
 <p>因为64位传参需要用到寄存器，所以用gadget找到rdi寄存器位置</p>
-<p><img src="/img/image-20210620202405923.png" alt="image-20210620202405923"></p>
+<p><img src="/img/image-20210620202405923.png"></p>
 <h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-none"><code class="language-none">from pwn import *
 context.log_level = "debug"
 
@@ -473,7 +473,7 @@ io.sendline(payload)
 io.interactive()<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>这里夺权之后还有一个小坑，就是flag不在根目录下，需要通过查找获得位置，然后拿到flag</p>
-<p><img src="/img/image-20210620202949778.png" alt="image-20210620202949778"></p>
+<p><img src="/img/image-20210620202949778.png"></p>
 
                 
             </div>

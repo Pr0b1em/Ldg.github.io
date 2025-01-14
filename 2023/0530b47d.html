@@ -451,13 +451,13 @@
                 <span id="more"></span>
 
 <h1 id="UUCTF-writeup"><a href="#UUCTF-writeup" class="headerlink" title="UUCTF writeup"></a>UUCTF writeup</h1><h3 id="writer-Pr0b1em-小菜鸡二进制选手，目标全栈选手，不配"><a href="#writer-Pr0b1em-小菜鸡二进制选手，目标全栈选手，不配" class="headerlink" title="writer:Pr0b1em(小菜鸡二进制选手，目标全栈选手，不配)"></a>writer:Pr0b1em<del>(小菜鸡二进制选手，目标全栈选手，不配)</del></h3><h2 id="PWN"><a href="#PWN" class="headerlink" title="PWN"></a>PWN</h2><h3 id="babystack"><a href="#babystack" class="headerlink" title="babystack"></a>babystack</h3><p>下载附件，先检查保护机制，只开了NX，64位文件</p>
-<p><img src="/img/1666613003904.png" alt="1666613003904"></p>
+<p><img src="/img/1666613003904.png"></p>
 <p>拖入IDA查看，分别查看main函数和字符串，找到关键字符串system和bin/sh，同时发现了vuln函数，继续跟进</p>
-<p><img src="/img/1666613080677.png" alt="1666613080677"></p>
-<p><img src="/img/1666613062494.png" alt="1666613062494"></p>
-<p><img src="/img/1666613139782.png" alt="1666613139782"></p>
+<p><img src="/img/1666613080677.png"></p>
+<p><img src="/img/1666613062494.png"></p>
+<p><img src="/img/1666613139782.png"></p>
 <p>发现buf此处，其中存在栈溢出，同时发现back_door函数，现成直接用 </p>
-<p><img src="/img/1666613319147.png" alt="1666613319147"></p>
+<p><img src="/img/1666613319147.png"></p>
 <p>构造脚本</p>
 <h4 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h4><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 
@@ -475,9 +475,9 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 
 <h3 id="easystack"><a href="#easystack" class="headerlink" title="easystack"></a>easystack</h3><p><strong>花式栈溢出</strong></p>
 <p>检查保护机制，开了NX和PIE,说明基地址随机，估计得碰运气</p>
-<p><img src="/img/1666614235498.png" alt="1666614235498"></p>
+<p><img src="/img/1666614235498.png"></p>
 <p>IDA打开，发现内容和上一题几乎一样，唯独不同的点就是溢出空间只够一个后门函数的地址，于是撰写脚本，因为基地址为止，需要碰，所以脚本些许变化</p>
-<p><img src="/img/1666614380686.png" alt="1666614380686"></p>
+<p><img src="/img/1666614380686.png"></p>
 <h4 id="exp-1"><a href="#exp-1" class="headerlink" title="exp"></a>exp</h4><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 
 <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
@@ -499,17 +499,17 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
         <span class="token keyword">continue</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <h3 id="just-rce"><a href="#just-rce" class="headerlink" title="just rce"></a>just rce</h3><p>简单的rce，通过rev指令逆序输出就得到flag，后面配上通配符绕过关键字</p>
-<p><img src="/img/1666618211863.png" alt="1666618211863"></p>
+<p><img src="/img/1666618211863.png"></p>
 <h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><h3 id="Where-is-flag？"><a href="#Where-is-flag？" class="headerlink" title="Where is flag？"></a>Where is flag？</h3><p>流量分析，wireshark打开后导出特定分组http，发现有个flag压缩包，打开文件发现是png图片格式，010打开，这里发现缺少头文件，于是修复好，发现是个二维码，扫出来的内容存在零宽容度字符，在线网站解密得到flag。</p>
-<p><img src="/img/1666777976579.png" alt="1666777976579"></p>
+<p><img src="/img/1666777976579.png"></p>
 <h3 id="搬好小板凳听故事"><a href="#搬好小板凳听故事" class="headerlink" title="搬好小板凳听故事"></a>搬好小板凳听故事</h3><p>简单的解决，用ciphey，好一个三花淡奶！</p>
-<p><img src="/img/1666778096125.png" alt="1666778096125"></p>
+<p><img src="/img/1666778096125.png"></p>
 <h3 id="村中奇怪的故事"><a href="#村中奇怪的故事" class="headerlink" title="村中奇怪的故事"></a>村中奇怪的故事</h3><p>这玩意儿图片真给我误导了，没想到就是百家姓加密，后来仔细一看悟出来了，赶紧去试，后来七七上hint也验证了我的想法。说真的，这故事够狗屎，给我看得一愣一愣，解出来之后，居然平台后台flag还是错的，给我整得怀疑人生。</p>
 <h3 id="蜜蜂和蛆"><a href="#蜜蜂和蛆" class="headerlink" title="蜜蜂和蛆"></a>蜜蜂和蛆</h3><p>crc32爆破，通过pass1和pass2分别得到一段密码，然后打开得到一张画着蜜蜂和蛆的png，改宽高，得到一个二维码，扫出来base64解密，<del>文件都删完了，懒得复现了</del></p>
 <h3 id="王八快跑"><a href="#王八快跑" class="headerlink" title="王八快跑"></a>王八快跑</h3><p>让你跑你就跑，签个到！哈哈哈哈</p>
 <h3 id="略略略来抓我啊"><a href="#略略略来抓我啊" class="headerlink" title="略略略来抓我啊"></a>略略略来抓我啊</h3><p>社工还是不太擅长，很久没做过了，找了很久，第一张图暴露了一个钱塘驿，直接暴露了位置，然后就找着地图找宾馆，是个眼力活，也是个体力活</p>
 <h2 id="web"><a href="#web" class="headerlink" title="web"></a>web</h2><h3 id="websign"><a href="#websign" class="headerlink" title="websign"></a>websign</h3><p>F12不管用？那我手动总行了吧！</p>
-<p><img src="/img/1666778791713.png" alt="1666778791713"></p>
+<p><img src="/img/1666778791713.png"></p>
 <h2 id="Crypto"><a href="#Crypto" class="headerlink" title="Crypto"></a>Crypto</h2><h3 id="爱丽丝梦境的兔子"><a href="#爱丽丝梦境的兔子" class="headerlink" title="爱丽丝梦境的兔子"></a>爱丽丝梦境的兔子</h3><p>兔子密码、社会主义核心价值观密码和栅栏密码，简单套娃</p>
 <h3 id="disparity-rsa"><a href="#disparity-rsa" class="headerlink" title="disparity_rsa"></a>disparity_rsa</h3><p>这个rsa有手就行，我直接用RsaCTFtools解的，脚本都懒得写了，这里就不放图复现了<del>（是真的懒</del></p>
 <h3 id="Easy-base64"><a href="#Easy-base64" class="headerlink" title="Easy_base64"></a>Easy_base64</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> base64

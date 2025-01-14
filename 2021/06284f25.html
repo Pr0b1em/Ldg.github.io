@@ -441,14 +441,14 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h1 id="ciscn-2019-es-2"><a href="#ciscn-2019-es-2" class="headerlink" title="ciscn_2019_es_2"></a>ciscn_2019_es_2</h1><p>检查保护机制，32位，开启NX</p>
-<p><img src="/img/image-20210628215206342.png" alt="image-20210628215206342"></p>
+<p><img src="/img/image-20210628215206342.png"></p>
 <p>IDA打开，shift+F12查找字符串，发现sysytem函数，但没有/bin/sh，还是无法直接利用</p>
-<p><img src="/img/image-20210628215304461.png" alt="image-20210628215304461"></p>
+<p><img src="/img/image-20210628215304461.png"></p>
 <p>找到system函数真实地址0x8048400</p>
-<p><img src="/img/image-20210628215541204.png" alt="image-20210628215541204"></p>
+<p><img src="/img/image-20210628215541204.png"></p>
 <p>main函数，还是一样，里面的vlu()函数肯定是重点</p>
-<p><img src="/img/image-20210628215636474.png" alt="image-20210628215636474"></p>
-<p><img src="/img/image-20210628215644207.png" alt="image-20210628215644207"></p>
+<p><img src="/img/image-20210628215636474.png"></p>
+<p><img src="/img/image-20210628215644207.png"></p>
 <p>读入0x30字节数据给s，s大小是0x28，只能溢出0x8字节，覆盖到ret，没法构造太长的rop，但是这边可以给s写入2次数据。</p>
 <h3 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h3><p>我们可以通过第一次输入来泄露程序里的ebp地址，知道了ebp的地址就能够推算出参数s在栈上的地址，第二次直接往栈上写入system（‘/bin/sh’），之后利用leave；ret的栈劫持去到参数s的栈，让它去执行我们布置在栈上的system（‘/bin/sh’）来获取shell。</p>
 <h3 id="解题过程："><a href="#解题过程：" class="headerlink" title="解题过程："></a>解题过程：</h3><p>1.泄露ebp</p>
@@ -461,7 +461,7 @@ ebp<span class="token operator">=</span>u32<span class="token punctuation">(</sp
 <p>2.找到s在栈上的位置</p>
 <p>算出ebp-0x38是参数s在栈上的位置</p>
 <p>3.布置栈上的值</p>
-<p><img src="/img/image-20210628221147958.png" alt="image-20210628221147958"></p>
+<p><img src="/img/image-20210628221147958.png"></p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python">payload<span class="token operator">=</span><span class="token string">'aaaa'</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>sys<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>main<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>s<span class="token operator">+</span><span class="token number">0x10</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">"/bin/sh"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>第一个’aaaa‘随便输入，如果一开始将system函数写第一个，那么我们在用leave；ret劫持栈的时候要抬高4字节<br>接着跟上system函数的地址<br>后面是执行完system函数后的返回地址，这边也可以随便写<br>之后是一个地址，这个地址指向的是我们写在栈上的’/bin/sh‘字符串</p>
@@ -492,7 +492,7 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>cat flag</p>
-<p><img src="/img/image-20210628221613459.png" alt="image-20210628221613459"></p>
+<p><img src="/img/image-20210628221613459.png"></p>
 
                 
             </div>

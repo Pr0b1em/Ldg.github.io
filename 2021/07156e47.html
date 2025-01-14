@@ -441,16 +441,16 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h2 id="Black-Watch-入群题-PWN"><a href="#Black-Watch-入群题-PWN" class="headerlink" title="[Black Watch 入群题]PWN"></a>[Black Watch 入群题]PWN</h2><p>检查保护机制，32位，开NX</p>
-<p><img src="/img/image-20210715112542782.png" alt="image-20210715112542782"></p>
+<p><img src="/img/image-20210715112542782.png"></p>
 <p>IDA打开，查看main函数，看到vul_function()函数</p>
-<p><img src="/img/image-20210715112703453.png" alt="image-20210715112703453"></p>
-<p><img src="/img/image-20210715112745902.png" alt="image-20210715112745902"></p>
+<p><img src="/img/image-20210715112703453.png"></p>
+<p><img src="/img/image-20210715112745902.png"></p>
 <pre class="line-numbers language-none"><code class="language-none">虽然buf在栈上但输入的长度仅仅能够覆盖ebp和返回地址，但s在bss段，而且输入的长度也够长，因此想到了栈迁移，覆盖vul_function返回地址，使其到bss段上执行<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 
 
 <h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><p>找到s在bss段中的位置是0x804A300</p>
-<p><img src="/img/image-20210715113306340.png" alt="image-20210715113306340"></p>
+<p><img src="/img/image-20210715113306340.png"></p>
 <p>在bss段的s上需要调用system(“/bin/sh”)，但没有提供system和”/bin/sh”的地址，还需要写个ROP链，先泄露write函数的真实地址，再利用LibcSearcher函数可以根据泄露的地址找到相应的libc版本,从而得到system和”/bin/sh”的地址。</p>
 <h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><p>注意:发现做题久了之后，libc版本的问题，如果虚拟机LibcSearcher每次搜出来的libc版本都不是想要的版本，其实有个libc-2.23就可以了，大部分题用2.23都可以跑出来，2.23yyds！</p>
 <h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/python2</span>
@@ -497,7 +497,7 @@ p<span class="token punctuation">.</span>sendafter<span class="token punctuation
 p<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="/img/image-20210715120438512.png" alt="image-20210715120438512"></p>
+<p><img src="/img/image-20210715120438512.png"></p>
 
                 
             </div>

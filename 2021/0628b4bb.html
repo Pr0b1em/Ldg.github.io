@@ -441,11 +441,11 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h1 id="jarvisoj-level3"><a href="#jarvisoj-level3" class="headerlink" title="jarvisoj_level3"></a>jarvisoj_level3</h1><p>检查保护机制，32位，开NX</p>
-<p><img src="/img/image-20210628222619420.png" alt="image-20210628222619420"></p>
+<p><img src="/img/image-20210628222619420.png"></p>
 <p>IDA打开，shift+F12没有找到system和’/bin/sh’，所以应该也是libc泄露</p>
 <p>查看main函数，又看到了熟悉的vulnerable_function()函数</p>
-<p><img src="/img/image-20210628222739706.png" alt="image-20210628222739706"></p>
-<p><img src="/img/image-20210628222833493.png" alt="image-20210628222833493"></p>
+<p><img src="/img/image-20210628222739706.png"></p>
+<p><img src="/img/image-20210628222833493.png"></p>
 <p>果然漏洞就在这个函数里</p>
 <p>写入长度只有7，而读的长度有0x100，漏洞很大</p>
 <p>解题思路和前几个题都类似了</p>
@@ -501,7 +501,7 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>cat flag</p>
-<p><img src="/img/image-20210706133135129.png" alt="image-20210706133135129"></p>
+<p><img src="/img/image-20210706133135129.png"></p>
 
                 
             </div>

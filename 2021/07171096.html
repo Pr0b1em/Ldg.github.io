@@ -441,17 +441,17 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h1 id="picoctf-2018-rop-chain"><a href="#picoctf-2018-rop-chain" class="headerlink" title="picoctf_2018_rop chain"></a>picoctf_2018_rop chain</h1><p>检查保护机制，32位，开NX</p>
-<p><img src="/img/image-20210717100253970.png" alt="image-20210717100253970"></p>
+<p><img src="/img/image-20210717100253970.png"></p>
 <p>IDA打开</p>
 <p>main函数，里面发现vuln函数</p>
-<p><img src="/img/image-20210717100706788.png" alt="image-20210717100706788"></p>
-<p><img src="/img/image-20210717100744059.png" alt="image-20210717100744059"></p>
+<p><img src="/img/image-20210717100706788.png"></p>
+<p><img src="/img/image-20210717100744059.png"></p>
 <h4 id="漏洞点：没有限制输入字符串长度"><a href="#漏洞点：没有限制输入字符串长度" class="headerlink" title="漏洞点：没有限制输入字符串长度"></a>漏洞点：没有限制输入字符串长度</h4><p>然后发现了一个flag函数，仔细查看后发现这是一个后门函数</p>
-<p><img src="/img/image-20210717101317225.png" alt="image-20210717101317225"></p>
+<p><img src="/img/image-20210717101317225.png"></p>
 <p>win_function1函数</p>
-<p><img src="/img/image-20210717101703475.png" alt="image-20210717101703475"></p>
+<p><img src="/img/image-20210717101703475.png"></p>
 <p>win_function2函数</p>
-<p><img src="/img/image-20210717101752632.png" alt="image-20210717101752632"></p>
+<p><img src="/img/image-20210717101752632.png"></p>
 <h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><pre class="line-numbers language-none"><code class="language-none">需要注意点就是，有个判断 条件if ( win1 &amp;&amp; win2 &amp;&amp; a1 == -559039827 )，需要控制win1、win2、a1
 win1、win2可以通过调用对应的函数进行赋值，而a1是作为flag函数的参数，在栈上构造好数据即可<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
@@ -478,7 +478,7 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
 <h4 id="注："><a href="#注：" class="headerlink" title="注："></a>注：</h4><pre class="line-numbers language-none"><code class="language-none">0xBAAAAAAD是-1163220307对应的16进制的补码作为win_function2函数的参数
 0xDEADBAAD是-559039827对应的16进制的补码作为flag函数的参数<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<p><img src="/img/image-20210717103414365.png" alt="image-20210717103414365"></p>
+<p><img src="/img/image-20210717103414365.png"></p>
 
                 
             </div>

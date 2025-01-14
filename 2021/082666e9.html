@@ -449,16 +449,16 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h1 id="xjusec考核赛wp"><a href="#xjusec考核赛wp" class="headerlink" title="xjusec考核赛wp"></a>xjusec考核赛wp</h1><h2 id="REVERSE："><a href="#REVERSE：" class="headerlink" title="REVERSE："></a>REVERSE：</h2><h3 id="justbase64"><a href="#justbase64" class="headerlink" title="justbase64"></a>justbase64</h3><p>这个题是以前看见过的一个类似的题，ida打开</p>
-<p><img src="/img/image-20210825211051630.png" alt="image-20210825211051630"></p>
+<p><img src="/img/image-20210825211051630.png"></p>
 <p>这边目录看见encode_one,encode_two,encode_three三个编码，右边主函数里就是三次编码后形成的”EmBmP5Pmn7QcPU4gLYKv5QcMmB3PWHcP5YkPq3=cT6QckkPckoRG”，题目也有提示base64，但肯定不只有base64</p>
 <p>挨个看，在encode_one里面发现一个变量alphabet，肯定了base64的存在</p>
-<p><img src="/img/image-20210825211343129.png" alt="image-20210825211343129"></p>
+<p><img src="/img/image-20210825211343129.png"></p>
 <p>encode_two里面关系一张图解释</p>
-<p><img src="/img/image-20210825211513679.png" alt="image-20210825211513679"></p>
+<p><img src="/img/image-20210825211513679.png"></p>
 <p><img src="/img/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20210825211744.jpg"></p>
 <p>就是这样的一个对应关系</p>
 <p>encode_three就是有个移位的问题</p>
-<p><img src="/img/image-20210825211933760.png" alt="image-20210825211933760"></p>
+<p><img src="/img/image-20210825211933760.png"></p>
 <p><img src="/img/20200911131956308.png"></p>
 <p>要还原就从three开始倒过来还原</p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">def</span> <span class="token function">m</span><span class="token punctuation">(</span>v5<span class="token punctuation">)</span><span class="token punctuation">:</span>
@@ -491,7 +491,7 @@ fin2 <span class="token operator">=</span> <span class="token string">""</span>
 
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p><img src="/img/image-20210825212900481.png" alt="image-20210825212900481"></p>
+<p><img src="/img/image-20210825212900481.png"></p>
 <p>再还原two，最后base64解码得到flag</p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> base64
 data <span class="token operator">=</span> <span class="token string">"BjYjM2Mjk4NzMR1dIVHs2NzJjY0MTEzM2VhMn0=zQ3NzhhMzhlOD"</span>
@@ -508,13 +508,13 @@ raw<span class="token punctuation">[</span><span class="token number">39</span><
 
 
 <h2 id="pwn："><a href="#pwn：" class="headerlink" title="pwn："></a>pwn：</h2><h3 id="ez-pwn（partial-overwrite-部分覆盖）"><a href="#ez-pwn（partial-overwrite-部分覆盖）" class="headerlink" title="ez_pwn（partial overwrite 部分覆盖）"></a>ez_pwn（partial overwrite 部分覆盖）</h3><p>这个题我觉得一点也不简单，在拿到hint之后才借助互联网的力量把他弄出来，过程艰辛</p>
-<p><img src="/img/image-20210825212508971.png" alt="image-20210825212508971"></p>
-<p><img src="/img/image-20210825214242973.png" alt="image-20210825214242973"></p>
+<p><img src="/img/image-20210825212508971.png"></p>
+<p><img src="/img/image-20210825214242973.png"></p>
 <p>一种比较新鲜的栈溢出，叫 <strong>花式栈溢出</strong> </p>
 <p>partial overwrite：在开启了PIE后，无论高位地址如何变化，低位地址是不变的，意味着有概率“撞到”正确的地址</p>
-<p><img src="/img/image-20210825213240232.png" alt="image-20210825213240232"></p>
+<p><img src="/img/image-20210825213240232.png"></p>
 <p>主要的问题就是开启了canary，而栈溢出在第二次read函数里，有canary保护 ，read读满不会追加\0 。可以计算出第一次 read 需要的长度为 0x30 - 0x8 + 1 (+ 1 是为了覆盖 canary 的最低位为非 0 的值, printf 使用 %s 时, 遇到 \0 结束, 覆盖 canary 低位为非 0 值时, canary 就可以被 printf 打印出来了)</p>
-<p><img src="/img/image-20210825213949666.png" alt="image-20210825213949666"></p>
+<p><img src="/img/image-20210825213949666.png"></p>
 <p>同时也发现了夺权函数，那么第二次栈溢出只要返回到夺权函数地址就行了</p>
 <p>最后脚本多次的尝试才拿到了flag，因为返回地址与 get shell 函数的地址只有低位的 16 bit 不同, 如果覆写低 16 bit 为<code>0x0A3E</code>, 就有一定的几率 get shell</p>
 <h5 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h5><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -536,10 +536,10 @@ raw<span class="token punctuation">[</span><span class="token number">39</span><
 
 
 
-<h3 id="mid-pwn"><a href="#mid-pwn" class="headerlink" title="mid_pwn"></a>mid_pwn</h3><p><img src="/img/image-20210825214846902.png" alt="image-20210825214846902"></p>
+<h3 id="mid-pwn"><a href="#mid-pwn" class="headerlink" title="mid_pwn"></a>mid_pwn</h3><p><img src="/img/image-20210825214846902.png"></p>
 <p>ida打开后，看见menu函数，五个功能</p>
 <p>Create_Heap函数</p>
-<p><img src="/img/image-20210825215031703.png" alt="image-20210825215031703"></p>
+<p><img src="/img/image-20210825215031703.png"></p>
 <p>读完后发现有两次malloc，就意味着申请了两次，第一个chunk可以看作是记录的作用，里面存放着第二个chunk的size和指针，同时，第一个chunk的地址指针保存在bss段中heaparray数组这里，两个大小都是0x20的chunk，举个例子方便理解</p>
 <pre class="line-numbers language-none"><code class="language-none">0x603000: 0x0000000000000000 0x0000000000000021
 0x603010: 0x0000000000000010 0x0000000000603030 (chunk0的大小和指针）
@@ -554,12 +554,12 @@ raw<span class="token punctuation">[</span><span class="token number">39</span><
 0x6030a0: 0x0000000000000000 0x0000000000000000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>然后是edit_heap函数</p>
-<p><img src="/img/image-20210825215827003.png" alt="image-20210825215827003"></p>
+<p><img src="/img/image-20210825215827003.png"></p>
 <p>在这里发现了off-by-one漏洞</p>
 <p>show_heap函数：</p>
-<p><img src="/img/image-20210825215943902.png" alt="image-20210825215943902"></p>
+<p><img src="/img/image-20210825215943902.png"></p>
 <p>最后的delete_heap函数读出最后会把之前申请到的两个chunk都free掉</p>
-<p><img src="/img/image-20210825220059801.png" alt="image-20210825220059801"></p>
+<p><img src="/img/image-20210825220059801.png"></p>
 <h4 id="利用思路："><a href="#利用思路：" class="headerlink" title="利用思路："></a>利用思路：</h4><p><strong>1.利用 off by one 漏洞覆盖下一个 chunk 的 size 字段，从而构造伪造的 chunk 大小。<br> 2.申请伪造的 chunk 大小，从而产生 chunk overlap，进而修改关键指针。</strong></p>
 <h4 id="exp-1"><a href="#exp-1" class="headerlink" title="exp"></a>exp</h4><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
 <span class="token keyword">from</span> LibcSearcher <span class="token keyword">import</span> <span class="token operator">*</span>
@@ -622,14 +622,14 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 <p><img src="/img/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20210825221547.png"></p>
 <p><img src="/img/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20210825221552.png"></p>
 <h3 id="仅仅是流量分析？"><a href="#仅仅是流量分析？" class="headerlink" title="仅仅是流量分析？"></a>仅仅是流量分析？</h3><p>根据hint</p>
-<p><img src="/img/image-20210825221847222.png" alt="image-20210825221847222"></p>
+<p><img src="/img/image-20210825221847222.png"></p>
 <p>ftm文件，rar损坏</p>
 <p>ftm文件解压点开后还有个key.pcap文件</p>
 <p>wireshark打开发现数据包，脚本得到数据包内容</p>
 <p>然后010打开rar文件，发现文件块位置错误，修改后正常解压</p>
 <p>打开发现233.png</p>
 <p>stegsolve打开233.png，逐层找，找到一个二维码，扫码后拿到flag原样，结合xinan发现是维吉尼亚密码，再解密后又是栅栏密码，最后拿到flag</p>
-<p><img src="/img/image-20210825222821574.png" alt="image-20210825222821574"></p>
+<p><img src="/img/image-20210825222821574.png"></p>
 <h3 id="可爱猫猫"><a href="#可爱猫猫" class="headerlink" title="可爱猫猫"></a>可爱猫猫</h3><p>两张表面上一样的图片</p>
 <p>盲水印的问题，用github上的脚本</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/chishaxie/BlindWaterMark">https://github.com/chishaxie/BlindWaterMark</a></p>
