@@ -132,7 +132,13 @@ p<span class="token punctuation">.</span>interactive<span class="token punctuati
 <p>注：linux环境下由于默认的远程软件库是国外的源，下载速度可能会比较慢，可以在清华镜像源里去下载需要的Linux版本</p>
 <p>同时，你需要安装pwntools这个python库，它是你在面对pwn题时最有力的工具，用它来get一个个 shell吧（安装方法详情请见百度） 在windows下你则需要<strong>IDA</strong>这个静态分析工具，建议在做题之前先在网上好好了解一下IDA的使用，会极大方便接下来的做题</p>
 <h3 id="2-举个栗子"><a href="#2-举个栗子" class="headerlink" title="2.举个栗子"></a>2.举个栗子</h3><p>拿到一个pwn题，第一时间便是<strong>检查保护机制</strong></p>
-<pre class="line-numbers language-none"><code class="language-none">1|ret2text checksec ret2text2|Arch: i386-32-little3|RELRO: Partial RELRO4|Stack: No canary found5|NX: NX enabled6|PIE: No PIE (0x8048000)<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-none"><code class="language-none">ret2text
+checksec ret2text
+Arch: i386-32-little
+RELRO: Partial RELRO
+Stack: No canary found
+NX: NX enabled
+PIE: No PIE (0x8048000)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <ul>
 <li><strong>arch</strong>即程序所采用的架构，由上可知这是一个x86架构下的32位程序 </li>
