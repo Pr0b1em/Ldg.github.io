@@ -412,7 +412,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.3k
+                    1.4k
                 </div>
                 
 
@@ -505,8 +505,9 @@ sudo apt install qemu-system<span aria-hidden="true" class="line-numbers-rows"><
 <p><img src="/img/image-20250116130659977.png"></p>
 <p><img src="/img/image-20250116130735837.png"></p>
 <p>简单给大家解释一下这两个漏洞的原理：</p>
-<p><em><strong>strcpy</strong></em>函数是stringcopy的缩写，顾名思义就是字符串复制，这个函数本身存在的漏洞就是，在进行内容复制，将一个变量里的字符串复制到另一个变量时，不会检查空间大小，这就会导致缓冲区溢出。</p>
+<p><em><strong>strcpy</strong></em>函数是stringcopy的缩写，顾名思义就是字符串复制，这个函数本身存在的漏洞就是，在进行内容复制，将一个变量里的字符串复制到另一个变量时，不会检查空间大小，当从一个大的变量复制所有内容到小变量时，小变量无法承载所有内容，发生溢出，就会到达缓冲区，这就是所谓的缓冲区溢出，缓冲区是计算机内存中的一块区域，用于临时存储数据，这也是计算机特性，无法避免。</p>
 <p>(换个大家都能听懂的说法就是，一瓶1L的水装满了，现在要机器人执行命令把他完全倒入另一个只有500mL容量的瓶里，因为机器人不会判断，只会接受指令，就好比这里的<em><strong>strcpy</strong></em>函数，指令执行了，500mL装满，剩下的溢出)当然这个形容也不是完全恰当，只是关键点就那个意思。</p>
+<p><img src="/img/image-20250116143956170.png"></p>
 <p>那么了解了这个地方的漏洞点，我们就写POC来尝试验证漏洞是否存在。</p>
 <p>继续跟进看见这个函数的利用函数是openSchedwifi函数，一级目录名是goform。</p>
 <p><img src="/img/image-20250116133743362.png"></p>
@@ -977,7 +978,7 @@ requests<span class="token punctuation">.</span>post<span class="token punctuati
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">42.9k</span>
+                        class="white-color">43k</span>
             
             
             
