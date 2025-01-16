@@ -462,7 +462,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="一炮双响-记第一次实战漏洞挖掘-路由器版"><a href="#一炮双响-记第一次实战漏洞挖掘-路由器版" class="headerlink" title="[一炮双响]记第一次实战漏洞挖掘(路由器版)"></a>[一炮双响]记第一次实战漏洞挖掘(路由器版)</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>**<code>路由器</code>**的洞大部分都是栈溢出，如果想要了解一些相关的知识，可以去看我的pwn和二进制安全虚拟机Protostar靶场系列文章，<a target="_blank" rel="noopener" href="http://pr0b1em.top/2024/111155bf.html">传送门</a></p>
+                <h1 id="一炮双响-记第一次实战漏洞挖掘-路由器版"><a href="#一炮双响-记第一次实战漏洞挖掘-路由器版" class="headerlink" title="[一炮双响]记第一次实战漏洞挖掘(路由器版)"></a>[一炮双响]记第一次实战漏洞挖掘(路由器版)</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><strong>路由器</strong>的洞大部分都是栈溢出，如果想要了解一些相关的知识，可以去看我的pwn和二进制安全虚拟机Protostar靶场系列文章，<a target="_blank" rel="noopener" href="http://pr0b1em.top/2024/111155bf.html">传送门</a></p>
 <h3 id="什么是缓冲区溢出"><a href="#什么是缓冲区溢出" class="headerlink" title="什么是缓冲区溢出"></a>什么是缓冲区溢出</h3><p>在程序运行时，系统会为程序在内存里生成一个固定空间，如果超过了这个空间，就会造成缓冲区溢出，可以导致<strong>程序运行失败</strong>、<strong>系统宕机</strong>、<strong>重新启动</strong>等后果。更为严重的是，甚至可以<strong>取得系统特权</strong>，进而进行各种非法操作。</p>
 <h2 id="工具使用"><a href="#工具使用" class="headerlink" title="工具使用"></a>工具使用</h2><h3 id="kali"><a href="#kali" class="headerlink" title="kali"></a>kali</h3><p>第一步从路由器官网提取更新固件，放进kali中，用binwalk工具对固件内容进行提取，一般都是.bin文件，大部分的老版本固件都可以提取，<del>新版本涉及到更高的加密，好像是不能完全提取，也可能是我binwalk版本不够</del></p>
 <p><strong>提取命令</strong></p>
@@ -505,8 +505,8 @@ sudo apt install qemu-system<span aria-hidden="true" class="line-numbers-rows"><
 <p><img src="/img/image-20250116130659977.png"></p>
 <p><img src="/img/image-20250116130735837.png"></p>
 <p>简单给大家解释一下这两个漏洞的原理：</p>
-<p>**<code>strcpy</code>**函数是stringcopy的缩写，顾名思义就是字符串复制，这个函数本身存在的漏洞就是，在进行内容复制，将一个变量里的字符串复制到另一个变量时，不会检查空间大小，这就会导致缓冲区溢出。</p>
-<p>(换个大家都能听懂的说法就是，一瓶1L的水装满了，现在要机器人执行命令把他完全倒入另一个只有500mL容量的瓶了，因为机器人不会判断，只会接受指令，就好比这里的**<code>strcpy</code>**函数，指令执行了，500mL装满，剩下的溢出)当然这个形容也不是完全恰当，只是关键点就那个意思。</p>
+<p><em><strong>strcpy</strong></em>函数是stringcopy的缩写，顾名思义就是字符串复制，这个函数本身存在的漏洞就是，在进行内容复制，将一个变量里的字符串复制到另一个变量时，不会检查空间大小，这就会导致缓冲区溢出。</p>
+<p>(换个大家都能听懂的说法就是，一瓶1L的水装满了，现在要机器人执行命令把他完全倒入另一个只有500mL容量的瓶了，因为机器人不会判断，只会接受指令，就好比这里的<em><strong>strcpy</strong></em>函数，指令执行了，500mL装满，剩下的溢出)当然这个形容也不是完全恰当，只是关键点就那个意思。</p>
 <p>那么了解了这个地方的漏洞点，我们就写POC来尝试验证漏洞是否存在</p>
 <p>继续跟进看见这个函数的利用函数是openSchedwifi函数，一级目录名是goform</p>
 <p><img src="/img/image-20250116133743362.png"></p>
@@ -519,7 +519,7 @@ data <span class="token operator">=</span> <span class="token punctuation">{</sp
 <span class="token punctuation">}</span>
 requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">=</span>url<span class="token punctuation">,</span>data<span class="token operator">=</span>data<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>执行POC脚本后，出现**<code>Segmentation fault</code>**，段错误退出当前程序，说明漏洞利用成功，因为传入了大量数据导致缓冲区溢出，程序返回异常退出！</p>
+<p>执行POC脚本后，出现<em><strong>Segmentation fault</strong></em>，段错误退出当前程序，说明漏洞利用成功，因为传入了大量数据导致缓冲区溢出，程序返回异常退出！</p>
 <p><img src="/img/image-20250116133454406.png"></p>
 <p>那么这一次漏洞挖掘到这里就算完了，接下来就是提交CVE官网，等候回复，果然功夫不负有心人，成功收到两个CVE编号</p>
 <p><img src="/img/58a201102297b78ce047717a550cf6f.png"></p>
