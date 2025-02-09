@@ -4516,9 +4516,9 @@ requests<span class="token punctuation">.</span>post<span class="token punctuati
       </tags>
   </entry>
   <entry>
-    <title>x86、x64 和 MIPS 是三种不同的指令集架构（ISA）的区别</title>
+    <title>x86、x64 和 MIPS 三种不同的指令集架构（ISA）的区别</title>
     <url>/2025/0209d0a6.html</url>
-    <content><![CDATA[<h1 id="x86、x64-和-MIPS-是三种不同的指令集架构（ISA）的区别"><a href="#x86、x64-和-MIPS-是三种不同的指令集架构（ISA）的区别" class="headerlink" title="x86、x64 和 MIPS 是三种不同的指令集架构（ISA）的区别"></a>x86、x64 和 MIPS 是三种不同的指令集架构（ISA）的区别</h1><p>x86、x64 和 MIPS 是三种不同的指令集架构（ISA），它们在设计目标、寄存器、指令集、内存模型等方面有显著区别。以下是它们的具体差异：</p>
+    <content><![CDATA[<h1 id="x86、x64-和-MIPS-三种不同的指令集架构（ISA）的区别"><a href="#x86、x64-和-MIPS-三种不同的指令集架构（ISA）的区别" class="headerlink" title="x86、x64 和 MIPS 三种不同的指令集架构（ISA）的区别"></a>x86、x64 和 MIPS 三种不同的指令集架构（ISA）的区别</h1><p>x86、x64 和 MIPS 是三种不同的指令集架构（ISA），它们在设计目标、寄存器、指令集、内存模型等方面有显著区别。以下是它们的具体差异：</p>
 <h2 id="设计目标和背景"><a href="#设计目标和背景" class="headerlink" title="设计目标和背景"></a><strong>设计目标和背景</strong></h2><ul>
 <li><p><strong>x86</strong>：</p>
 <ul>
