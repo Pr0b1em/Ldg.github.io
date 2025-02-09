@@ -5,8 +5,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="baidu-site-verification" content="codeva-1wZQQJBzcr" />
-    <meta name="keywords" content="大一生活结束了, Linux，二进制，IoT，CTF">
-    <meta name="description" content="回忆与展望">
+    <meta name="keywords" content="x86、x64 和 MIPS 是三种不同的指令集架构（ISA）的区别, Linux，二进制，IoT，CTF">
+    <meta name="description" content="三种不同指令集架构区别">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -18,7 +18,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>大一生活结束了 | 8023</title>
+    <title>x86、x64 和 MIPS 是三种不同的指令集架构（ISA）的区别 | 8023</title>
     <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
     
     <style>
@@ -324,7 +324,7 @@
 <script src="/libs/cryptojs/crypto-js.min.js"></script>
 <script>
     (function() {
-        let pwd = '66c3230e5b7d13febf253c3e6560d82d367bace8c8b69d5a62ee8935aeb138e8';
+        let pwd = '';
         if (pwd && pwd.length > 0) {
             if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
                 alert('密码错误，将返回主页！');
@@ -337,12 +337,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/24.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/6.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">大一生活结束了</h1>
+                    <h1 class="description center-align post-title">x86、x64 和 MIPS 是三种不同的指令集架构（ISA）的区别</h1>
                 </div>
             </div>
         </div>
@@ -366,12 +366,16 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/%E7%94%9F%E6%B4%BB/">
-                                <span class="chip bg-color">生活</span>
+                            <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                                <span class="chip bg-color">笔记</span>
                             </a>
                         
-                            <a href="/tags/2021/">
-                                <span class="chip bg-color">2021</span>
+                            <a href="/tags/2025/">
+                                <span class="chip bg-color">2025</span>
+                            </a>
+                        
+                            <a href="/tags/%E6%B1%87%E7%BC%96/">
+                                <span class="chip bg-color">汇编</span>
                             </a>
                         
                     </div>
@@ -382,8 +386,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/%E6%97%A5%E5%B8%B8%E9%97%B2%E8%AF%9D/" class="post-category">
-                                日常闲话
+                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category">
+                                笔记
                             </a>
                         
                     </div>
@@ -395,7 +399,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2021-09-28
+                    2025-02-09
                 </div>
                 
 
@@ -411,7 +415,7 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    3 分
+                    4 分
                 </div>
                 
 
@@ -454,20 +458,213 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="大一总结："><a href="#大一总结：" class="headerlink" title="大一总结："></a>大一总结：</h2><p>   2020年9月21日，是我第一天到新疆大学报道的日子，怀着憧憬和忐忑的心，我正式成为了一名网安的学生。其实刚到大学，脑子里只有一股念想： 怎么在大学四年里过得充实。<br>   要我说，真正让我开始感到大学意义的便是ctf。刚开学，社团招新，本着我对计算机方面的强烈兴趣，我不假思索的选择了新疆大学网络安全兴趣协会，从那时起，我才开始逐渐了解有一项比赛叫ctf，里面很多方向，涉及很多的计算机知识、专业领域。就觉得缘分挺奇妙的，我一看见这个东西，就爱上它了。往往是因为热爱，才让很多人能够变得优秀。从“1024”的招新赛之后，我便一发不可收拾，开始越来越想了解ctf比赛，终于大一上寒假，一个很好的培训机会，我正式开始了我的ctf之路，学习汇编、pthon，开始入门pwn方向，众所周知，pwn方向是选择较少但又很大头的一个方向，不单单是因为入门门槛高，更是因为它乏味。多少次刷题刷到不想刷的时候，都是依靠着我的兴趣在不断坚持。暑假是一个非常好的时期，三个月的长假，足够一个菜鸟变成大菜鸟(bushi)。终于在暑假考核赛中，我展露了锋芒。不过这也只是刚刚开始，pwn需要沉淀，我也是。</p>
+                <h1 id="x86、x64-和-MIPS-是三种不同的指令集架构（ISA）的区别"><a href="#x86、x64-和-MIPS-是三种不同的指令集架构（ISA）的区别" class="headerlink" title="x86、x64 和 MIPS 是三种不同的指令集架构（ISA）的区别"></a>x86、x64 和 MIPS 是三种不同的指令集架构（ISA）的区别</h1><p>x86、x64 和 MIPS 是三种不同的指令集架构（ISA），它们在设计目标、寄存器、指令集、内存模型等方面有显著区别。以下是它们的具体差异：</p>
+<h2 id="设计目标和背景"><a href="#设计目标和背景" class="headerlink" title="设计目标和背景"></a><strong>设计目标和背景</strong></h2><ul>
+<li><p><strong>x86</strong>：</p>
+<ul>
+<li>最初由 Intel 设计，用于早期的 16 位处理器（如 8086）。</li>
+<li>后来扩展到 32 位（IA-32），广泛应用于个人电脑和服务器。</li>
+<li>采用复杂指令集计算机（CISC）设计，指令长度可变，支持复杂的内存寻址模式。</li>
+</ul>
+</li>
+<li><p><strong>x64（x86-64）</strong>：</p>
+<ul>
+<li>是 x86 的 64 位扩展，由 AMD 设计，后由 Intel 采纳。</li>
+<li>兼容 32 位 x86 指令集，同时引入了 64 位寄存器和地址空间。</li>
+<li>仍然是 CISC 架构，但优化了性能和内存寻址能力。</li>
+</ul>
+</li>
+<li><p><strong>MIPS</strong>：</p>
+<ul>
+<li>由 MIPS Technologies 设计，是一种精简指令集计算机（RISC）架构。</li>
+<li>强调简单、高效的指令集，固定长度的指令格式。</li>
+<li>广泛应用于嵌入式系统、路由器和早期的工作站。</li>
+</ul>
+</li>
+</ul>
 <hr>
-<p>   生活总是百般刁难，虽然我对ctf拥有足够多的热爱，但是仍然避免不了我的平庸。大一的课程，确实让我不知所措，上册初来乍到，没有追求过绩点高低，等到下册想来时，却遇上了大劫难。为了新校区的搬迁，我们的课程排满了，每天都是高强度的上课上课，自己所有的节奏都被打乱，强压之下喘不过气，最后落下了一个非常不好的结局。不是很想再提，不管是老师的教学问题还是我本人的问题，反正结局已定，也无可厚非了。只是从大二开始，一定不能再浑浑噩噩过日子了，这一学年遇到的人和事也都当历练了，人哪有不走弯路的，任何人的一生也不可能是一帆风顺的，只要认识问题及时改正，我就还有机会做个好人，哈哈哈哈。</p>
+<h2 id="寄存器"><a href="#寄存器" class="headerlink" title="寄存器"></a><strong>寄存器</strong></h2><ul>
+<li><p><strong>x86</strong>：</p>
+<ul>
+<li>8 个通用寄存器：<code>EAX</code>, <code>EBX</code>, <code>ECX</code>, <code>EDX</code>, <code>ESI</code>, <code>EDI</code>, <code>EBP</code>, <code>ESP</code>。</li>
+<li>32 位寄存器（例如 <code>EAX</code> 是 32 位）。</li>
+<li>分段内存模型（使用段寄存器和偏移量）。</li>
+</ul>
+</li>
+<li><p><strong>x64</strong>：</p>
+<ul>
+<li>16 个通用寄存器：<code>RAX</code>, <code>RBX</code>, <code>RCX</code>, <code>RDX</code>, <code>RSI</code>, <code>RDI</code>, <code>RBP</code>, <code>RSP</code>, <code>R8</code>-<code>R15</code>。</li>
+<li>64 位寄存器（例如 <code>RAX</code> 是 64 位），同时支持 32 位、16 位和 8 位子寄存器（如 <code>EAX</code>, <code>AX</code>, <code>AL</code>）。</li>
+<li>平坦内存模型（64 位线性地址空间）。</li>
+</ul>
+</li>
+<li><p><strong>MIPS</strong>：</p>
+<ul>
+<li>32 个通用寄存器：<code>$0</code>-<code>$31</code>，其中 <code>$0</code> 是硬编码的零寄存器（始终为 0）。</li>
+<li>32 位寄存器（例如 <code>$t0</code>, <code>$t1</code> 等）。</li>
+<li>专用寄存器：<code>$pc</code>（程序计数器），<code>$hi</code> 和 <code>$lo</code>（用于乘除法结果）。</li>
+</ul>
+</li>
+</ul>
 <hr>
-<p>   很荣幸能在第一批新生中就加入XJUSEC。可以说我一直是一个人，在我们班上，我是唯一一个打ctf的，在ctf中，我是唯一一个学pwn的新生，种种孤独都向我而来，我接受孤独，享受孤独。都说站在顶峰的人才会享受孤独，但我这也不算吧哈哈哈哈。战队是一个大家庭，学长们人都很好，好说话，好相处，我觉得我没来错地方，挺好的。我们萌新们也都算是志同道合了，不然不会这么聊得来。一转眼就大二了，时间不等人，开学就要迎接新生，招他们入会了，芜湖！</p>
+<h2 id="指令集"><a href="#指令集" class="headerlink" title="指令集"></a><strong>指令集</strong></h2><ul>
+<li><p><strong>x86</strong>：</p>
+<ul>
+<li>复杂指令集（CISC），指令长度可变（1 到 15 字节）。</li>
+<li>支持多种寻址模式（寄存器、直接、间接、基址加偏移等）。</li>
+<li>指令功能强大，但解码和执行较复杂。</li>
+</ul>
+</li>
+<li><p><strong>x64</strong>：</p>
+<ul>
+<li>与 x86 类似，但扩展了 64 位指令和寄存器。</li>
+<li>新增了一些指令以支持 64 位操作（如 <code>MOVSXD</code> 符号扩展指令）。</li>
+</ul>
+</li>
+<li><p><strong>MIPS</strong>：</p>
+<ul>
+<li>精简指令集（RISC），指令长度固定（32 位）。</li>
+<li>指令集简单，通常每条指令只完成一个基本操作。</li>
+<li>采用加载-存储架构（只有加载和存储指令可以访问内存）。</li>
+</ul>
+</li>
+</ul>
 <hr>
-<h2 id="大二展望："><a href="#大二展望：" class="headerlink" title="大二展望："></a>大二展望：</h2><p>   真是，大二了，很幸运12.18我能参加四级考试，争取一次过四级，后面才好过六级，早早为考研做准备吧！</p>
-<p>   大二了，过了一年大学生活，我也算是活明白了，现在起，拒绝懒惰，拒绝无用功，好好学习，扎实基础，保研肯定是不用想的，但是考研肯定是要做的。这不国庆快到了，安排了一些计划：</p>
-<pre><code>1.复习大一学的不牢靠的课程知识（必须）
-2.继续buu刷题，看书学pwn（看时间够不）
-3.把没了的暑假作业了了（一定）
-</code></pre>
-<p>   我要再不努力，耶稣也救不了我了！！！<br>   等开学后，准备找学长和咱宿舍的兄弟们做个大创项目啥的，先把创新学分拿下吧，那200个学时咱再慢慢争。然后就是，打比赛！打比赛！打比赛！拿奖！拿奖！拿奖！</p>
-<p>   希望我的大二学年能够照着计划稳稳走完。大一就当混了，大二绝不做混子！我要洗心革面，做个好人!</p>
+<h2 id="内存模型"><a href="#内存模型" class="headerlink" title="内存模型"></a><strong>内存模型</strong></h2><ul>
+<li><p><strong>x86</strong>：</p>
+<ul>
+<li>分段内存模型（16 位模式下使用段寄存器和偏移量）。</li>
+<li>32 位模式下支持平坦内存模型（4GB 地址空间）。</li>
+</ul>
+</li>
+<li><p><strong>x64</strong>：</p>
+<ul>
+<li>平坦内存模型，支持 64 位地址空间（理论上 2^64 字节，实际实现通常为 48 位或 52 位）。</li>
+<li>不再使用分段内存模型。</li>
+</ul>
+</li>
+<li><p><strong>MIPS</strong>：</p>
+<ul>
+<li>平坦内存模型，32 位地址空间（4GB）。</li>
+<li>采用加载-存储架构，所有算术和逻辑操作都在寄存器中完成。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="调用约定"><a href="#调用约定" class="headerlink" title="调用约定"></a><strong>调用约定</strong></h2><ul>
+<li><p><strong>x86</strong>：</p>
+<ul>
+<li>参数通常通过栈传递。</li>
+<li>调用约定包括 <code>cdecl</code>、<code>stdcall</code>、<code>fastcall</code> 等。</li>
+</ul>
+</li>
+<li><p><strong>x64</strong>：</p>
+<ul>
+<li>前 6 个整数或指针参数通过寄存器传递（<code>RCX</code>, <code>RDX</code>, <code>R8</code>, <code>R9</code>, <code>XMM0</code>-<code>XMM3</code> 用于浮点数）。</li>
+<li>剩余参数通过栈传递。</li>
+</ul>
+</li>
+<li><p><strong>MIPS</strong>：</p>
+<ul>
+<li>前 4 个参数通过寄存器传递（<code>$a0</code>-<code>$a3</code>）。</li>
+<li>剩余参数通过栈传递。</li>
+<li>返回值通常存放在 <code>$v0</code> 和 <code>$v1</code> 寄存器中。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="性能和用途"><a href="#性能和用途" class="headerlink" title="性能和用途"></a><strong>性能和用途</strong></h2><ul>
+<li><p><strong>x86/x64</strong>：</p>
+<ul>
+<li>高性能，广泛用于桌面、服务器和笔记本电脑。</li>
+<li>兼容性强，支持复杂的操作系统和应用程序。</li>
+</ul>
+</li>
+<li><p><strong>MIPS</strong>：</p>
+<ul>
+<li>低功耗，适合嵌入式系统和专用设备（如路由器、游戏机）。</li>
+<li>指令集简单，易于实现流水线和优化。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="示例代码对比"><a href="#示例代码对比" class="headerlink" title="示例代码对比"></a><strong>示例代码对比</strong></h2><h3 id="x86（32-位）"><a href="#x86（32-位）" class="headerlink" title="x86（32 位）"></a><strong>x86（32 位）</strong></h3><pre class="line-numbers language-asm" data-language="asm"><code class="language-asm">section .data
+msg db "Hello, World!", 0
+
+section .text
+global _start
+_start:
+    mov eax, 4      ; sys_write
+    mov ebx, 1      ; file descriptor (stdout)
+    mov ecx, msg    ; message to write
+    mov edx, 13     ; message length
+    int 0x80        ; interrupt to invoke syscall<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="x64"><a href="#x64" class="headerlink" title="x64"></a><strong>x64</strong></h3><pre class="line-numbers language-asm" data-language="asm"><code class="language-asm">section .data
+msg db "Hello, World!", 0
+
+section .text
+global _start
+_start:
+    mov rax, 1      ; sys_write
+    mov rdi, 1      ; file descriptor (stdout)
+    mov rsi, msg    ; message to write
+    mov rdx, 13     ; message length
+    syscall         ; invoke syscall<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="MIPS"><a href="#MIPS" class="headerlink" title="MIPS"></a><strong>MIPS</strong></h3><pre class="line-numbers language-asm" data-language="asm"><code class="language-asm">.data
+msg: .asciiz "Hello, World!"
+
+.text
+.globl main
+main:
+    li $v0, 4       ; sys_write
+    la $a0, msg     ; message to write
+    li $a1, 13      ; message length
+    syscall         ; invoke syscall<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a><strong>总结</strong></h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>x86 (32 位)</th>
+<th>x64 (64 位)</th>
+<th>MIPS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>寄存器</strong></td>
+<td>8 个 32 位寄存器</td>
+<td>16 个 64 位寄存器</td>
+<td>32 个 32 位寄存器</td>
+</tr>
+<tr>
+<td><strong>指令集</strong></td>
+<td>CISC</td>
+<td>CISC</td>
+<td>RISC</td>
+</tr>
+<tr>
+<td><strong>内存模型</strong></td>
+<td>分段或平坦</td>
+<td>平坦</td>
+<td>平坦</td>
+</tr>
+<tr>
+<td><strong>调用约定</strong></td>
+<td>栈传递参数</td>
+<td>寄存器 + 栈</td>
+<td>寄存器 + 栈</td>
+</tr>
+<tr>
+<td><strong>用途</strong></td>
+<td>桌面、服务器</td>
+<td>桌面、服务器</td>
+<td>嵌入式系统</td>
+</tr>
+</tbody></table>
+<p>每种架构都有其独特的优势和适用场景，选择哪种架构取决于具体的应用需求。</p>
 
                 
             </div>
@@ -494,7 +691,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://Pr0b1em.github.io/2021/09289e01.html">https://Pr0b1em.github.io/2021/09289e01.html</a>
+                    <a href="https://Pr0b1em.github.io/2025/0209d0a6.html">https://Pr0b1em.github.io/2025/0209d0a6.html</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -532,12 +729,16 @@
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/%E7%94%9F%E6%B4%BB/">
-                                    <span class="chip bg-color">生活</span>
+                                <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                                    <span class="chip bg-color">笔记</span>
                                 </a>
                             
-                                <a href="/tags/2021/">
-                                    <span class="chip bg-color">2021</span>
+                                <a href="/tags/2025/">
+                                    <span class="chip bg-color">2025</span>
+                                </a>
+                            
+                                <a href="/tags/%E6%B1%87%E7%BC%96/">
+                                    <span class="chip bg-color">汇编</span>
                                 </a>
                             
                         </div>
@@ -616,29 +817,88 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2021/1020bb48.html">
+                <a href="/2025/0209d0a6.html">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/28.jpg" class="responsive-img" alt="Pwn入门指南">
+                        <img src="/medias/featureimages/6.jpg" class="responsive-img" alt="x86、x64 和 MIPS 是三种不同的指令集架构（ISA）的区别">
                         
-                        <span class="card-title">Pwn入门指南</span>
+                        <span class="card-title">x86、x64 和 MIPS 是三种不同的指令集架构（ISA）的区别</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            指难
+                            三种不同指令集架构区别
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2021-10-20
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2025-02-09
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category">
+                                    笔记
+                                </a>
+                            
+                            
                         </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E7%AC%94%E8%AE%B0/">
+                        <span class="chip bg-color">笔记</span>
+                    </a>
+                    
+                    <a href="/tags/2025/">
+                        <span class="chip bg-color">2025</span>
+                    </a>
+                    
+                    <a href="/tags/%E6%B1%87%E7%BC%96/">
+                        <span class="chip bg-color">汇编</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2025/01166d4b.html">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/6.jpg" class="responsive-img" alt="第一次实战漏洞挖掘(路由器版)">
+                        
+                        <span class="card-title">第一次实战漏洞挖掘(路由器版)</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            喜提CVE两连号(高危!!)
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2025-01-16
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -654,73 +914,20 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/pwn/">
-                        <span class="chip bg-color">pwn</span>
-                    </a>
-                    
                     <a href="/tags/%E7%AC%94%E8%AE%B0/">
                         <span class="chip bg-color">笔记</span>
                     </a>
                     
-                    <a href="/tags/2021/">
-                        <span class="chip bg-color">2021</span>
+                    <a href="/tags/2025/">
+                        <span class="chip bg-color">2025</span>
                     </a>
                     
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
-            </div>
-            <div class="card">
-                <a href="/2021/082666e9.html">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="xjusec考核赛 writeup">
-                        
-                        <span class="card-title">xjusec考核赛 writeup</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            2021考核赛
-                        
-                    </div>
-                    <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2021-08-26
-                            </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/writeup/" class="post-category">
-                                    writeup
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/pwn/">
-                        <span class="chip bg-color">pwn</span>
+                    <a href="/tags/%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/">
+                        <span class="chip bg-color">漏洞挖掘</span>
                     </a>
                     
-                    <a href="/tags/2021/">
-                        <span class="chip bg-color">2021</span>
-                    </a>
-                    
-                    <a href="/tags/%E5%A4%8D%E7%8E%B0/">
-                        <span class="chip bg-color">复现</span>
+                    <a href="/tags/IoT/">
+                        <span class="chip bg-color">IoT</span>
                     </a>
                     
                 </div>
