@@ -3155,7 +3155,7 @@ iface br0 inet dhcp
 <p><img src="/img/image-20210825211343129.png"></p>
 <p>encode_two里面关系一张图解释</p>
 <p><img src="/img/image-20210825211513679.png"></p>
-<p><img src="/img/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20210825211744.jpg"></p>
+<p><img src="/img/IMG_20210825_211729.jpg"></p>
 <p>就是这样的一个对应关系</p>
 <p>encode_three就是有个移位的问题</p>
 <p><img src="/img/image-20210825211933760.png"></p>
